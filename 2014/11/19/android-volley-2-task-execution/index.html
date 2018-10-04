@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="首先，重温Volley框架图：  我们所有的代码都是围绕这个框架来分析。所以为什么现在来看看CacheDispatcher和NetworkDispatcher？  从上面的框架图可以看出，大部分任务的执行都是通过CacheDispatcher和NetworkDispatcher来分发的。 从RequestQueue的代码入手，启动了RequestQueue之后(调用RequestQueue的sta">
+<meta name="keywords" content="Android,Volley">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Volley源代码分析 – 2：任务的执行，CacheDispatcher、NetworkDispatcher、ResponseDelivery">
+<meta property="og:url" content="http://yoursite.com/2014/11/19/android-volley-2-task-execution/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="首先，重温Volley框架图：  我们所有的代码都是围绕这个框架来分析。所以为什么现在来看看CacheDispatcher和NetworkDispatcher？  从上面的框架图可以看出，大部分任务的执行都是通过CacheDispatcher和NetworkDispatcher来分发的。 从RequestQueue的代码入手，启动了RequestQueue之后(调用RequestQueue的sta">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/volley-arch.png">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/CacheDispatcher.run_.png">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/NetworkDispatcher.run_.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.616Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Volley源代码分析 – 2：任务的执行，CacheDispatcher、NetworkDispatcher、ResponseDelivery">
+<meta name="twitter:description" content="首先，重温Volley框架图：  我们所有的代码都是围绕这个框架来分析。所以为什么现在来看看CacheDispatcher和NetworkDispatcher？  从上面的框架图可以看出，大部分任务的执行都是通过CacheDispatcher和NetworkDispatcher来分发的。 从RequestQueue的代码入手，启动了RequestQueue之后(调用RequestQueue的sta">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/volley-arch.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/19/android-volley-2-task-execution/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Volley源代码分析 – 2：任务的执行，CacheDispatcher、NetworkDispatcher、ResponseDelivery | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/19/android-volley-2-task-execution/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Volley源代码分析 – 2：任务的执行，CacheDispatcher、NetworkDispatcher、ResponseDelivery
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-19 17:05:39" itemprop="dateCreated datePublished" datetime="2014-11-19T17:05:39+08:00">2014-11-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Volley/" itemprop="url" rel="index"><span itemprop="name">Volley</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>首先，重温Volley框架图： <a href="/images/wordpress/2014/11/volley-arch.png"><img src="/images/wordpress/2014/11/volley-arch.png" alt="volley-arch"></a> 我们所有的代码都是围绕这个框架来分析。所以为什么现在来看看CacheDispatcher和NetworkDispatcher？</p>
+<ul>
+<li>从上面的框架图可以看出，大部分任务的执行都是通过CacheDispatcher和NetworkDispatcher来分发的。</li>
+<li>从RequestQueue的代码入手，启动了RequestQueue之后(调用RequestQueue的start()方法)，主要做了两件事情，启动1个CacheDispatcher线程，启动多个NetworkDispatcher线程。</li>
+</ul>
+<p>这里是RequestQueue的start()代码：</p>
+<pre><code>public void start() {
+    stop();  // Make sure any currently running dispatchers are stopped. 确保当前正在运行的调度器已经停止。
+    // Create the cache dispatcher and start it. 创建调度器，并且启动它
+    mCacheDispatcher = new CacheDispatcher(mCacheQueue, mNetworkQueue, mCache, mDelivery);
+    mCacheDispatcher.start();
+
+    // Create network dispatchers (and corresponding threads) up to the pool size.
+    // 创建网络的调度器，最高启动线程池大小个调度器。
+    for (int i = 0; i &lt; mDispatchers.length; i++) {
+        NetworkDispatcher networkDispatcher = new NetworkDispatcher(mNetworkQueue, mNetwork,
+                mCache, mDelivery);
+        mDispatchers\[i\] = networkDispatcher;
+        networkDispatcher.start();
+    }
+}
+</code></pre><p>所以说，从哪个角度讲，都应该分析CacheDispatcher和NetworkDispatcher。</p>
+<h2 id="CacheDispatcher"><a href="#CacheDispatcher" class="headerlink" title="CacheDispatcher"></a>CacheDispatcher</h2><p>刚刚看RequestQueue的start()代码，看到mCacheDispatcher.start()的调用，其实就应该想到，这必然是个线程啊，当然，从一开始框架图更应该看出来。所以初始化之类的我们不需要关心，只要看一下其run()方法里面，都做了一些什么样的工作？</p>
+<pre><code>@Override
+public void run() {
+    if (DEBUG) VolleyLog.v(&quot;start new dispatcher&quot;);
+    //设定优先级会后台优先级。
+    Process.setThreadPriority(Process.THREAD\_PRIORITY\_BACKGROUND);
+
+    // Make a blocking call to initialize the cache.
+    // 阻塞调用，初始化cache
+    mCache.initialize();
+
+    while (true) {
+        try {
+            // Get a request from the cache triage queue, blocking until
+            // at least one is available.
+            // 从cache中获取一个待分类的cache，采用了blocking的队列，会一直阻塞直到有可用的位置。
+            final Request&lt;?&gt; request = mCacheQueue.take();
+            request.addMarker(&quot;cache-queue-take&quot;);
+
+            // If the request has been canceled, don&apos;t bother dispatching it.
+            // 检查请求是否已经被取消，如果是的话，则放弃该请求，重新获取新的进行调度。
+            if (request.isCanceled()) {
+                request.finish(&quot;cache-discard-canceled&quot;);
+                continue;
+            }
+
+            // Attempt to retrieve this item from cache.
+            // 尝试从Cache中获取数据
+            Cache.Entry entry = mCache.get(request.getCacheKey());
+            if (entry == null) {
+                // 从Cache中获取数据失败，意味着cache miss，需要从网络中重新获取
+                request.addMarker(&quot;cache-miss&quot;);
+                // Cache miss; send off to the network dispatcher.
+                // 将请求添加到网络任务队列中。
+                mNetworkQueue.put(request);
+                continue;
+            }
+
+            // If it is completely expired, just send it to the network.
+            // 此处和上面情况类似，但是不是cache缺失，而是cache过期
+            if (entry.isExpired()) {
+                request.addMarker(&quot;cache-hit-expired&quot;);
+                // 更新之前，首先将数据保存一份。
+                request.setCacheEntry(entry);
+                // 将Request添加到网络任务队列当中。
+                mNetworkQueue.put(request);
+                continue;
+            }
+
+            // We have a cache hit; parse its data for delivery back to the request.
+            // 到此处已经检查过Cache是否确实，Cache是否过期，此时说明数据从Cache中取回即可。
+            request.addMarker(&quot;cache-hit&quot;);
+            // 首先将cache中的raw数据进行解析。
+            Response&lt;?&gt; response = request.parseNetworkResponse(
+                    new NetworkResponse(entry.data, entry.responseHeaders));
+            request.addMarker(&quot;cache-hit-parsed&quot;);
+
+            if (!entry.refreshNeeded()) {
+                // Completely unexpired cache hit. Just deliver the response.
+                // 此时数据不需要更新，直接将数据分发出去。
+                mDelivery.postResponse(request, response);
+            } else {
+                // Soft-expired cache hit. We can deliver the cached response,
+                // but we need to also send the request to the network for
+                // refreshing.
+                // 此时数据虽然说是cache命中了，但数据需要进行更新。
+                request.addMarker(&quot;cache-hit-refresh-needed&quot;);
+                request.setCacheEntry(entry);
+
+                // Mark the response as intermediate.
+                // 标记该response为一个中间结果，以后还会需要更新
+                response.intermediate = true;
+
+                // Post the intermediate response back to the user and have
+                // the delivery then forward the request along to the network.
+                // 将中间结果返回给用户，并且将请求转发给网络层。
+                // 但不清楚为什么要将添加到网络队列的过程放在其他线程中去做--&gt;查看该方法的签名，该方法是首先将结果传递给用户，然后再执行Runnable
+                mDelivery.postResponse(request, response, new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            mNetworkQueue.put(request);
+                        } catch (InterruptedException e) {
+                            // Not much we can do about this.
+                        }
+                    }
+                });
+            }
+
+        } catch (InterruptedException e) {
+            // We may have been interrupted because it was time to quit.
+            if (mQuit) {
+                return;
+            }
+            continue;
+        }
+    }
+}
+</code></pre><p>和前面的文章一样，我们还是先来画一张流程图来分析一下： <a href="/images/wordpress/2014/11/CacheDispatcher.run_.png"><img src="/images/wordpress/2014/11/CacheDispatcher.run_.png" alt="CacheDispatcher.run"></a>   这一部分就是在CacheDispatcher的线程中循环执行的部分，我们可以看到Cachedispatcher主要做了以下的工作：</p>
+<ol>
+<li>从阻塞队列中取出一个需要处理的Request，如果没有，则一直等待。</li>
+<li>取出之后，首先判断该Request是否已经被取消了，如果是的话，则调用Request.finish()方法取消相应的Request。并重新获取下一个需要执行的Request。</li>
+<li>尝试从cache中获取cacheKey对应的entry。如果entry是null，则没有取到entry，需要放到网络任务中执行。</li>
+<li>此时entry必然是有数据的，再一步判断entry是否在有效期，如果已经过期，则保留一份数据，然后提交到网络的任务队列当中执行。</li>
+<li>此时entry是有效的而且没有过期，所以对结果进行解析。</li>
+<li>根据entry中的数据判断数据是否需要刷新了，有的时候，这些数据现在还是有效，但可能过很短的时间就过期，那么在后面的操作中就记得需要刷新这些数据。</li>
+<li>如果不需要刷新，就直接通过mDelivery分发结果</li>
+<li>如果需要刷新，则设置Cache的数据备份，然后设置需要刷新的标签</li>
+<li>调用postReqonse中带有Runnalbe参数的那个方法，首先将结果进行分发，分发完成之后则将该任务添加到网络的任务队列当中。</li>
+</ol>
+<p>总结就是，首先尝试获取Cache对应的数据，如果没有数据，则扔到mNetworkQueue中等待执行，有的话，则判断是否过期，是否后续需要刷新，再分发结果，或者继续放进mNetworkQueue中即可。</p>
+<h2 id="NetworkDispatcher"><a href="#NetworkDispatcher" class="headerlink" title="NetworkDispatcher"></a>NetworkDispatcher</h2><p>同样的办法，我们继续分析一下NetworkDispatcher的工作原理，首先上源代码：  </p>
+<pre><code>public void run() {
+    //设置进程的优先级为后台进程。
+    Process.setThreadPriority(Process.THREAD\_PRIORITY\_BACKGROUND);
+    while (true) {
+        Request&lt;?&gt; request;
+        try {
+            // Take a request from the queue.
+            // 从任务队列中获取一个请求
+            request = mQueue.take();
+        } catch (InterruptedException e) {
+            // We may have been interrupted because it was time to quit.
+            if (mQuit) {
+                return;
+            }
+            continue;
+        }
+
+        try {
+            //添加日志
+            request.addMarker(&quot;network-queue-take&quot;);
+
+            // If the request was cancelled already, do not perform the
+            // network request.
+            // 如果该请求已经被取消，那么就不再处理
+            if (request.isCanceled()) {
+                request.finish(&quot;network-discard-cancelled&quot;);
+                continue;
+            }
+            //添加流量统计信息标记。
+            addTrafficStatsTag(request);
+
+            // Perform the network request.
+            // 从网络中获取请求数据
+            NetworkResponse networkResponse = mNetwork.performRequest(request);
+            request.addMarker(&quot;network-http-complete&quot;);
+
+            // If the server returned 304 AND we delivered a response already,
+            // we&apos;re done -- don&apos;t deliver a second identical response.
+            // 如果服务器已经返回了304，并且我们已经进行过同样的请求，那么就不需要再处理
+            // HTTP 304 =  如果客户端发送了一个带条件的 GET 请求且该请求已被允许，而文档的内容（自上次访问以来或者根据请求的条件）并没有改变，则服务器应当返回这个状态码。
+            if (networkResponse.notModified &amp;&amp; request.hasHadResponseDelivered()) {
+                request.finish(&quot;not-modified&quot;);
+                continue;
+            }
+
+            // Parse the response here on the worker thread.
+            // 在工作线程中，对网络请求返回的数据进行解析
+            Response&lt;?&gt; response = request.parseNetworkResponse(networkResponse);
+            request.addMarker(&quot;network-parse-complete&quot;);
+
+            // Write to cache if applicable.
+            // TODO: Only update cache metadata instead of entire record for 304s.
+            // 如果需要，则写入cache。注意，对于304，则只写入元数据，而非整个全部数据
+            if (request.shouldCache() &amp;&amp; response.cacheEntry != null) {
+                mCache.put(request.getCacheKey(), response.cacheEntry);
+                request.addMarker(&quot;network-cache-written&quot;);
+            }
+
+            // Post the response back.
+            // 标记该请求已经分发过。
+            request.markDelivered();
+            // 将解析的结果分发给main线程。
+            mDelivery.postResponse(request, response);
+        } catch (VolleyError volleyError) {
+            parseAndDeliverNetworkError(request, volleyError);
+        } catch (Exception e) {
+            VolleyLog.e(e, &quot;Unhandled exception %s&quot;, e.toString());
+            mDelivery.postError(request, new VolleyError(e));
+        }
+    }
+}
+</code></pre><p>同样的，我们也画一张流程图来分析一下NetworkDispatcher都做了什么事情。 <a href="/images/wordpress/2014/11/NetworkDispatcher.run_.png"><img src="/images/wordpress/2014/11/NetworkDispatcher.run_.png" alt="NetworkDispatcher.run"></a> 从上图我们可以看出，NetworkDispatcher的run()方法中所做的事情和CacheDispatcher所做的事情基本上是类似的。</p>
+<ol>
+<li>首先从阻塞队列中获取一个需要处理的Request。如果没有可以处理的Request，则阻塞等待。</li>
+<li>判断这个request是否已经被取消了，如果取消了，则调用request的finish()方法。</li>
+<li>添加流量统计</li>
+<li>通过网络访问，获取网络访问的返回结果</li>
+<li>如果说数据没有修改，而且数据结果已经被分发过，那么就可以终止该任务。</li>
+<li>新的数据，那么需要解析数据</li>
+<li>判断是否需要cache，如果需要，则写入cache，如果不需要则跳过。</li>
+<li>标记该请求已经分发过，同时通过mDevliery派发结果。</li>
+</ol>
+<h2 id="ResponseDelivery"><a href="#ResponseDelivery" class="headerlink" title="ResponseDelivery"></a>ResponseDelivery</h2><p>通过分析上面的代码，我们可以发现，所有的操作的最后，都要讲Response交给mDelivery的postResponse方法当中，也就是要将结果分发出去。那么具体是怎么实现的呢？ ResponseDelivery的源代码如下：</p>
+<p>public interface ResponseDelivery {<br>    /**<br>     * Parses a response from the network or cache and delivers it.<br>     *<br>     * 解析从网络或者cache获取的相应，然后派发结果<br>     */<br>    public void postResponse(Request&lt;?&gt; request, Response&lt;?&gt; response);</p>
+<pre><code>/\*\*
+ \* Parses a response from the network or cache and delivers it. The provided
+ \* Runnable will be executed after delivery.
+ \* 
+ \* 解析从网络或者cache获取的相应，然后派发结果，提供的Runnable将在派发之后执行。
+ */
+public void postResponse(Request&lt;?&gt; request, Response&lt;?&gt; response, Runnable runnable);
+
+/\*\*
+ \* Posts an error for the given request.
+ \* 
+ \* 对给定的request返回error。
+ */
+public void postError(Request&lt;?&gt; request, VolleyError error);
+</code></pre><p>}</p>
+<p>从上我们可以看出，ResponseDelivery是一个接口，其中共有三个方法签名，实际上前两种是做的同一件事情，只是签名不同而已。在Volley中，有一个默认的实现，基本上我们也不会去修改它，就是ExecutorDelivery。 该方法共有两个构造函数，分别是</p>
+<pre><code>public ExecutorDelivery(final Handler handler) {
+    // Make an Executor that just wraps the handler.
+    mResponsePoster = new Executor() {
+        @Override
+        public void execute(Runnable command) {
+            //默认情况下，这段代码的调用位于调用者的线程之上。
+            handler.post(command);
+        }
+    };
+}
+
+public ExecutorDelivery(Executor executor) {
+    mResponsePoster = executor;
+}
+</code></pre><p>可以看出，一共有两个构造函数，一个其参数为Executor，即调用者传递给他一个executor，另外一种是传递一个handler进来，然后在构造函数中定义一个继承了Executor的匿名类，在execute(Runnable command)方法中，将command发送给handler到对应的线程上去处理。那么这个线程是什么呢？ 我们跟踪代码，发现在Volley内部，只有对第一个构造函数，即</p>
+<p>public ExecutorDelivery(final Handler handler);</p>
+<p>是已经使用了的，在RequestQueue的构造函数当中：</p>
+<pre><code>public RequestQueue(Cache cache, Network network, int threadPoolSize) {
+    this(cache, network, threadPoolSize,
+            new ExecutorDelivery(new Handler(Looper.getMainLooper())));
+}
+</code></pre><p>在RequestQueue当中，实例化了一个ExecutorDelivery，需要注意的是，此时传入ExecutorDelivery构造函数所对应的Looper为Looper.getMainLooper()，也就是说，handler发送的消息都是在主线程即UI线程上进行处理的。这也就可以解释了之前我们看Android当中Volley的文档，其中一直在强调，所有的结果的分发都是在主线程上完成的。 我们继续查看源代码，看看ExecutorDelivery是怎么样来分发结果的。其实现的ReuestDelivery的接口的实现为：</p>
+<pre><code>@Override
+public void postResponse(Request&lt;?&gt; request, Response&lt;?&gt; response) {
+    postResponse(request, response, null);
+}
+
+@Override
+public void postResponse(Request&lt;?&gt; request, Response&lt;?&gt; response, Runnable runnable) {
+    request.markDelivered();
+    request.addMarker(&quot;post-response&quot;);
+    mResponsePoster.execute(new ResponseDeliveryRunnable(request, response, runnable));
+}
+
+@Override
+public void postError(Request&lt;?&gt; request, VolleyError error) {
+    request.addMarker(&quot;post-error&quot;);
+    Response&lt;?&gt; response = Response.error(error);
+    mResponsePoster.execute(new ResponseDeliveryRunnable(request, response, null));
+}
+</code></pre><p>可以发现其主要做了两件事情：</p>
+<ol>
+<li>调用request.markDelivered()来标记该request已经分发过了。</li>
+<li>将一个Runnalbe对象实际上交给了主线程的handler去执行。</li>
+</ol>
+<p>因此我们继续看看这个Runnable都做了哪些工作，该Runnable的代码如下：</p>
+<pre><code>@SuppressWarnings(&quot;rawtypes&quot;)
+private class ResponseDeliveryRunnable implements Runnable {
+    private final Request mRequest;
+    private final Response mResponse;
+    private final Runnable mRunnable;
+
+    public ResponseDeliveryRunnable(Request request, Response response, Runnable runnable) {
+        mRequest = request;
+        mResponse = response;
+        mRunnable = runnable;
+    }
+
+    @SuppressWarnings(&quot;unchecked&quot;)
+    @Override
+    public void run() {
+        // If this request has canceled, finish it and don&apos;t deliver.
+        // 如果request已经被取消，那么就不需要派发结果。
+        if (mRequest.isCanceled()) {
+            mRequest.finish(&quot;canceled-at-delivery&quot;);
+            return;
+        }
+
+        // Deliver a normal response or error, depending.
+        // 如果Response解析成功，那么将任务派发给Request。
+        if (mResponse.isSuccess()) {
+            mRequest.deliverResponse(mResponse.result);
+        } else {
+            mRequest.deliverError(mResponse.error);
+        }
+
+        // If this is an intermediate response, add a marker, otherwise we&apos;re done
+        // and the request can be finished.
+        // 如果是中间结果，那么就添加标记，否则则调用finish命令，结束该任务。
+        if (mResponse.intermediate) {
+            mRequest.addMarker(&quot;intermediate-response&quot;);
+        } else {
+            mRequest.finish(&quot;done&quot;);
+        }
+
+        // If we have been provided a post-delivery runnable, run it.
+        // 此时任务已经派发完成，如果传入了其他的Runnable，那么就调用该Runnable。
+        if (mRunnable != null) {
+            mRunnable.run();
+        }
+   }
+}
+</code></pre><p>代码比较简单，也不需要去画什么流程图了。</p>
+<ol>
+<li>检查该mRequest是否已经被取消了，如果已经取消了，那么就调用Request的finish()方法，进而调用RequestQueue的finish()方法删除该request。</li>
+<li>根据该mRequest的执行结果，即mResponse.isSuccess()结果来调用相应的mRequest.deliverResponse()或者mRequest.deliverError()方法。</li>
+<li>检查该mRequest对应的执行结果mResponse.intermeidate来判断该任务是否还有后面可能存在的更新，因为这时候标示mResponse的结果是暂时的，需要更新的。如果不需要更新的话那么，那么调用mRequst.finish()方法来结束该Request。</li>
+<li>以上工作完成之后，如果还设置了需要执行的mRunnable，则调用该Runnable，需要注意的是，此时并不会开辟新的线程去执行其中的代码，而是直接运行在主线程上，所以我们必须要注意该Runnable代码中的工作量，避免ANR。</li>
+</ol>
+<p>综上，CacheDispatcher、NetworkDispatcher、ResponseDelivery就分析完了，后面可能会继续分析下Volley其他设计比较巧妙的边边角角的代码。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Volley/" rel="tag"># Volley</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/19/android-volley-1-task/" rel="next" title="Volley源代码分析 - 1：任务的添加、删除和取消">
+                <i class="fa fa-chevron-left"></i> Volley源代码分析 - 1：任务的添加、删除和取消
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/20/android-volley-3-cache-bytearraypool/" rel="prev" title="Volley源代码分析 – 3: 缓存之ByteArrayPool">
+                Volley源代码分析 – 3: 缓存之ByteArrayPool <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#CacheDispatcher"><span class="nav-number">1.</span> <span class="nav-text">CacheDispatcher</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NetworkDispatcher"><span class="nav-number">2.</span> <span class="nav-text">NetworkDispatcher</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ResponseDelivery"><span class="nav-number">3.</span> <span class="nav-text">ResponseDelivery</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

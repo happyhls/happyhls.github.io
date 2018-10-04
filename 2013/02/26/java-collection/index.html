@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="HashSet，ArrayList，HashMap等都是在Java中常用的数据结构，简单进行归纳分析。上图从网上搜索而来，简单来说，有如下拓扑结构 java.util.Collection [I] +–java.util.List [I] +–java.util.ArrayList [C] +–java.util.LinkedList [C] +–java.util.Vector [C]">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java--Collection,ArrayList,HashMap,HashSet">
+<meta property="og:url" content="http://yoursite.com/2013/02/26/java-collection/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="HashSet，ArrayList，HashMap等都是在Java中常用的数据结构，简单进行归纳分析。上图从网上搜索而来，简单来说，有如下拓扑结构 java.util.Collection [I] +–java.util.List [I] +–java.util.ArrayList [C] +–java.util.LinkedList [C] +–java.util.Vector [C]">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2013/01/Javacollect.bmp">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.604Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java--Collection,ArrayList,HashMap,HashSet">
+<meta name="twitter:description" content="HashSet，ArrayList，HashMap等都是在Java中常用的数据结构，简单进行归纳分析。上图从网上搜索而来，简单来说，有如下拓扑结构 java.util.Collection [I] +–java.util.List [I] +–java.util.ArrayList [C] +–java.util.LinkedList [C] +–java.util.Vector [C]">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2013/01/Javacollect.bmp">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/02/26/java-collection/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java--Collection,ArrayList,HashMap,HashSet | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/02/26/java-collection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java--Collection,ArrayList,HashMap,HashSet
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-02-26 19:53:20" itemprop="dateCreated datePublished" datetime="2013-02-26T19:53:20+08:00">2013-02-26</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="http://blog.happyhls.me/?attachment_id=278" target="_blank" rel="noopener"><img src="/images/wordpress/2013/01/Javacollect.bmp" alt="Javacollect"></a>     HashSet，ArrayList，HashMap等都是在Java中常用的数据结构，简单进行归纳分析。上图从网上搜索而来，简单来说，有如下拓扑结构 java.util.Collection [I] +–java.util.List [I] +–java.util.ArrayList [C] +–java.util.LinkedList [C] +–java.util.Vector [C] +–java.util.Stack [C] +–java.util.Set [I] +–java.util.HashSet [C] +–java.util.SortedSet [I] +–java.util.TreeSet [C]</p>
+<p>java.util.Map [I] +–java.util.SortedMap [I] +–java.util.TreeMap [C] +–java.util.Hashtable [C] +–java.util.HashMap [C] +–java.util.LinkedHashMap [C] +–java.util.WeakHashMap [C]</p>
+<p>[I]：接口</p>
+<p>[C]：类</p>
+<p>根据使用经验和网上搜索的信息总结：</p>
+<h2 id="Collection接口"><a href="#Collection接口" class="headerlink" title="Collection接口"></a><strong>Collection接口</strong></h2><p>查看其声明</p>
+<p>public interface Collection extends Iterable</p>
+<p>发现其中继承了Iterable类，继续跟踪，./Java/laung/Iterable.java</p>
+<p>public interface Iterable{<br>/**<br>* Returns an iterator over a set of elements of type T.<br>*<br>* @return an Iterator.<br>*/<br>Iterator iterator();<br>}</p>
+<p>因此，我们可以发现，之所以Collection都可以实现一个Iterator类，是因为其都继承了接口Interalbe<t>，于是，我们再使用的时候，可以使用</t></p>
+<p>Collection c = new ArrayList();<br>Iterator it=c.iterator();<br>while(it.hasNext())<br>{<br>…<br>}</p>
+<p>当然，对于Collection我们其实还可以使用foreach来遍历其中的每一个元素</p>
+<p>Collection c=new ArrayList();<br>for(Object ob:c)<br>{<br>…<br>}</p>
+<h2 id="List类"><a href="#List类" class="headerlink" title="List类"></a>List类</h2><p>查看定义可得</p>
+<p>public interface List extends Collection</p>
+<p>List与Set的主要区别在于List中的元素可以重复，且List中的元素位置是确定的，可以类比与Java中打数组来理解，在List中提供了</p>
+<p>boolean equals(Obect o)</p>
+<p>来判断List中的两个元素是否相等。 此外在List中除了Iterator方法之外，还提供了一个ListIterator，在Iterator基础上增加了如下方法</p>
+<p>boolean hasrevious();<br>Object previous();<br>void add();</p>
+<p>在使用List中需要使用迭代器Iterator的时候，使用Iterator更为方便。</p>
+<h3 id="ArrayList和Vector类"><a href="#ArrayList和Vector类" class="headerlink" title="ArrayList和Vector类"></a>ArrayList和Vector类</h3><p>ArrayList和Vector类是List类打两个典型的实现，而这两个类是使用Obect[]来实现的，capacity为其大小，无参实例化的时候，默认的ArrayList的大小为10;当向其中添加元素的时候，capacity为自动增加，因此，当我们明确元素数量会比较大的时候，我们可以使用new ArrayList(int capactiy)构造函数，使其初始化为比较大的空间。除此之外，ArrayList和Vector还提供了两个方法来操作capacity属性：</p>
+<p>void ensureCapacity(int minCapacity): Increase the capacity<br>void trimTosize(); Trim to the min size</p>
+<p>相对于ArrayList而言，Vector是一个相对比较老的类，同时，两者另外一个比较重要的区别在于，ArrayList的线程是不安全的，而Vector的线程是安全的，因此可以理解的是Vector的性能比ArrayList要低，但我们可以使用Collections的工具，将ArrayList变成线程安全。</p>
+<h3 id="Stack类"><a href="#Stack类" class="headerlink" title="Stack类"></a>Stack类</h3><p>Stack类是Vector的一个子类，可以实现堆栈这种数据结构，此处不再赘述。其中主要有3个方法</p>
+<p>Object peek();<br>Object pop();<br>void push(Object item);</p>
+<p>其中peek和pop是将元素弹出堆栈，其区别在于peek只弹出，不删除其中元素，而pop弹出后会删除元素。</p>
+<h3 id="固定长度List"><a href="#固定长度List" class="headerlink" title="固定长度List"></a>固定长度List</h3><p>对于数组来说，有一个工具类：Arrays，该工具类提供了一个asList(Object… a)打方法，可以将一个数组或指定个数打对象转换成一个List集合，要注意的是，该List的集合既不是ArrayList实现类的实例，也不是Vector实现类的实例，而是Arrays打内部类ArrayList的实例。 Arrays.ArrayList是一个固定长度的List集合，程序只能遍历访问该集合中的元素，不可以增加、删除。</p>
+<h2 id="Queue接口"><a href="#Queue接口" class="headerlink" title="Queue接口"></a>Queue接口</h2><p>该接口主要用于模拟队列数据结构，FIFO，主要有下面的方法</p>
+<p>void add(Object e):加入元素<br>Object element():获取队列头部元素，但不删除<br>boolean offer(Object e):将指定元素加入队列，当队列容量有限打时候，该方法要优于add<br>Object peek():获取头部元素，但不删除<br>Object poll():获取头部元素，且删除<br>Object remove();获取头部元素，并删除</p>
+<p>对于该接口而言，主要有两个实现类LinkedList和PriorityQueue</p>
+<h3 id="LinkedList类"><a href="#LinkedList类" class="headerlink" title="LinkedList类"></a>LinkedList类</h3><p>该类继承于List并实现了Queue接口， 与ArrayList、Vector区别： 实现原理不同，ArrayList和Vector都是使用数组实现，而LinkedList则是使用链表来实现(Linked)，因此可以这样理解，在效率上，当使用随机访问时：ArrayList和Vector要比LinkedList更好，而当数据插入删除比较频繁打时候，使用LinkedList的效率要远远高于ArrayList和Vector。同时要注意的问题是，Vector由于实现了线程保护，因此，其最终打效率仍然是比较低的。</p>
+<h3 id="PriorityQueue类"><a href="#PriorityQueue类" class="headerlink" title="PriorityQueue类"></a>PriorityQueue类</h3><p>该类是一个队列，但并不完全满足队列打要求，因为该类主要内部的排列顺序为按照大小来排序</p>
+<h2 id="Map"><a href="#Map" class="headerlink" title="Map"></a>Map</h2><p>Map保存的数据具有映射关系，在Map的集合中保存有两组值，Key+Value，其中Key和Value都可以为任意类型，但Key不可以重复，而Value可以重复。Key和Value之间存在有意义对应的关系。因此可以理解Key放在一起，组成了一个Set集合。 在类的名字上，我们可以发现 Set： ? ? ? ? ? ? ? HashSet、LinkedHashSet、SortedSet(Interface)、TreeSet、EnumSet HashMap： ? HashMap、LinkedHashMap、SortedMap(Interface)、Treemap、EnumMap 实际上，HashSet的实际实现方法就是依赖于HashMap来实现的。 在Java中有一个Hashtable类，HashMap与Hashtable类的关系与HashSet和Vector类似。</p>
+<h3 id="Properities类"><a href="#Properities类" class="headerlink" title="Properities类"></a>Properities类</h3><p>该类为Hashtable类的一个子类，该类可以利用Map的特点，将属性保存在配置文件中，有如下代码</p>
+<p>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.FileOutputStream;<br>import java.io.IOException;<br>import java.util.Properties;</p>
+<p>public class TestProperties {<br>    public static void main(String[] args) throws FileNotFoundException, IOException<br>    {<br>        Properties prop=new Properties();<br>        prop.setProperty(“Name”, “This is name”);<br>        prop.setProperty(“Password”, “This is password”);<br>        prop.store(new FileOutputStream(“tmp”),”This is comments line”);<br>        Properties prop_1=new Properties();<br>        prop_1.load(new FileInputStream(“tmp”));<br>        System.out.println(prop_1);<br>    }<br>}</p>
+<p>该程序运行结果为：</p>
+<p>{Name=This is name, Password=This is password}</p>
+<p>同时在工作目录下还生成文件tmp，内容为：</p>
+<p>#This is comments line</p>
+<p>#Tue Feb 26 19:32:48 CST 2013<br>Name=This is name<br>Password=This is password</p>
+<h2 id="操作集合工具类：Collections"><a href="#操作集合工具类：Collections" class="headerlink" title="操作集合工具类：Collections"></a>操作集合工具类：Collections</h2><p>该类提供了可以对Set、List、Map等方便操作的类：Collections，功能简介： 1、排序</p>
+<p>static void reverse(List list);反转所有集合顺序<br>static viod shuffle(List list):对List集合随机排序<br>static void sort(List list):排序，升序<br>static void sort(List list,Comparator c):根据Comparator顺序进行排序<br>static void swap(List list,int i,int j):将List中i和j位置交换<br>static void rotate(List list,int distance):</p>
+<p>2、查找、替换 3、同步控制 Vector和Hashtable分别比HashSet和HashMap的优点就在于其线程是安全的，在Collection中提供了synchronizedXxx方法，用来解决多线程访问的时候的并发问题 代码为</p>
+<p>Collection c = Collections.synchronizedCollection(new ArrayList());<br>List list = Collections.synchronizedList(new ArrayList());<br>Set s = Collections.synchronizedSet(new HashSet());<br>Map m = Collections.synchronizedMap(new HashMap());</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/01/26/java-enum/" rel="next" title="Java类-枚举类(enum)">
+                <i class="fa fa-chevron-left"></i> Java类-枚举类(enum)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/02/26/java-carzy-java-generic/" rel="prev" title="《疯狂Java讲义》-泛型(Generic)">
+                《疯狂Java讲义》-泛型(Generic) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Collection接口"><span class="nav-number">1.</span> <span class="nav-text">Collection接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#List类"><span class="nav-number">2.</span> <span class="nav-text">List类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ArrayList和Vector类"><span class="nav-number">2.1.</span> <span class="nav-text">ArrayList和Vector类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Stack类"><span class="nav-number">2.2.</span> <span class="nav-text">Stack类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#固定长度List"><span class="nav-number">2.3.</span> <span class="nav-text">固定长度List</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Queue接口"><span class="nav-number">3.</span> <span class="nav-text">Queue接口</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#LinkedList类"><span class="nav-number">3.1.</span> <span class="nav-text">LinkedList类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PriorityQueue类"><span class="nav-number">3.2.</span> <span class="nav-text">PriorityQueue类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Map"><span class="nav-number">4.</span> <span class="nav-text">Map</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Properities类"><span class="nav-number">4.1.</span> <span class="nav-text">Properities类</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#操作集合工具类：Collections"><span class="nav-number">5.</span> <span class="nav-text">操作集合工具类：Collections</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

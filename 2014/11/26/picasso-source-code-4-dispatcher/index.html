@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Picasso的源代码分析已经到了第4届，之前我们依次分析了Picasso，ReqeustCreaor，BitmapHunter，Picasso是Picasso框架的入口，同时也负责初始化各种工作的子线程，工作的实例；RequestCreator则是对任务的描述；而BitmapHunter则是一个具体的工作的线程，接受Picasso中配置好的调度池的调度同时负责知道对应的ReqeustHandle">
+<meta name="keywords" content="Android,Picasso,Dispatcher">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Picasso源代码分析：4、任务的分发 Dispatcher">
+<meta property="og:url" content="http://yoursite.com/2014/11/26/picasso-source-code-4-dispatcher/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Picasso的源代码分析已经到了第4届，之前我们依次分析了Picasso，ReqeustCreaor，BitmapHunter，Picasso是Picasso框架的入口，同时也负责初始化各种工作的子线程，工作的实例；RequestCreator则是对任务的描述；而BitmapHunter则是一个具体的工作的线程，接受Picasso中配置好的调度池的调度同时负责知道对应的ReqeustHandle">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/Disaptcher-performSubmit.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.533Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Picasso源代码分析：4、任务的分发 Dispatcher">
+<meta name="twitter:description" content="Picasso的源代码分析已经到了第4届，之前我们依次分析了Picasso，ReqeustCreaor，BitmapHunter，Picasso是Picasso框架的入口，同时也负责初始化各种工作的子线程，工作的实例；RequestCreator则是对任务的描述；而BitmapHunter则是一个具体的工作的线程，接受Picasso中配置好的调度池的调度同时负责知道对应的ReqeustHandle">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/Disaptcher-performSubmit.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/26/picasso-source-code-4-dispatcher/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Picasso源代码分析：4、任务的分发 Dispatcher | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/26/picasso-source-code-4-dispatcher/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Picasso源代码分析：4、任务的分发 Dispatcher
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-26 17:15:43" itemprop="dateCreated datePublished" datetime="2014-11-26T17:15:43+08:00">2014-11-26</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/Picasso/" itemprop="url" rel="index"><span itemprop="name">Picasso</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Picasso的源代码分析已经到了第4届，之前我们依次分析了Picasso，ReqeustCreaor，BitmapHunter，Picasso是Picasso框架的入口，同时也负责初始化各种工作的子线程，工作的实例；RequestCreator则是对任务的描述；而BitmapHunter则是一个具体的工作的线程，接受Picasso中配置好的调度池的调度同时负责知道对应的ReqeustHandler去执行数据请求，并将结果解析为图片，还可以进行一些图片的处理(Transformation)。但之前我们的分析中一直没有考虑到的一点是，在Picasso当中，任务到底是怎么调度的？任务到底怎么添加进来？添加进来之后都做了哪些工作？任务失败之后重试策略如何(Picasso目前还没有看到类似Volley那种明显的RetryPolicy)？所以，接下来，我们要分析<strong>Dispatcher</strong>。<a href="https://github.com/happyhls/Picasso-MyComments/blob/master/src/com/squareup/picasso/Dispatcher.java" target="_blank" rel="noopener">Github</a></p>
+<h1 id="Dispatcher"><a href="#Dispatcher" class="headerlink" title="Dispatcher"></a>Dispatcher</h1><p>首先，在Dispatcher中定义了很多的事件，如下：</p>
+<p>  static final int REQUEST_SUBMIT = 1;<br>  static final int REQUEST_CANCEL = 2;<br>  static final int REQUEST_GCED = 3;<br>  static final int HUNTER_COMPLETE = 4;<br>  static final int HUNTER_RETRY = 5;<br>  static final int HUNTER_DECODE_FAILED = 6;<br>  static final int HUNTER_DELAY_NEXT_BATCH = 7;<br>  static final int HUNTER_BATCH_COMPLETE = 8;<br>  static final int NETWORK_STATE_CHANGE = 9;<br>  static final int AIRPLANE_MODE_CHANGE = 10;<br>  static final int TAG_PAUSE = 11;<br>  static final int TAG_RESUME = 12;<br>  static final int REQUEST_BATCH_RESUME = 13;</p>
+<p>当Picasso.java中调用submit等方法的时候，会从Handler中获取相应的Message并发送给hanlder进行处理。因此我们首先要提出疑问：</p>
+<ul>
+<li>handler工作在哪个线程成？</li>
+<li>handler收到Message之后，其处理过程是怎么样？</li>
+</ul>
+<p>先不着急，按照代码的顺序接着往下分析： <strong>构造函数：</strong></p>
+<p>Dispatcher(Context context, ExecutorService service, Handler mainThreadHandler,<br>      Downloader downloader, Cache cache, Stats stats) {<br>    //任务分发线程，继承自ThreadHandler<br>    this.dispatcherThread = new DispatcherThread();<br>    this.dispatcherThread.start();<br>    this.context = context;<br>    this.service = service;<br>    //注意这个地方使用了LinkedHashMap，肯定要其特殊的考虑，暂时还不清楚。<br>    this.hunterMap = new LinkedHashMap&lt;String, BitmapHunter&gt;();<br>    //此处使用了两个WeakHashMap，也就说，一旦外部放弃对对应的Ojbect的引用的话，该Entry就会在GC时被回收。<br>    this.failedActions = new WeakHashMap&lt;Object, Action&gt;();<br>    this.pausedActions = new WeakHashMap&lt;Object, Action&gt;();<br>    //暂停的任务集合<br>    this.pausedTags = new HashSet<object>();<br>    //这里就是处理分发任务的Handler，查看源代码可以知道，DispatcherHandler工作在dispatcherThread的线程之上。<br>    this.handler = new DispatcherHandler(dispatcherThread.getLooper(), this);<br>    this.downloader = downloader;<br>    //保留主线程的Handler的引用<br>    this.mainThreadHandler = mainThreadHandler;<br>    this.cache = cache;<br>    this.stats = stats;<br>    //一个列表，用来保存BitmapHunter的batch，但还不清楚为什么要限制size为4？<br>    this.batch = new ArrayList<bitmaphunter>(4);<br>    //是否为飞行模式<br>    this.airplaneMode = Utils.isAirplaneModeOn(this.context);<br>    //是否拥有检测网络状态变化的权限<br>    this.scansNetworkChanges = hasPermission(context, Manifest.permission.ACCESS_NETWORK_STATE);<br>    //注册网络状态的广播接收<br>    this.receiver = new NetworkBroadcastReceiver(this);<br>    receiver.register();<br>  }</bitmaphunter></object></p>
+<p>在代码中我添加了注释，同时这个时候，我们就可以解释上面提到的第一个问题，handler是工作在哪个线程之上的？当然是dispatcherThread。 那<strong>DispatcherThread</strong>是怎么样的呢？</p>
+<p>static class DispatcherThread extends HandlerThread {<br>  DispatcherThread() {<br>    super(Utils.THREAD_PREFIX + DISPATCHER_THREAD_NAME, THREAD_PRIORITY_BACKGROUND);<br>  }<br>}</p>
+<p>哈哈，更简单，其实就是一个HandlerThread，只是设置了Thread Name和优先级为BACKGROUND而已。 <strong> shutdown()方法，关闭Dispatcher</strong></p>
+<p>  void shutdown() {<br>    // Shutdown the thread pool only if it is the one created by Picasso.<br>    // 关闭Picasso创建的线程池<br>    if (service instanceof PicassoExecutorService) {<br>      service.shutdown();<br>    }<br>    // 关闭downlaoder<br>    downloader.shutdown();<br>    // 退出dispatcherThread<br>    dispatcherThread.quit();<br>    // Unregister network broadcast receiver on the main thread.<br>    // 在主线程上注销receiver，注意和上面的Dispatcher构造函数区分，在构造函数中，没有特别说明需要在主线程上调用receiver.register()，<br>    Picasso.HANDLER.post(new Runnable() {<br>      @Override public void run() {<br>        receiver.unregister();<br>      }<br>    });<br>  }</p>
+<p>有一个地方我们可以注意到的是，在构造函数中，广播接收器没有说明需要在主线程上运行，但关闭的时候，取消注册是在主线程上运行的，我们知道，广播的onReceive方法是在主线程上运行，但是广播的注册和取消注册，也必须要在主线程上进行吗？这个问题以后需要再讨论一下。 接下来我们去看看再Dispatcher中的Handler到底是如何处理各种消息的。</p>
+<p>//Dispacher的处理函数<br>private static class DispatcherHandler extends Handler {<br>  private final Dispatcher dispatcher;</p>
+<p>  // 根据Dispatcher中调用的构造函数DispatcherHandler(dispatcherThread.getLooper(), this)可以看出，<br>  // 该Handler其实是工作在DispatcherThread之上的。<br>  public DispatcherHandler(Looper looper, Dispatcher dispatcher) {<br>    super(looper);<br>    this.dispatcher = dispatcher;<br>  }</p>
+<p>  // 根据不同的Message，调用dispatcher中对应的不同的方法。<br>  @Override public void handleMessage(final Message msg) {<br>    switch (msg.what) {<br>      case REQUEST_SUBMIT: {<br>        //Action提交之后，会调用dispatcher.performSubmit(action)函数。<br>        Action action = (Action) msg.obj;<br>        dispatcher.performSubmit(action);<br>        break;<br>      }<br>      case REQUEST_CANCEL: {<br>        Action action = (Action) msg.obj;<br>        dispatcher.performCancel(action);<br>        break;<br>      }<br>      case TAG_PAUSE: {<br>        Object tag = msg.obj;<br>        dispatcher.performPauseTag(tag);<br>        break;<br>      }<br>      case TAG_RESUME: {<br>        Object tag = msg.obj;<br>        dispatcher.performResumeTag(tag);<br>        break;<br>      }<br>      case HUNTER_COMPLETE: {<br>        BitmapHunter hunter = (BitmapHunter) msg.obj;<br>        dispatcher.performComplete(hunter);<br>        break;<br>      }<br>      case HUNTER_RETRY: {<br>        BitmapHunter hunter = (BitmapHunter) msg.obj;<br>        dispatcher.performRetry(hunter);<br>        break;<br>      }<br>      case HUNTER_DECODE_FAILED: {<br>        BitmapHunter hunter = (BitmapHunter) msg.obj;<br>        dispatcher.performError(hunter, false);<br>        break;<br>      }<br>      case HUNTER_DELAY_NEXT_BATCH: {<br>        dispatcher.performBatchComplete();<br>        break;<br>      }<br>      case NETWORK_STATE_CHANGE: {<br>        NetworkInfo info = (NetworkInfo) msg.obj;<br>        dispatcher.performNetworkStateChange(info);<br>        break;<br>      }<br>      case AIRPLANE_MODE_CHANGE: {<br>        dispatcher.performAirplaneModeChange(msg.arg1 == AIRPLANE_MODE_ON);<br>        break;<br>      }<br>      default:<br>        Picasso.HANDLER.post(new Runnable() {<br>          @Override public void run() {<br>            throw new AssertionError(“Unknown handler message received: “ + msg.what);<br>          }<br>        });<br>    }<br>  }<br>}</p>
+<p>其实很简单，构造函数中，将Handler与DispatcherThread绑定在一起，所有的消息都在DispatcherThread中进行处理。那么Dispatcher具体是怎么处理各种请求的呢？这可是Picasso怎么去处理一个任务的核心内容，我们来看一下依次的处理函数： <strong>performSubmit(Action action, boolean dismissFailed)</strong></p>
+<p>//执行提交的action<br>void performSubmit(Action action, boolean dismissFailed) {<br>  //如果pausedTags包含了对应的action<br>  if (pausedTags.contains(action.getTag())) {<br>    //那么将action放入到pausedActions当中(我擦，还有暂停功能)<br>    pausedActions.put(action.getTarget(), action);<br>    if (action.getPicasso().loggingEnabled) {<br>      log(OWNER_DISPATCHER, VERB_PAUSED, action.request.logId(),<br>          “because tag ‘“ + action.getTag() + “‘ is paused”);<br>    }<br>    return;<br>  }</p>
+<p>  // 看看该任务是否已经添加过。<br>  BitmapHunter hunter = hunterMap.get(action.getKey());<br>  if (hunter != null) {<br>    hunter.attach(action);<br>    return;<br>  }</p>
+<p>  //服务终止。。。<br>  if (service.isShutdown()) {<br>    if (action.getPicasso().loggingEnabled) {<br>      log(OWNER_DISPATCHER, VERB_IGNORED, action.request.logId(), “because shut down”);<br>    }<br>    return;<br>  }</p>
+<p>  //根据任务的uri，找到真正可以执行该任务的对应的Handler，重新封装为一个BitmapHunter<br>  hunter = forRequest(action.getPicasso(), this, cache, stats, action);<br>  //提交任务，并且获取一个future<br>  hunter.future = service.submit(hunter);<br>  //将提交过的任务放入hunterMap当中<br>  hunterMap.put(action.getKey(), hunter);<br>  //忽略失败标志。<br>  if (dismissFailed) {<br>    failedActions.remove(action.getTarget());<br>  }</p>
+<p>  if (action.getPicasso().loggingEnabled) {<br>    log(OWNER_DISPATCHER, VERB_ENQUEUED, action.request.logId());<br>  }<br>}</p>
+<p>我画了一个流程图     <a href="/images/wordpress/2014/11/Disaptcher-performSubmit.png"><img src="/images/wordpress/2014/11/Disaptcher-performSubmit.png" alt="Disaptcher-performSubmit"></a>   简单的理解，就是根据Action创建BitmapHunter，前面我们已经看过，BitmapHunter为一个线程，因此将该线程提交到PicassoExecutorService中执行，获取对应的future，这样即可。 <strong>performCancel(Action action) </strong> performCancel的逻辑和performSubmit思路大体上相同的，只是其逆序而已，因此我们直接在代码中分析其业务逻辑来看看。</p>
+<p>void performCancel(Action action) {<br>  // 获取对应的key<br>  String key = action.getKey();<br>  // 从hunterMap中获取对应的BitmapHunter<br>  BitmapHunter hunter = hunterMap.get(key);<br>  // 如果hunter存在，则调用hunter.detach(action)和hunter.cancel()删除任务<br>  if (hunter != null) {<br>    // 将对应的action从hunter当中删除<br>    hunter.detach(action);<br>    // 如果返回true，那么以为这已经没有对应的actions，并且future也通过cancel()函数取消掉了<br>    if (hunter.cancel()) {<br>      // 该BitmapHunter不会用到了，删除<br>      hunterMap.remove(key);<br>      if (action.getPicasso().loggingEnabled) {<br>        log(OWNER_DISPATCHER, VERB_CANCELED, action.getRequest().logId());<br>      }<br>    }<br>  }</p>
+<p>  // 如果暂停的pasusedTags中还有对应的action<br>  if (pausedTags.contains(action.getTag())) {<br>    // 从队列中删除<br>    pausedActions.remove(action.getTarget());<br>    if (action.getPicasso().loggingEnabled) {<br>      log(OWNER_DISPATCHER, VERB_CANCELED, action.getRequest().logId(),<br>          “because paused request got canceled”);<br>    }<br>  }</p>
+<p>  // 从失败列表中删除对应的action<br>  Action remove = failedActions.remove(action.getTarget());<br>  if (remove != null &amp;&amp; remove.getPicasso().loggingEnabled) {<br>    log(OWNER_DISPATCHER, VERB_CANCELED, remove.getRequest().logId(), “from replaying”);<br>  }<br>}</p>
+<p>上面是performCancel(Action action)的代码，其逻辑也比较简单，就是各种队列中删除对应的action信息。 <strong>performPauseTag(Object tag)</strong></p>
+<p>void performPauseTag(Object tag) {<br>  // Trying to pause a tag that is already paused.<br>  // 如果返回true，说明添加成功，set已经修改，如果false，说明该tag已经在pasuedTags中，也就是说，任务已经暂停过了。<br>  if (!pausedTags.add(tag)) {<br>    return;<br>  }</p>
+<p>  // Go through all active hunters and detach/pause the requests<br>  // that have the paused tag.<br>  // 遍历全部正在执行的hunter们，如果BitmapHunter对应的Action有相应的pausedTag，那么就暂定对应的BitmapHunter<br>  for (Iterator<bitmaphunter> it = hunterMap.values().iterator(); it.hasNext();) {<br>    BitmapHunter hunter = it.next();<br>    boolean loggingEnabled = hunter.getPicasso().loggingEnabled;</bitmaphunter></p>
+<pre><code>// 获取hunter对应的action，已经后来detached的actions。
+Action single = hunter.getAction();
+List&lt;Action&gt; joined = hunter.getActions();
+// 如果joined不为空，并且有元素，那么说明该BitmapHunter拥有多个Action同时附件在上面
+boolean hasMultiple = joined != null &amp;&amp; !joined.isEmpty();
+
+// Hunter has no requests, bail early. 此处说明BitmapHunter没有请求。
+if (single == null &amp;&amp; !hasMultiple) {
+  continue;
+}
+
+// 如果下面判断为真，说明需要暂停对应的Action
+if (single != null &amp;&amp; single.getTag().equals(tag)) {
+  // 从hunter中detach该Action
+  hunter.detach(single);
+  // 将该Action放入pausedActions队列当中
+  pausedActions.put(single.getTarget(), single);
+  if (loggingEnabled) {
+    log(OWNER\_DISPATCHER, VERB\_PAUSED, single.request.logId(),
+        &quot;because tag &apos;&quot; + tag + &quot;&apos; was paused&quot;);
+  }
+}
+
+// 如果BitmapHunter还有附加的其他的Actions，那么还需要依次检查他们。
+if (hasMultiple) {
+  for (int i = joined.size() - 1; i &gt;= 0; i--) {
+    Action action = joined.get(i);
+    if (!action.getTag().equals(tag)) {
+      continue;
+    }
+
+    hunter.detach(action);
+    pausedActions.put(action.getTarget(), action);
+    if (loggingEnabled) {
+      log(OWNER\_DISPATCHER, VERB\_PAUSED, action.request.logId(),
+          &quot;because tag &apos;&quot; + tag + &quot;&apos; was paused&quot;);
+    }
+  }
+}
+
+// Check if the hunter can be cancelled in case all its requests
+// had the tag being paused here.
+if (hunter.cancel()) {
+  it.remove();
+  if (loggingEnabled) {
+    log(OWNER\_DISPATCHER, VERB\_CANCELED, getLogIdsForHunter(hunter), &quot;all actions paused&quot;);
+  }
+}
+</code></pre><p>  }<br>}</p>
+<p>有个地方比较有意思，需要仔细考虑的：此处的tag并不是之前我们说的cacheKey，cacheKey一般是根据图片的网址或者大小而设定的，一般用于缓存等情况；而此处的tag则一般是用来暂定恢复任务，那什么时候要暂定或者恢复任务呢？ 我进入一个Activity，要使用Picasso显示一个图片，但我希望在Activity退出的时候，该图片只是暂停，因为我后面很快还要用到，那这个时候就应该使用恢复和暂停，那Tag呢？这种情况下使用Activity的名字作为tag就完全可以。 <strong> performResumeTag(Object tag)</strong></p>
+<p>void performResumeTag(Object tag) {<br>  // Trying to resume a tag that is not paused.<br>  // 尝试恢复tag对应的暂停的请求<br>  if (!pausedTags.remove(tag)) {<br>    return;<br>  }</p>
+<p>  // 将同一个tag对应的Action放在一个List当中<br>  List<action> batch = null;<br>  for (Iterator<action> i = pausedActions.values().iterator(); i.hasNext();) {<br>    Action action = i.next();<br>    if (action.getTag().equals(tag)) {<br>      if (batch == null) {<br>        batch = new ArrayList<action>();<br>      }<br>      batch.add(action);<br>      i.remove();<br>    }<br>  }</action></action></action></p>
+<p>  if (batch != null) {<br>    // 通知主线程进行处理<br>    mainThreadHandler.sendMessage(mainThreadHandler.obtainMessage(REQUEST_BATCH_RESUME, batch));<br>  }<br>}</p>
+<p>执行恢复任务的处理函数，其实这段代码比较简单，就做了两件事情：</p>
+<ol>
+<li>从pausedActions中找到所有的tag对应的Action，将其放入到batch的List当中。</li>
+<li>该batch通过主线程的Handler发送到主线程上去处理。</li>
+</ol>
+<p>这个和其他的就明显不一样啊，其他的任务处理函数，一般在DispatcherThread线程上就处理完成了，那这个为什么要发送到主线程上去处理呢？还是先去看看再主线程的HANDLER上，接收到这个Message之后，到底做了什么工作？相关的代码片段：</p>
+<p>  case REQUEST_BATCH_RESUME:<br>      //请求被恢复了，还不太懂其业务逻辑。<br>    @SuppressWarnings(“unchecked”) List<action> batch = (List<action>) msg.obj;<br>    for (int i = 0, n = batch.size(); i &lt; n; i++) {<br>      Action action = batch.get(i);<br>      action.picasso.resumeAction(action);<br>    }<br>    break;</action></action></p>
+<p>之前的时候还不清楚这个是怎么的逻辑，现在清晰一些，其实是在主线程上，依次通过Picasso中的resumeAction(action)函数将其唤醒。那resumeAction(action)又做了什么工作呢？ 在Picasso中我们有分析过这段代码的作用，我们现在再回过头来看一下。</p>
+<p>void resumeAction(Action action) {<br>  Bitmap bitmap = null;<br>  if (!action.skipCache) {<br>    bitmap = quickMemoryCacheCheck(action.getKey());<br>  }</p>
+<p>  if (bitmap != null) {<br>    // Resumed action is cached, complete immediately.<br>    deliverAction(bitmap, MEMORY, action);<br>    if (loggingEnabled) {<br>      log(OWNER_MAIN, VERB_COMPLETED, action.request.logId(), “from “ + MEMORY);<br>    }<br>  } else {<br>    // Re-submit the action to the executor.<br>    enqueueAndSubmit(action);<br>    if (loggingEnabled) {<br>      log(OWNER_MAIN, VERB_RESUMED, action.request.logId());<br>    }<br>  }<br>}</p>
+<p>现在看就简单明了，同样的两步工作：</p>
+<ol>
+<li>尝试从Cache中获取Bitmap，如果有，则直接通过deliverAction(bitmap, MEMORY, action)派发相应。</li>
+<li>如果没有，那么说明需要重新执行请求，将action添加到队列当中，并提交。</li>
+</ol>
+<p><strong>performRetry(BitmapHunter hunter)</strong></p>
+<p>void performRetry(BitmapHunter hunter) {<br>  if (hunter.isCancelled()) return;</p>
+<p>  if (service.isShutdown()) {<br>    performError(hunter, false);<br>    return;<br>  }</p>
+<p>  // 检查网络状态<br>  NetworkInfo networkInfo = null;<br>  if (scansNetworkChanges) {<br>    ConnectivityManager connectivityManager = getService(context, CONNECTIVITY_SERVICE);<br>    networkInfo = connectivityManager.getActiveNetworkInfo();<br>  }</p>
+<p>  // 是否有网络连接<br>  boolean hasConnectivity = networkInfo != null &amp;&amp; networkInfo.isConnected();<br>  // 根据当前的网络状态和BitmapHunter的重试次数，来判断是否需要重试<br>  boolean shouldRetryHunter = hunter.shouldRetry(airplaneMode, networkInfo);<br>  // BitmapHunter中保存的Action对应的RequestHandler是否支持重试？<br>  boolean supportsReplay = hunter.supportsReplay();</p>
+<p>  if (!shouldRetryHunter) {<br>    // Mark for replay only if we observe network info changes and support replay.<br>    // 如果BitmapHunter的重试次数已经用完，还是要根据当前的网络状态看看是否还让其重新尝试<br>    boolean willReplay = scansNetworkChanges &amp;&amp; supportsReplay;<br>    // 通知执行performError<br>    performError(hunter, willReplay);<br>    // 如果网络状态变化，并且RequestHandler支持重试，那么就重新尝试<br>    if (willReplay) {<br>      // 标记以重新尝试 ，调用markForReplay(hunter)，实际上是将对应的Action放入到failedActions当中。<br>      markForReplay(hunter);<br>    }<br>    return;<br>  }</p>
+<p>  // If we don’t scan for network changes (missing permission) or if we have connectivity, retry.<br>  // 此时对于BitmapHunter来说，支持网络重试，如果受权限限制无法检查网络状态，或者是网络连接，那么直接重试。<br>  if (!scansNetworkChanges || hasConnectivity) {<br>    if (hunter.getPicasso().loggingEnabled) {<br>      log(OWNER_DISPATCHER, VERB_RETRYING, getLogIdsForHunter(hunter));<br>    }<br>    // 向service提交该hunter。<br>    hunter.future = service.submit(hunter);<br>    return;<br>  }</p>
+<p>  performError(hunter, supportsReplay);</p>
+<p>  // 如果支持重试，调用markForReplay(hunter)，实际上是将对应的Action放入到failedActions当中。<br>  if (supportsReplay) {<br>    markForReplay(hunter);<br>  }<br>}</p>
+<p>这里面主要做了以下的事情：</p>
+<ol>
+<li>检查对应的BtimapHunter是否还有重试机会，如果有，那么如果网络又畅通，则直接将对应的BitmapHunter提交到service当中</li>
+<li><p>如果BitmapHunter没有重试机会，已经用完了，那么就检查下对应的Handler是否支持重试，如果可以的话，则将其放入到failedActions队列当中。</p>
+<p><strong>performComplete(BitmapHunter hunter) &amp;&amp; performBatchComplete()</strong> 当BitmapHunter执行完成之后，会给Dispatcher的Handler发送Message，Handler的处理函数会调用performComplete(BitmapHunter hunter)函数进行处理。其代码如下：</p>
+</li>
+</ol>
+<p>void performComplete(BitmapHunter hunter) {<br>  // 是否要跳过Memory Cache<br>  if (!hunter.shouldSkipMemoryCache()) {<br>    // 不跳过的话，则将hunter的key和结果放入Cache当中Result为对应的图像<br>    cache.set(hunter.getKey(), hunter.getResult());<br>  }<br>  // 从hunterMap中删除该hunter<br>  hunterMap.remove(hunter.getKey());<br>  // 打包，看说明是将hunter放到batch的list当中，并检查如果没有HUNTER_DELAY_NEXT_BATCH，则200ms之后，发送该Message<br>  // handler处理该Message，其实实际上直接调用performBatchComplete()<br>  batch(hunter);<br>  if (hunter.getPicasso().loggingEnabled) {<br>    log(OWNER_DISPATCHER, VERB_BATCHED, getLogIdsForHunter(hunter), “for completion”);<br>  }<br>}</p>
+<p>void performBatchComplete() {<br>  // 打包处理，同时取出batch所有的BitmapHunter，并发送给主线程Handler进行处理。<br>  List<bitmaphunter> copy = new ArrayList<bitmaphunter>(batch);<br>  batch.clear();<br>  mainThreadHandler.sendMessage(mainThreadHandler.obtainMessage(HUNTER_BATCH_COMPLETE, copy));<br>  logBatch(copy);<br>}</bitmaphunter></bitmaphunter></p>
+<p>Picasso对BitmapHunter执行的任务结果的分发采用了打包的机制进行处理，换句话说，所有的BitmapHunter执行完成之后，会调用performComplete(BitmapHunter hunter)，在该方法中，Picasso将hunter放入batch列表中，然后在Handler中的Messages中是否有HUNTER_DELAY_NEXT_BATCH等待执行，如果没有，那么则等200ms之后再分发，而此时hunter已经加入到batch当中。200ms之后，Handler接收到HUNTER_DELAY_NEXT_BATCH的Message，则将batch中所有的BitmapHunter的结果一起进行处理。 我们接着看看主线程的HANDLER接收到HUNTER_BATCH_COMPLETE的消息的时候，是如何处理的：</p>
+<p>  case HUNTER_BATCH_COMPLETE: {<br>            //此处应该是和Volley一样，打包处理的图形库，因为这些图片可能地址以及大小都是一样的所有打包在一起进行处理。<br>    @SuppressWarnings(“unchecked”) List<bitmaphunter> batch = (List<bitmaphunter>) msg.obj;<br>    //noinspection ForLoopReplaceableByForEach<br>    //依次进行分发<br>    for (int i = 0, n = batch.size(); i &lt; n; i++) {<br>      BitmapHunter hunter = batch.get(i);<br>      hunter.picasso.complete(hunter);<br>    }<br>    break;</bitmaphunter></bitmaphunter></p>
+<p>其实就是依次调用了Picasso.complete(BitmapHunter)方法，继续查看，则是调用了Action的</p>
+<p>void complete(Bitmap result, Picasso.LoadedFrom from);</p>
+<p>好了，到现在位置，Dispatcher我们也学习完毕了，下一篇文章中，会对Picasso的整体框架做一个梳理。   Tips： Volley的访问如果不成功的话，是有惩罚系数的，但Picasso默认现在看可能只是设置了RETRY_DELAY=500;BATCH_DELAY=200;</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Picasso/" rel="tag"># Picasso</a>
+          
+            <a href="/tags/Dispatcher/" rel="tag"># Dispatcher</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/25/picasso-source-code-2-bitmap-hunter/" rel="next" title="Picasso源代码分析：3、BitmapHunter">
+                <i class="fa fa-chevron-left"></i> Picasso源代码分析：3、BitmapHunter
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/27/picasso-source-code-5-architecture/" rel="prev" title="Picasso源代码分析：5、Picasso架构分析">
+                Picasso源代码分析：5、Picasso架构分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Dispatcher"><span class="nav-number">1.</span> <span class="nav-text">Dispatcher</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="InputStream,OutputStreamIO是最常用的组件之一，也想写一篇关于IO的，总结下，也方便自己查找，主要分三个部分来写，1、传统IO，2、NIO ，3、Java7中的NIO.2 首先是传统的IO操作，这是Java IO的基础，在Java中，所有的IO操作以流的方式存在，如果从流的角度来分来，在我们使用的时候，分为输出流/输入流，字节流/字符流，节点流/处理流。其中输出流和输入流不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java IO 之一：传统IO (1)InputStream,OutputStream">
+<meta property="og:url" content="http://yoursite.com/2013/04/04/java-io-inputstream-outputstream/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="InputStream,OutputStreamIO是最常用的组件之一，也想写一篇关于IO的，总结下，也方便自己查找，主要分三个部分来写，1、传统IO，2、NIO ，3、Java7中的NIO.2 首先是传统的IO操作，这是Java IO的基础，在Java中，所有的IO操作以流的方式存在，如果从流的角度来分来，在我们使用的时候，分为输出流/输入流，字节流/字符流，节点流/处理流。其中输出流和输入流不">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2013/04/InputStream.bmp">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2013/04/OutputStream.bmp">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.547Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java IO 之一：传统IO (1)InputStream,OutputStream">
+<meta name="twitter:description" content="InputStream,OutputStreamIO是最常用的组件之一，也想写一篇关于IO的，总结下，也方便自己查找，主要分三个部分来写，1、传统IO，2、NIO ，3、Java7中的NIO.2 首先是传统的IO操作，这是Java IO的基础，在Java中，所有的IO操作以流的方式存在，如果从流的角度来分来，在我们使用的时候，分为输出流/输入流，字节流/字符流，节点流/处理流。其中输出流和输入流不">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2013/04/InputStream.bmp">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/04/04/java-io-inputstream-outputstream/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java IO 之一：传统IO (1)InputStream,OutputStream | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/04/04/java-io-inputstream-outputstream/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java IO 之一：传统IO (1)InputStream,OutputStream
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-04-04 12:52:12" itemprop="dateCreated datePublished" datetime="2013-04-04T12:52:12+08:00">2013-04-04</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="InputStream-OutputStream"><a href="#InputStream-OutputStream" class="headerlink" title="InputStream,OutputStream"></a>InputStream,OutputStream</h1><p>IO是最常用的组件之一，也想写一篇关于IO的，总结下，也方便自己查找，主要分三个部分来写，1、传统IO，2、NIO ，3、Java7中的NIO.2 首先是传统的IO操作，这是Java IO的基础，在Java中，所有的IO操作以流的方式存在，如果从流的角度来分来，在我们使用的时候，分为输出流/输入流，字节流/字符流，节点流/处理流。其中输出流和输入流不用多说，指的就是数据的流向，要从硬盘中读入内存，那必然是输入流，要从内存中写到硬盘等外部设备中，那就是输出流。 字节流/字符流：其实两者的区别在于其数据单元的大小上，字节流，每次处理的都是8bit的字节，而字符流，处理的都是16bit的字符，因此我们可以容易理解，在处理汉字的时候，大多数用的字符流而并非字节流。 节点流/处理流：简单的理解，节点流是一种较低级别的数据流，是直接从硬盘、网络等I/O设备中获取数据的流，处理流是节点流的一个封装，通过对节点流的封装，可以大大简化我们在操作Java的IO的时候的编程的复杂性。同时，在面向对象设计中，使用处理流可以使我们的程序能够更加容易的适配不同的I/O设备，降低程序对I/O具体操作的依赖。 Java的I/O有4个处理流的基类，InputStream、OutputStream、Reader、Writer，在该4个基类的基础之上派生出很多的子类，我用下面这样一张图来梳理一下。</p>
+<h2 id="InputStream"><a href="#InputStream" class="headerlink" title="InputStream"></a>InputStream</h2><p><a href="/images/wordpress/2013/04/InputStream.bmp"><img src="/images/wordpress/2013/04/InputStream.bmp" alt="InputStream"></a>   先看看InputStream</p>
+<p>public abstract class InputStream<br>extends Object<br>implements Closeable</p>
+<p>This abstract class is the superclass of all classes representing an input stream of bytes. Applications that need to define a subclass of <code>InputStream</code> must always provide a method that returns the next byte of input. InputStream是所有输入字节流的父类，而要继承InputStream必须实现一个返回下一个字节的方法，同时我们也注意到，在Java 7中，该类实现了Closeable接口，所以我们可以直接在try后面打开文件，从而减少了手动关闭的麻烦。既然是所有字节输入流的父类，那我们就看一看里面声明的主要的方法有那些。</p>
+<p>Modifier and Type</p>
+<p>Method and Description</p>
+<p><code>int</code></p>
+<p><code>**[available](http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#available())**()</code> </p>
+<p>Returns an estimate of the number of bytes that can be read (or skipped over) from this input stream without blocking by the next invocation of a method for this input stream.</p>
+<p><code>void</code></p>
+<p><code>**[close](http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#close())**()</code> </p>
+<p>Closes this input stream and releases any system resources associated with the stream.</p>
+<p><code>void</code></p>
+<p><code>**[mark](http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#mark(int))**(int readlimit)</code> </p>
+<p>Marks the current position in this input stream.</p>
+<p><code>boolean</code></p>
+<p><code>**[markSupported](http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#markSupported())**()</code> </p>
+<p>Tests if this input stream supports the <code>mark</code> and <code>reset</code> methods.</p>
+<p><code>abstract int</code></p>
+<p><code>**[read](http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#read())**()</code> </p>
+<p>Reads the next byte of data from the input stream.</p>
+<p><code>int</code></p>
+<p><code>**[read](http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#read(byte[]))**(byte[] b)</code> </p>
+<p>Reads some number of bytes from the input stream and stores them into the buffer array <code>b</code>.</p>
+<p><code>int</code></p>
+<p><code>**[read](http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#read(byte[], int, int))**(byte[] b, int off, int len)</code> </p>
+<p>Reads up to <code>len</code> bytes of data from the input stream into an array of bytes.</p>
+<p><code>void</code></p>
+<p><code>**[reset](http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#reset())**()</code> </p>
+<p>Repositions this stream to the position at the time the <code>mark</code> method was last called on this input stream.</p>
+<p><code>long</code></p>
+<p><code>**[skip](http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#skip(long))**(long n)</code> </p>
+<p>Skips over and discards <code>n</code> bytes of data from this input stream.</p>
+<p>我们查看源文件也可以发现，InputStream中，有一个抽象方法 read()，而read(byte[] b,),<strong><a href="http://docs.oracle.com/javase/7/docs/api/java/io/InputStream.html#read(byte[], int, int" target="_blank" rel="noopener">read</a>)</strong>(byte[] b, int off, int len)都在read()方法上实现。然而向其他的available()、close()、mark()、等等都是需要在子类中去重载的。</p>
+<h2 id="OutputStream"><a href="#OutputStream" class="headerlink" title="OutputStream"></a>OutputStream</h2><p><a href="/images/wordpress/2013/04/OutputStream.bmp"><img src="/images/wordpress/2013/04/OutputStream.bmp" alt="OutputStream"></a> OutputStream与InputStream一样，是基于字节流的处理，是ByteArrayOutputStream, FileOutputStream, FilterOutputStream, ObjectOutputStream, OutputStream, PipedOutputStream的父类，其中提供了</p>
+<p><code>void</code></p>
+<p><code>**[close](http://docs.oracle.com/javase/7/docs/api/java/io/OutputStream.html#close())**()</code> </p>
+<p>Closes this output stream and releases any system resources associated with this stream.</p>
+<p><code>void</code></p>
+<p><code>**[flush](http://docs.oracle.com/javase/7/docs/api/java/io/OutputStream.html#flush())**()</code> </p>
+<p>Flushes this output stream and forces any buffered output bytes to be written out.</p>
+<p><code>void</code></p>
+<p><code>**[write](http://docs.oracle.com/javase/7/docs/api/java/io/OutputStream.html#write(byte[]))**(byte[] b)</code> </p>
+<p>Writes <code>b.length</code> bytes from the specified byte array to this output stream.</p>
+<p><code>void</code></p>
+<p><code>**[write](http://docs.oracle.com/javase/7/docs/api/java/io/OutputStream.html#write(byte[], int, int))**(byte[] b, int off, int len)</code> </p>
+<p>Writes <code>len</code> bytes from the specified byte array starting at offset <code>off</code> to this output stream.</p>
+<p><code>abstract void</code></p>
+<p><code>**[write](http://docs.oracle.com/javase/7/docs/api/java/io/OutputStream.html#write(int))**(int b)</code> </p>
+<p>Writes the specified byte to this output stream.</p>
+<h3 id="一-AudioInputStream"><a href="#一-AudioInputStream" class="headerlink" title="(一)AudioInputStream"></a>(一)AudioInputStream</h3><p>该类是音频输入流，我们一般很少用到，这里不是讨论的重点。</p>
+<h3 id="二-ByteArrayInputStream-amp-amp-ByteArrayOutputStream这两个方法是将数组封装成Stream的类。"><a href="#二-ByteArrayInputStream-amp-amp-ByteArrayOutputStream这两个方法是将数组封装成Stream的类。" class="headerlink" title="(二)ByteArrayInputStream &amp;&amp; ByteArrayOutputStream这两个方法是将数组封装成Stream的类。"></a>(二)ByteArrayInputStream &amp;&amp; ByteArrayOutputStream这两个方法是将数组封装成Stream的类。</h3><p>package InputStream;</p>
+<p>import java.io.ByteArrayInputStream;<br>import java.io.ByteArrayOutputStream;<br>import java.io.File;<br>import java.io.FileNotFoundException;<br>import java.io.FileOutputStream;<br>import java.io.IOException;</p>
+<p>public class TestByteArrayStream {<br>    public static void main(String[] args) throws IOException<br>    {<br>        //Default Constructor:Size is set to 32 On OpenJDK7 / Ubuntu12.04<br>        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();<br>        for(int i=0;i&lt;100;i++)<br>            byteArrayOutputStream.write(i);<br>        try {<br>            FileOutputStream fileOutputStream=new FileOutputStream(new File(“TestByteArrayStream.data”));<br>            byteArrayOutputStream.writeTo(fileOutputStream);<br>        } catch (FileNotFoundException e) {<br>            // TODO Auto-generated catch block<br>            e.printStackTrace();<br>        } catch (IOException e) {<br>            // TODO Auto-generated catch block<br>            e.printStackTrace();<br>        }</p>
+<pre><code>    byte data\[\]=new byte\[100\];
+    for(byte i=0;i&lt;100;i++)
+        data\[i\]=i;
+    ByteArrayInputStream byteArrayInputStream=new ByteArrayInputStream(data);
+    int tmp;
+    //the next byte of data, or -1 if the end of the stream has been reached.
+    while((tmp=byteArrayInputStream.read())!=-1)
+    {
+        System.out.print(tmp+&quot; &quot;);
+        if(byteArrayInputStream.available()==6)
+        {
+            byteArrayInputStream.skip(10);
+        }
+    }
+
+    byteArrayInputStream.close();
+    byteArrayOutputStream.close();
+}
+</code></pre><p>}</p>
+<p>该两个类比较简单，即使将数组这一节点流封装成处理流丢给上层处理，需要注意的是，可以发现在ByteArrayInputStream或者ByteArrayOutputStream中，关于读、写方法都是同步的，可以保证数据的完整性。</p>
+<h3 id="三-FileInputStream-FileOutputStream"><a href="#三-FileInputStream-FileOutputStream" class="headerlink" title="(三)FileInputStream\FileOutputStream"></a>(三)FileInputStream\FileOutputStream</h3><p>package InputStream;</p>
+<p>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.FileOutputStream;<br>import java.io.IOException;</p>
+<p>public class TestFileStream {<br>    public static void main(String[] args) throws IOException<br>    {<br>        try {<br>            FileInputStream fileInputStream=new FileInputStream(“src/InputStream/TestFileStream.java”);<br>            byte buf[]=new byte[1024];<br>            FileOutputStream fileOutputStream=new FileOutputStream(“TestFileStream.data”);<br>            while(fileInputStream.available()&gt;0)<br>            {<br>                int count=fileInputStream.read(buf);<br>                fileOutputStream.write(buf,0,count);<br>            }<br>            fileInputStream.close();<br>            fileOutputStream.close();<br>        }catch (FileNotFoundException e) {<br>            // TODO: handle exception<br>            e.printStackTrace();<br>        }catch (IOException e)<br>        {<br>            e.printStackTrace();<br>        }<br>    }</p>
+<p>}</p>
+<h3 id="四-FilterInputStream-FilterOutputStream"><a href="#四-FilterInputStream-FilterOutputStream" class="headerlink" title="(四)FilterInputStream\FilterOutputStream"></a>(四)FilterInputStream\FilterOutputStream</h3><p>从上面的类的继承关系上来看，都有很多子类，我们来看一下这两个类的作用。</p>
+<p>FilterInputStream<br>A FilterInputStream contains some other input stream, which it uses as its basic source of data, possibly transforming the data along the way or providing additional functionality. The class FilterInputStream itself simply overrides all methods of InputStream with versions that pass all requests to the contained input stream. Subclasses of FilterInputStream may further override some of these methods and may also provide additional methods and fields.</p>
+<p>FilterOutputStream<br>This class is the superclass of all classes that filter output streams. These streams sit on top of an already existing output stream (the underlying output stream) which it uses as its basic sink of data, but possibly transforming the data along the way or providing additional functionality.<br>The class FilterOutputStream itself simply overrides all methods of OutputStream with versions that pass all requests to the underlying output stream. Subclasses ofFilterOutputStream may further override some of these methods as well as provide additional methods and fields.</p>
+<p>从Java的API文档中我们可以看到，这两个类只是实现了对InputStream和OutputStream的简单封装，在类里面都分别定义了一个protected Inputstream in;protected OutputStream out;通过这两个类及其子类，我们可以更好的优化程序数据流通路。</p>
+<h4 id="BufferedInputStream-BufferedOutputStream"><a href="#BufferedInputStream-BufferedOutputStream" class="headerlink" title="BufferedInputStream/BufferedOutputStream"></a><1>BufferedInputStream/BufferedOutputStream</1></h4><p>A BufferedInputStream adds functionality to another input stream-namely, the ability to buffer the input and to support the mark and reset methods. When the BufferedInputStream is created, an internal buffer array is created. As bytes from the stream are read or skipped, the internal buffer is refilled as necessary from the contained input stream, many bytes at a time. The mark operation remembers a point in the input stream and the reset operation causes all the bytes read since the most recent mark operation to be reread before new bytes are taken from the contained input stream.</p>
+<p>顾名思义，BufferedInputStream就是将我们(三)FileInputStream\FileOutputStream中写的程序那样，在外面使用的buffer缓冲区，内建在类中，查看源文件我们可以看到，默认的buffer大小为8192byte，同时还提供了一个mark和reset的方法，因此，要搞明白这两个类的使用方法，我们需要好好注意这两个方法的使用，下面是一个小小的demo。</p>
+<p>package InputStream;</p>
+<p>import java.io.BufferedInputStream;<br>import java.io.BufferedOutputStream;<br>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.FileOutputStream;<br>import java.io.IOException;</p>
+<p>public class TestBufferedStream {<br>    public static void main(String[] args)<br>    {<br>        try {<br>            FileInputStream fileInputStream=new FileInputStream(“src/InputStream/TestBufferedStream.java”);<br>            FileOutputStream fileOutputStream=new FileOutputStream(“TestBufferedStream.data”);</p>
+<pre><code>        BufferedInputStream bufferedInputStream=new BufferedInputStream(fileInputStream);
+        BufferedOutputStream bufferedOutputStream=new BufferedOutputStream(fileOutputStream);
+
+        int times=0;
+        int marktimes=0;
+        int count=0;
+        bufferedInputStream.mark(1000);
+        while(bufferedInputStream.available()&gt;0)
+        {
+            byte\[\] buff;
+            if(marktimes&lt;3)
+                buff=new byte\[1000\];
+            else{
+                if(marktimes==3)
+                    bufferedInputStream.mark(1000);
+                buff=new byte\[8192\];
+            }
+            marktimes++;
+            int counttmp=bufferedInputStream.read(buff);
+            count=counttmp+count;
+            //for(byte tmp:buff)
+            //    System.out.print(String.valueOf(tmp));
+            bufferedOutputStream.write(buff,0,counttmp);
+            if(bufferedInputStream.available()&lt;100 &amp;&amp; times&lt;5)
+            {
+                System.out.println(&quot;\\n上一次读取: &quot;+count+&quot; bytes&quot;);
+                count=0;
+                bufferedInputStream.reset();
+                times++;
+            }
+        }
+        System.out.println(&quot;\\n上一次读取: &quot;+count+&quot; bytes&quot;);
+
+        //注意！应该先关闭BufferedInputStream/BufferedOutputStream，在关闭InputStream/OutStream
+        //或者只关闭BufferedStream即刻，因为在BufferedStream的close方法中，会将构造函数中传入的InputStream/OutputStream自动关闭。
+        bufferedInputStream.close();
+        bufferedOutputStream.close();
+        //fileInputStream.close();
+        //fileOutputStream.close();
+
+    }catch (FileNotFoundException e) {
+        // TODO: handle exception
+        e.printStackTrace();
+    }catch (IOException e)
+    {
+        e.printStackTrace();
+    }
+}
+</code></pre><p>}</p>
+<p>比较简单，就不加注释了，主要是讲讲其中的mark(int readlimit)其中的<code>readlimit</code> - the maximum limit of bytes that can be read before the mark position becomes invalid.就是说，在读到readlimit个字节之前，可以保证该mark有效的。 mark函数和reset()函数是一起的，当mark之后，调用reset函数，则再读取数据的时候，读取到的就是mark时所在的位置，上图。同时要注意到，在mark函数运行之前，不能调用reset函数，否则会引发IOException错误(<code>[IOException](http://docs.oracle.com/javase/7/docs/api/java/io/IOException.html &quot;class in java.io&quot;)</code> - if this stream has not been marked or, if the mark has been invalidated, or the stream has been closed by invoking its <a href="http://docs.oracle.com/javase/7/docs/api/java/io/BufferedInputStream.html#close(" target="_blank" rel="noopener"><code>close()</code></a>) method, or an I/O error occurs.) 同时，我们还应该注意到的时候，我们使用处理流之后，就不需要去关闭我们包装的流，当我们直接关闭处理流的时候，传入的被包装的流会被自动关闭。 上述程序的运行结果为</p>
+<p>上一次读取: 1987 bytes<br>上一次读取: 1987 bytes<br>上一次读取: 987 bytes<br>上一次读取: 987 bytes<br>上一次读取: 987 bytes<br>上一次读取: 987 bytes</p>
+<p>最初的时候，我们设置的mark为开始的位置，所以那时我们调用reset，便会回到文章开头，所以我们看到执行的结果中，头两次都是1987 bytes，当我们在文件读写过程中设置标签的时候，可以发现，此时读取便会从我们设置标签的位置开始，程序中设置的是1000,我们查看生成的文件，也是这样的效果。</p>
+<h4 id="2-CheckedInputStream-CheckedOutputStream"><a href="#2-CheckedInputStream-CheckedOutputStream" class="headerlink" title="(2)CheckedInputStream/CheckedOutputStream"></a>(2)CheckedInputStream/CheckedOutputStream</h4><p>CheckedInputStream:An input stream that also maintains a checksum of the data being read. The checksum can then be used to verify the integrity of the input data. CheckedOutputStream:An output stream that also maintains a checksum of the data being written. The checksum can then be used to verify the integrity of the output data. CheckedInputStream和CheckedInputStream的源码在 java/util/zip/目录下，其作用是为了校验数据的准确行，其构造函数为</p>
+<p>CheckedInputStream(InputStream in, Checksum cksum)<br>Creates an input stream using the specified Checksum.</p>
+<p>CheckedOutputStream(OutputStream out, Checksum cksum)<br>Creates an output stream with the specified Checksum.</p>
+<p>需要我们传入InputStream/OutputStream流，和一个Checksum接口，查看zip下的源文件，发现Java已经为我们写好了两个可以用的继承了Checksum接口的源程序。Adler32/CRC32,我们以CRC32为例，来看看怎么使用。</p>
+<p>package InputStream;</p>
+<p>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.FileOutputStream;<br>import java.io.InputStream;<br>import java.util.zip.CRC32;<br>import java.util.zip.CheckedInputStream;<br>import java.util.zip.CheckedOutputStream;</p>
+<p>public class TestCheckedStream{<br>    public static void main(String[] args)<br>    {<br>        FileInputStream fileInputStream;<br>        FileOutputStream fileOutputStream;</p>
+<pre><code>    CheckedInputStream checkedInputStream;
+    CheckedOutputStream checkedOutputStream;
+
+    CRC32 crc32=new CRC32();
+
+    try{
+        fileInputStream=new FileInputStream(&quot;src/InputStream/TestCheckedStream.java&quot;);
+        fileOutputStream=new FileOutputStream(&quot;TestCheckedStream.data&quot;);
+
+        checkedInputStream=new CheckedInputStream(fileInputStream,crc32);
+        checkedOutputStream=new CheckedOutputStream(fileOutputStream, crc32);
+
+        System.out.println(&quot;CheckedInputStream:CheckSum:&quot;+checkedInputStream.getChecksum().getValue());
+        System.out.println(&quot;CheckedOutStream:CheckSum:&quot;+checkedOutputStream.getChecksum().getValue());
+        byte\[\] buffer=new byte\[1024\];
+        while(checkedInputStream.available()&gt;0)
+        {
+            int count=checkedInputStream.read(buffer);
+            checkedOutputStream.write(buffer, 0, count);
+        }
+        System.out.println(&quot;CheckedInputStream:CheckSum:&quot;+checkedInputStream.getChecksum().getValue());
+        System.out.println(&quot;CheckedOutStream:CheckSum:&quot;+checkedOutputStream.getChecksum().getValue());
+
+        checkedInputStream.close();
+        checkedOutputStream.close();
+    }
+    catch(Exception ex)
+    {
+
+    }
+
+}
+</code></pre><p>}</p>
+<p>运行程序，得到结果为：</p>
+<p>CheckedInputStream:CheckSum:0<br>CheckedOutStream:CheckSum:0<br>CheckedInputStream:CheckSum:280008503<br>CheckedOutStream:CheckSum:280008503</p>
+<p>可以发现，CheckedSum是根据流过的数据流来计算的。在实际使用中，我们可以使用这个办法来简单的判断文件是否完整。</p>
+<h3 id="3-CipherInputStream-CipherOutputStream"><a href="#3-CipherInputStream-CipherOutputStream" class="headerlink" title="(3)CipherInputStream/CipherOutputStream"></a>(3)CipherInputStream/CipherOutputStream</h3><p>该子类是Java中的加密类 A CipherInputStream is composed of an InputStream and a Cipher so that read() methods return data that are read in from the underlying InputStream but have been additionally processed by the Cipher. The Cipher must be fully initialized before being used by a CipherInputStream. 之前用过，回去翻翻代码，再补充一下相关的内容，可单独作为一篇来仔细理解。</p>
+<h3 id="4-DataInputStream-DataOutputStream"><a href="#4-DataInputStream-DataOutputStream" class="headerlink" title="(4)DataInputStream/DataOutputStream"></a>(4)DataInputStream/DataOutputStream</h3><p>该两个类主要的作用在于帮助我们省去格式转换的麻烦，我们可以直接将特定格式的内容写入输出流或者从输入流中读到信息，使用起来也比较简单，直接上代码吧。</p>
+<p>package InputStream;</p>
+<p>import java.io.DataInputStream;<br>import java.io.DataOutputStream;<br>import java.io.FileInputStream;<br>import java.io.FileOutputStream;<br>import java.util.ArrayList;</p>
+<p>import javax.swing.text.StyledEditorKit.ForegroundAction;</p>
+<p>public class TestDataStream {<br>    public static void main(String[] args)<br>    {<br>        ArrayList<fruit> arrayList=new ArrayList<fruit>();<br>        for(int i=0;i&lt;10;i++)<br>        {<br>            Fruit tmp=new Fruit(“Apple”+i, i);<br>            arrayList.add(tmp);<br>        }</fruit></fruit></p>
+<pre><code>    try{
+        FileOutputStream fileOutputStream=new FileOutputStream(&quot;TestDataStream.data&quot;);
+        DataOutputStream dataOutputStream=new DataOutputStream(fileOutputStream);
+
+        for(Fruit tmp:arrayList)
+        {
+            dataOutputStream.writeUTF(tmp.kind);
+            dataOutputStream.writeInt(tmp.price);
+        }
+
+        FileInputStream fileInputStream=new FileInputStream(&quot;TestDataStream.data&quot;);
+        DataInputStream dataInputStream=new DataInputStream(fileInputStream);
+        while(dataInputStream.available()&gt;0){
+            System.out.println(&quot;Get: Kind:&quot;+dataInputStream.readUTF()+&quot; Price:&quot;+dataInputStream.readInt());
+        }
+
+        dataInputStream.close();
+        dataOutputStream.close();
+    }
+    catch(Exception ex)
+    {
+        ex.printStackTrace();
+    }
+
+}
+</code></pre><p>}</p>
+<p>class Fruit{<br>    public String kind;<br>    public int price;<br>    public Fruit(String kind,int price){<br>        this.kind=kind;<br>        this.price=price;<br>    }<br>}</p>
+<p>程序的运行结果为：</p>
+<p>Get: Kind:Apple0 Price:0<br>Get: Kind:Apple1 Price:1<br>Get: Kind:Apple2 Price:2<br>Get: Kind:Apple3 Price:3<br>Get: Kind:Apple4 Price:4<br>Get: Kind:Apple5 Price:5<br>Get: Kind:Apple6 Price:6<br>Get: Kind:Apple7 Price:7<br>Get: Kind:Apple8 Price:8<br>Get: Kind:Apple9 Price:9</p>
+<p>至于文件内容中具体是怎么保存的，我们不去做仔细的追求。</p>
+<h4 id="5-DeflaterInputStream-InflaterOutputStream-AND-InflaterInputStream-DeflaterOutputStream"><a href="#5-DeflaterInputStream-InflaterOutputStream-AND-InflaterInputStream-DeflaterOutputStream" class="headerlink" title="(5)DeflaterInputStream/InflaterOutputStream   AND  InflaterInputStream/DeflaterOutputStream"></a>(5)DeflaterInputStream/InflaterOutputStream   AND  InflaterInputStream/DeflaterOutputStream</h4><p>这是两组输入输出流，其实都是用的DEFLATE的加密解密算法，具体的大家可以参阅维基百科  <a href="https://zh.wikipedia.org/wiki/DEFLATE，使用这两组输入输出流，可以直接在输出的时候将我们的数据进行加密、解密。这里我们使用" target="_blank" rel="noopener">https://zh.wikipedia.org/wiki/DEFLATE，使用这两组输入输出流，可以直接在输出的时候将我们的数据进行加密、解密。这里我们使用</a> InflaterInputStream/DeflaterOutputStream来实验以下其用法，我们选择一个文件进行读取，压缩，解压。好了，开工。</p>
+<p>package InputStream;</p>
+<p>import java.io.File;<br>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.FileOutputStream;<br>import java.io.IOException;<br>import java.util.zip.Deflater;<br>import java.util.zip.DeflaterInputStream;<br>import java.util.zip.DeflaterOutputStream;<br>import java.util.zip.Inflater;<br>import java.util.zip.InflaterInputStream;<br>import java.util.zip.InflaterOutputStream;</p>
+<p>public class TestDeflaterStream {<br>    public static void main(String[] args){<br>        try{<br>            File file=new File(“src/InputStream/TestDeflaterStream.java”);<br>            FileInputStream fileInputStream=new FileInputStream(file);<br>            FileOutputStream fileOutputStream=new FileOutputStream(“TestDeflaterStream.data”);</p>
+<pre><code>        Deflater deflater=new Deflater();
+        deflater.setLevel(Deflater.BEST_COMPRESSION);
+        DeflaterOutputStream deflaterOutputStream=new DeflaterOutputStream(fileOutputStream, deflater);
+
+        byte\[\] buffer=new byte\[8192\];
+        System.out.println(&quot;文件 原始长度：&quot;+file.length());
+        while(fileInputStream.available()&gt;0){
+            int count=fileInputStream.read(buffer);
+            deflaterOutputStream.write(buffer, 0, count);
+        }
+
+        deflaterOutputStream.close();
+        fileInputStream.close();
+
+        file=new File(&quot;TestDeflaterStream.data&quot;);
+        fileInputStream=new FileInputStream(file);
+        InflaterInputStream inflaterInputStream=new InflaterInputStream(fileInputStream);
+
+        fileOutputStream=new FileOutputStream(&quot;TestDeflaterStream.java.data&quot;);
+        System.out.println(&quot;压缩后文件长度：&quot;+file.length());
+        while(inflaterInputStream.available()&gt;0){
+            int chardata=inflaterInputStream.read();
+            fileOutputStream.write(chardata);
+        }
+
+        fileOutputStream.close();
+        inflaterInputStream.close();
+
+    }
+    catch(FileNotFoundException ex)
+    {
+        ex.printStackTrace();
+    } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+}
+</code></pre><p>}</p>
+<p>程序会加密后保存到一个文件中 TestDeflaterStream.data中，然后解密，放入TestDeflaterStream.java.data 文件大小：</p>
+<p>文件 原始长度：1893<br>压缩后文件长度：622</p>
+<p>对于文本文档，压缩比还是很不错的，当然，这里选择的是最高的压缩比。</p>
+<h4 id="6-LineNumberInputStream"><a href="#6-LineNumberInputStream" class="headerlink" title="(6)LineNumberInputStream"></a>(6)LineNumberInputStream</h4><p>该类在Java中已经是被标志为deprecation，是因为不能准确的对字符统计行数，更好的方法是使用character流的类。如下所说：</p>
+<p><em>This class incorrectly assumes that bytes adequately represent characters. As of JDK 1.1, the preferred way to operate on character streams is via the new character-stream classes, which include a class for counting line numbers.</em></p>
+<p>而且提供的功能也比较简单， This class is an input stream filter that provides the added functionality of keeping track of the current line number. A line is a sequence of bytes ending with a carriage return character (<code>&#39;\r&#39;</code>), a newline character (<code>&#39;\n&#39;</code>), or a carriage return character followed immediately by a linefeed character. In all three cases, the line terminating character(s) are returned as a single newline character. 只是增加了一个行的标记，比较简单，不多探究。</p>
+<h4 id="7-PushbackInputStream"><a href="#7-PushbackInputStream" class="headerlink" title="(7)PushbackInputStream"></a>(7)<code>PushbackInputStream</code></h4><p>A <code>PushbackInputStream</code> adds functionality to another input stream, namely the ability to “push back” or “unread” one byte. This is useful in situations where it is convenient for a fragment of code to read an indefinite number of data bytes that are delimited by a particular byte value; after reading the terminating byte, the code fragment can “unread” it, so that the next read operation on the input stream will reread the byte that was pushed back. For example, bytes representing the characters constituting an identifier might be terminated by a byte representing an operator character; a method whose job is to read just an identifier can read until it sees the operator and then push the operator back to be re-read. 顾名思义，该类的主要目的在于帮助我们，可以将读过的数据再推送回去，下次读数据的时候，这些被推送回去的数据就可以被读到。用个小例子来看看其用法。</p>
+<p>package InputStream;</p>
+<p>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.IOException;<br>import java.io.LineNumberInputStream;<br>import java.io.PushbackInputStream;</p>
+<p>public class TestPushBackInputStream {<br>    public static void main(String[] args){</p>
+<pre><code>    try{
+        FileInputStream fileInputStream=new FileInputStream(&quot;src/InputStream/TestPushBackInputStream.java&quot;);
+        PushbackInputStream pushbackInputStream=new PushbackInputStream(fileInputStream,1024);  //默认情况下，buf为1
+
+        byte\[\] buffer=new byte\[10\];
+        int count=0;
+        boolean status=false;
+        while(pushbackInputStream.available()&gt;0)
+        {
+            int tmpcount=pushbackInputStream.read(buffer);
+            count=tmpcount+count;
+            if(count&gt;=20 &amp;&amp; !status)
+            {
+                pushbackInputStream.unread(buffer);
+                status=true;
+            }
+            System.out.print(new String(buffer));
+        }
+
+    }
+    catch(FileNotFoundException ex)
+    {
+        ex.printStackTrace();
+    }
+    catch (IOException e) {
+        // TODO: handle exception
+        e.printStackTrace();
+    }
+
+}
+</code></pre><p>}</p>
+<p>在文章中，buffer大小为10，当读了两次之后，退回去一次，所以看到运行结果为</p>
+<p>package InputStream;putStream;</p>
+<p>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.IOException;<br>import java.io.LineNumberInputStream;<br>…</p>
+<p>特别注意第一行，发现确实是有效的，同时，我们要注意到一个问题，在程序中，我有这样一条注释</p>
+<p>PushbackInputStream pushbackInputStream=new PushbackInputStream(fileInputStream,1024);  //默认情况下，buf为1</p>
+<p>最开始的时候，我调用的构造函数是</p>
+<p>PushbackInputStream pushbackInputStream=new PushbackInputStream(fileInputStream);</p>
+<p>即不指定buffer大小，但后来发现一个问题，在unread调用的时候，只能操作一个字节，否则就会报错：</p>
+<p>java.io.IOException: Push back buffer is full<br>    at java.io.PushbackInputStream.unread(Unknown Source)<br>    at java.io.PushbackInputStream.unread(Unknown Source)<br>    at InputStream.TestPushBackInputStream.main(TestPushBackInputStream.java:25)</p>
+<p>最早的时候，以为程序写的有问题，后来查看 PushbackInputStream.java的源代码才发现，其不指定buffer大小的时候，传入的buffer大小为：</p>
+<pre><code>public PushbackInputStream(InputStream in) {
+    this(in, 1);
+}
+
+public PushbackInputStream(InputStream in, int size) {
+    super(in);
+    if (size &lt;= 0) {
+        throw new IllegalArgumentException(&quot;size &lt;= 0&quot;);
+    }
+    this.buf = new byte\[size\];
+    this.pos = size;
+}
+</code></pre><p>好了，这就明白了，buffer大小默认为1，我那样用当然会出错啦，这里也给大家提个醒，一定要好好注意。 </p>
+<h3 id="五-ObjectInputStream-ObjectOutputStream"><a href="#五-ObjectInputStream-ObjectOutputStream" class="headerlink" title="(五)ObjectInputStream/ObjectOutputStream"></a>(五)ObjectInputStream/ObjectOutputStream</h3><p>对于ObjectInputStream和ObjectOuptStream主要是用于Java中对象序列化，单独关于Java的序列化就要探究好长时间，这里不多做分析，留着，等有时间了，专门好好从源代码看看这一部分内容。<a href="http://blog.happyhls.me/?p=368" target="_blank" rel="noopener">http://blog.happyhls.me/?p=368</a></p>
+<h3 id="六-PipedInputStream-PipedOutputStream"><a href="#六-PipedInputStream-PipedOutputStream" class="headerlink" title="(六)PipedInputStream/PipedOutputStream"></a>(六)PipedInputStream/PipedOutputStream</h3><p>管道的概念，就是水管一样，尤其是在不同线程的时候，我这个线程放水，然后另外一个线程用来接水，我们看看怎么用就可以，在程序中，我开了两个线程，分别是Sender和Receiver，然后将其中的PipedInputStream和PipedOutputStrem链接到一起。 代码如下：</p>
+<p>package InputStream;</p>
+<p>import java.io.IOException;<br>import java.io.PipedInputStream;<br>import java.io.PipedOutputStream;</p>
+<p>public class TestPipedStream {<br>    public static void main(String[] args) {<br>        Sender sender = new Sender();<br>        Receiver receiver = new Receiver();<br>        try {<br>            sender.getPipedOutputStrem().connect(receiver.getPipedInputStrem());</p>
+<pre><code>        new Thread(sender).start();
+        new Thread(receiver).start();
+
+    } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+    }
+}
+</code></pre><p>}</p>
+<p>class Sender extends Thread {<br>    private PipedOutputStream pipedOutputStream = new PipedOutputStream();</p>
+<pre><code>public PipedOutputStream getPipedOutputStrem() {
+    return pipedOutputStream;
+}
+
+public void run() {
+    while (true) {
+        try {
+            System.out.println(System.currentTimeMillis()
+                    \+ &quot;:Piped 准备写入数据...即将阻塞进程&quot;);
+            pipedOutputStream.write(&quot;发送数据Sender&quot;.getBytes());
+            System.out.println(System.currentTimeMillis()
+                    \+ &quot;:Piped 写入数据完毕...休眠1s&quot;);
+            Thread.sleep(2000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>}</p>
+<p>class Receiver extends Thread {<br>    private PipedInputStream pipedInputStream = new PipedInputStream();</p>
+<pre><code>public PipedInputStream getPipedInputStrem() {
+    return pipedInputStream;
+}
+
+public void run() {
+    while (true) {
+        try {
+            System.out.println(System.currentTimeMillis()
+                    \+ &quot;:Piped 等待数据中...即将阻塞进程&quot;);
+            byte\[\] buffer = new byte\[8192\];
+            int count = pipedInputStream.read(buffer);
+            System.out.println(System.currentTimeMillis() + &quot;:接收到数据:&quot;
+                    \+ new String(buffer, 0, count));
+            Thread.sleep(1000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+}
+</code></pre><p>}</p>
+<p>运行结果：</p>
+<p>1365048086265:Piped 等待数据中…即将阻塞进程<br>1365048086265:Piped 准备写入数据…即将阻塞进程<br>1365048086265:Piped 写入数据完毕…休眠1s<br>1365048087265:接收到数据:发送数据Sender<br>1365048088265:Piped 准备写入数据…即将阻塞进程<br>1365048088265:Piped 写入数据完毕…休眠1s<br>1365048088265:Piped 等待数据中…即将阻塞进程<br>1365048088265:接收到数据:发送数据Sender</p>
+<h3 id="七-SequenceInputStream"><a href="#七-SequenceInputStream" class="headerlink" title="(七)SequenceInputStream"></a>(七)SequenceInputStream</h3><p>A <code>SequenceInputStream</code> represents the logical concatenation of other input streams. It starts out with an ordered collection of input streams and reads from the first one until end of file is reached, whereupon it reads from the second one, and so on, until end of file is reached on the last of the contained input streams. SequenceInputStream是将多个输入流合并到一起，形成一个输入流，然后我们就可以对这一个输入流进行访问，从而大大方便了我们的编程。 我们看SequenceInputStream的构造函数</p>
+<p>SequenceInputStream(Enumeration&lt;? extends InputStream&gt; e)<br>Initializes a newly created SequenceInputStream by remembering the argument, which must be an Enumeration that produces objects whose run-time type is InputStream.<br>SequenceInputStream(InputStream s1, InputStream s2)<br>Initializes a newly created SequenceInputStream by remembering the two arguments, which will be read in order, first s1 and then s2, to provide the bytes to be read from this SequenceInputStream.</p>
+<p>可以看到，只要是InputStream的子类，那我们都可以使用这个累，将其合成一个输入流，从而进行读写，这里我们写这样一个demo</p>
+<p>package InputStream;</p>
+<p>import java.io.ByteArrayInputStream;<br>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.IOException;<br>import java.io.InputStream;<br>import java.io.SequenceInputStream;<br>import java.util.ArrayList;<br>import java.util.Collections;<br>import java.util.Enumeration;</p>
+<p>public class TestSequenceInputStream {</p>
+<pre><code>public static void main(String\[\] args) throws Exception
+{
+
+    ArrayList&lt;InputStream&gt; inputStreams=new ArrayList&lt;InputStream&gt;();
+    byte\[\] tmp=new byte\[100\];
+    for(byte i=0;i&lt;100;i++)
+    {
+        tmp\[i\]=i;
+    }
+    inputStreams.add(new ByteArrayInputStream(tmp));
+    inputStreams.add(new FileInputStream(&quot;src/InputStream/TestSequenceInputStream.java&quot;));
+
+    Enumeration&lt;InputStream&gt; enumeration=Collections.enumeration(inputStreams);
+    SequenceInputStream sequenceInputStream=new SequenceInputStream(enumeration);
+
+    byte\[\] buffer=new byte\[1024\];
+    while(true){
+        int count=sequenceInputStream.read(buffer);
+        if(count==-1)
+            break;
+        System.out.println(new String(buffer,0,count));
+    }
+}
+</code></pre><p>}</p>
+<p>需要注意的一个问题是，在下面的程序段中：</p>
+<pre><code>while(true){
+    int count=sequenceInputStream.read(buffer);
+    if(count==-1)
+        break;
+    System.out.println(new String(buffer,0,count));
+}
+</code></pre><p>最初使用的是之前的方法：</p>
+<p>while(sequenceInputStrem.available()&gt;0)</p>
+<p>来判断是否还有数据，但在这段的执行过程中，发现第二个数据流不会被读取，但在之前的程序中运行一直正常，我的理解是因为，SequenceInputStream包装了多个InputStream，但 available()函数的时候，调用的是第一个输入流中的available函数，所以会出现退出循环的问题，为了验证这个想法，修改了一下代码</p>
+<pre><code>byte\[\] buffer=new byte\[1024\];
+while(sequenceInputStream.available()&gt;0){
+    int count=sequenceInputStream.read(buffer);
+    System.out.println(new String(buffer,0,count));
+}
+sequenceInputStream.read();//多读数据一次
+while(sequenceInputStream.available()&gt;0){
+    int count=sequenceInputStream.read(buffer);
+    System.out.println(new String(buffer,0,count));
+}
+</code></pre><p>看到这句了吧，当两个数据流切换的时候，让其多读了一次，如果不加这一语句，程序依然只打印第一个InputStream流的信息</p>
+<pre><code>sequenceInputStream.read();//多读数据一次
+</code></pre><p>加入这句之后，执行正常，当然，会丢失下一个输入流的第一个字符数据。当然可以保存下来，但还是比较麻烦，还是用count是否为-1来判断是否到输入流的结尾比较妥当。</p>
+<h3 id="八-StringBufferInputStream"><a href="#八-StringBufferInputStream" class="headerlink" title="(八) StringBufferInputStream"></a>(八) StringBufferInputStream</h3><p>该输入流也被取消掉了，看定义是将字符串转化为输入流的类，既然JDK都摒弃了，那我们也就不做探究，如果用到，再来仔细查看。 This class allows an application to create an input stream in which the bytes read are supplied by the contents of a string. Applications can also read bytes from a byte array by using a <code>ByteArrayInputStream</code>.</p>
+<h3 id="九-PrintStream"><a href="#九-PrintStream" class="headerlink" title="(九) PrintStream"></a>(九) PrintStream</h3><p>PrintStream在Java中是一个非常重要的处理流，要知道，我们常用的System.out其本质上就是封装了个PrintStream，该类非常强大，支持各种格式化输出，使用起来比较简单，而且由于System.out的缘故，我们用的也比较熟悉，有什么新颖的功能，用到的时候再添加进来。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/03/31/how-android-get-information-of-installed-app/" rel="next" title="How Android get information of installed app?">
+                <i class="fa fa-chevron-left"></i> How Android get information of installed app?
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/04/04/java-io-reader-writer/" rel="prev" title="Java IO 之二：传统IO (2)Reader,Writer">
+                Java IO 之二：传统IO (2)Reader,Writer <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#InputStream-OutputStream"><span class="nav-number">1.</span> <span class="nav-text">InputStream,OutputStream</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#InputStream"><span class="nav-number">1.1.</span> <span class="nav-text">InputStream</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OutputStream"><span class="nav-number">1.2.</span> <span class="nav-text">OutputStream</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一-AudioInputStream"><span class="nav-number">1.2.1.</span> <span class="nav-text">(一)AudioInputStream</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二-ByteArrayInputStream-amp-amp-ByteArrayOutputStream这两个方法是将数组封装成Stream的类。"><span class="nav-number">1.2.2.</span> <span class="nav-text">(二)ByteArrayInputStream &amp;&amp; ByteArrayOutputStream这两个方法是将数组封装成Stream的类。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三-FileInputStream-FileOutputStream"><span class="nav-number">1.2.3.</span> <span class="nav-text">(三)FileInputStream\FileOutputStream</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四-FilterInputStream-FilterOutputStream"><span class="nav-number">1.2.4.</span> <span class="nav-text">(四)FilterInputStream\FilterOutputStream</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#BufferedInputStream-BufferedOutputStream"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">BufferedInputStream/BufferedOutputStream</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-CheckedInputStream-CheckedOutputStream"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">(2)CheckedInputStream/CheckedOutputStream</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-CipherInputStream-CipherOutputStream"><span class="nav-number">1.2.5.</span> <span class="nav-text">(3)CipherInputStream/CipherOutputStream</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-DataInputStream-DataOutputStream"><span class="nav-number">1.2.6.</span> <span class="nav-text">(4)DataInputStream/DataOutputStream</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-DeflaterInputStream-InflaterOutputStream-AND-InflaterInputStream-DeflaterOutputStream"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">(5)DeflaterInputStream/InflaterOutputStream   AND  InflaterInputStream/DeflaterOutputStream</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-LineNumberInputStream"><span class="nav-number">1.2.6.2.</span> <span class="nav-text">(6)LineNumberInputStream</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-PushbackInputStream"><span class="nav-number">1.2.6.3.</span> <span class="nav-text">(7)PushbackInputStream</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#五-ObjectInputStream-ObjectOutputStream"><span class="nav-number">1.2.7.</span> <span class="nav-text">(五)ObjectInputStream/ObjectOutputStream</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#六-PipedInputStream-PipedOutputStream"><span class="nav-number">1.2.8.</span> <span class="nav-text">(六)PipedInputStream/PipedOutputStream</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#七-SequenceInputStream"><span class="nav-number">1.2.9.</span> <span class="nav-text">(七)SequenceInputStream</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#八-StringBufferInputStream"><span class="nav-number">1.2.10.</span> <span class="nav-text">(八) StringBufferInputStream</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#九-PrintStream"><span class="nav-number">1.2.11.</span> <span class="nav-text">(九) PrintStream</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="想写一篇文章来对比一下Volley以及Picasso，有人或许会说了，Volley和Picasso的服务对象都不同，Picasso是专注于图片的下载以及处理，而Volley则适应于任何轻量的网络请求。是的，的确如此，那我们不如就图片下载缓存这个应用场景展开来，来对比分析Volley和Picasso的相同之处与不同之处。 首先我们先来看一下Volley和Picasso的整体框图。 Volley：">
+<meta name="keywords" content="Android,Picasso,Volley,对比">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Volley与Picasso的对比">
+<meta property="og:url" content="http://yoursite.com/2014/11/27/android-volley-picasso-comparation/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="想写一篇文章来对比一下Volley以及Picasso，有人或许会说了，Volley和Picasso的服务对象都不同，Picasso是专注于图片的下载以及处理，而Volley则适应于任何轻量的网络请求。是的，的确如此，那我们不如就图片下载缓存这个应用场景展开来，来对比分析Volley和Picasso的相同之处与不同之处。 首先我们先来看一下Volley和Picasso的整体框图。 Volley：">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/volley-arch-1024x575.png">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/Picasso-整体架构-1024x595.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.605Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Volley与Picasso的对比">
+<meta name="twitter:description" content="想写一篇文章来对比一下Volley以及Picasso，有人或许会说了，Volley和Picasso的服务对象都不同，Picasso是专注于图片的下载以及处理，而Volley则适应于任何轻量的网络请求。是的，的确如此，那我们不如就图片下载缓存这个应用场景展开来，来对比分析Volley和Picasso的相同之处与不同之处。 首先我们先来看一下Volley和Picasso的整体框图。 Volley：">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/volley-arch-1024x575.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/27/android-volley-picasso-comparation/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Volley与Picasso的对比 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/27/android-volley-picasso-comparation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Volley与Picasso的对比
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-27 16:37:38" itemprop="dateCreated datePublished" datetime="2014-11-27T16:37:38+08:00">2014-11-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/Picasso/" itemprop="url" rel="index"><span itemprop="name">Picasso</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/Picasso/Volley/" itemprop="url" rel="index"><span itemprop="name">Volley</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>想写一篇文章来对比一下Volley以及Picasso，有人或许会说了，Volley和Picasso的服务对象都不同，Picasso是专注于图片的下载以及处理，而Volley则适应于任何轻量的网络请求。是的，的确如此，那我们不如就图片下载缓存这个应用场景展开来，来对比分析Volley和Picasso的相同之处与不同之处。 首先我们先来看一下Volley和Picasso的整体框图。 <strong>Volley：</strong>   <a href="/images/wordpress/2014/11/volley-arch.png"><img src="/images/wordpress/2014/11/volley-arch-1024x575.png" alt="volley-arch"></a>   <strong>Picasso： </strong> <a href="/images/wordpress/2014/11/Picasso-整体架构.png"><img src="/images/wordpress/2014/11/Picasso-整体架构-1024x595.png" alt="Picasso-整体架构"></a>   其中Volley是官方给出的整体框架图，而Picasso是我自己根据源代码抽离出来的，可能有些地方不是那么准确，请大家指教。先说一下从上面两张框架图对比，发现的其中的不同之处：</p>
+<ul>
+<li>对请求对象的封装不同：<ul>
+<li>在Volley中，请求会直接封装在Reqeust当中，包括目标的网址/回调的接口等等信息，直接提交给CacheDispatcher即可。</li>
+<li>在Picasso中，一个请求会依次封装成ReqeustCreator，Reqeust，Action等不同状态，其中ReqeustCreator是用于创建Reqeust，在ReqeustCreator中可以设置图片的地址，大小，是否居中，是否旋转，图片的后处理等等参数，通过ReqeustCreator中拥有一个RequestBuilder对象；当用户调用into(Target)方法的时候，通过RequestBuilder中的build()方法，会构造出Reqeust，然后构造出对应的Action方法，提交至Dispatcher队列进行处理。</li>
+</ul>
+</li>
+<li>Dispatcher不同：<ul>
+<li>在Volley中，Dispatcher包括CacheDispatcher和NetworkDispatcher两部分，其中CacheDispatcher只有一个线程，而NetworkDispatcher默认会有4个线程在执行。</li>
+<li>在Picasso当中，所有的任务的分发都是通过一个Dispatcher，即DispatcherThread工作线程来完成。</li>
+</ul>
+</li>
+<li>消息的传递方式不同：<ul>
+<li>当添加任务的时候：<ul>
+<li>Volley是通过阻塞队列实现，所有的Dispatcher(包括CacheDispatcher和NetworkDispatcher)。</li>
+<li>Picasso添加任务是通过Handler，将Action作为消息的Message中的object的进行传递。</li>
+</ul>
+</li>
+<li>当任务结束，发送消息的时候：<ul>
+<li>Volley是通过Handler实现，但不会在消息中传递具体的任务，而是负责发送消息，并使用handler.post()方法将要执行的代码发送到主线程上执行。</li>
+<li>Picasso是将任务的包装类BitmapHunter作为Message的object来进行传递。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Cache<ul>
+<li>MemoryCache<ul>
+<li>Volley中，对于普通的任务，并没有设定MemoryCache，我理解的这是因为Volley的设计初衷是用于那些轻量级的网络访问，一般不会占用太大内存，所有不需要再使用MemoryCache，使用DiskBasedCache，性能也能满足。而服务于图片的ImageLoader，其中明确要求我们实现一个MemoryCache以供使用。</li>
+<li>Picasso由于其设计服务对象就是图片，因此其本身自带的Cache就是MemoryCache</li>
+</ul>
+</li>
+<li>DiskCache<ul>
+<li>Volley中默认实现的Cache就是DiskBasedCache，根据网络请求结果根据情况保存在Cache当中。</li>
+<li>Picasso其本身并不支持DiskCache，但根据我在StackOverflow查到的结果，有网友说，其DiskCache依赖于其网络库，默认的为Square自己的OKHttp，okhttp内部已经实现有网络Cache，未考察(参考：<a href="http://stackoverflow.com/questions/23280242/using-picasso-with-custom-disk-cache" target="_blank" rel="noopener">stackoverflow</a>)。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>支持的请求来源不同：<ul>
+<li>Volley仅支持从网络上访问图片或者其他的资源。</li>
+<li>Picasso支持从网络，File，Resource，Asserts中加载图片。</li>
+</ul>
+</li>
+<li>支持的请求对象不同：<ul>
+<li>Volley支持图片，Json，String等等各种各样的网络请求，而且可以很容易的扩展自己的实现。</li>
+<li>Picasso仅仅支持图片。</li>
+</ul>
+</li>
+<li>任务优先级的支持：<ul>
+<li>Volley支持任务的优先级</li>
+<li>Picasso没有任务的优先级这一说</li>
+</ul>
+</li>
+<li>图片后续处理的支持：<ul>
+<li>Volley不支持通过注册函数的方式实现图片的后处理，仅仅可以在收到请求完成的回调之后，自己进行图片的后处理。</li>
+<li>Picasso可以通过注册Transformer的形式，对获取的图片进行后续处理，完成之后再通知完成动作。参考：<a href="http://blog.happyhls.me/2014/11/23/picasso%e7%9a%84%e4%bd%bf%e7%94%a8%ef%bc%9a%e4%bd%bf%e7%94%a8transformation%ef%bc%8c%e4%b8%8b%e8%bd%bd%e5%90%8e%e9%a2%84%e5%a4%84%e7%90%86%e5%9b%be%e7%89%87%e5%b9%b6%e6%98%be%e7%a4%ba/" target="_blank" rel="noopener">Picasso的使用：使用Transformation，下载后预处理图片并显示</a></li>
+</ul>
+</li>
+<li><p>任务的暂停：</p>
+<ul>
+<li>Volley不支持</li>
+<li>Picasso支持，通过调用Picasso中的pauseTag(Object tag)实现</li>
+</ul>
+<p>说完不同的，再来看看Volley和Picasso在设计的时候都考虑到的地方，这也是在我们需要设计自己的图形缓存库的时候，更加需要注意到的地方：</p>
+</li>
+<li><p>主线程仅负责任务的添加和完成时的回调，其他的任务又其他线程负责处理</p>
+<ul>
+<li>老生常谈了，主线程不能做太多的事情，否则ANR有好看的。</li>
+</ul>
+</li>
+<li>允许多个任务同时进行处理<ul>
+<li>多个线程是优化效率的一种特别有效的手段，比如多个任务同时进行的时候，可以同时下载，提高效率。</li>
+</ul>
+</li>
+<li>根据不同的网络情况，按需调整或者重新设置同时工作线程数目：<ul>
+<li>Volley和Picasso当中，都根据网络状态的不同，规定了不同的同时进行的网络请求数目，既能充分利用网络，又不至于榨干系统网络请求资源。 这个地方是我之前理解有错误，在默认情况下，Picasso是可以根据网络的不同设置不同的网络请求并发数目，但实际上Volley中并不存在这个功能，其默认newRequestQueue生成的ReqeustQueue其指定的并发数目为4，因此如果有需要，需要自己手动编写一层封装，以实现根据网络状态设置工作线程数目的目的。感谢<a href="http://weibo.com/qianzuiz" target="_blank" rel="noopener">千醉z</a>。</li>
+</ul>
+</li>
+<li>要有Cache<ul>
+<li>分为MemoryCache和DiskCache，MemoryCache不多说了，对于图片来说，必须要有的，要不频繁解码，容易OOM不说，解码消耗的大量时间，用户体验也会很差。</li>
+</ul>
+</li>
+<li>支持批量任务的添加、删除、暂定<ul>
+<li>比如当一个Activity退出的时候，总要有办法能够同时取消该Activity对应的所有的网络请求的。</li>
+</ul>
+</li>
+<li><p>避免OOM</p>
+<ul>
+<li>同一个时刻，仅仅允许一张图片进行解码操作，这个Picasso是从Volley中学来的。</li>
+</ul>
+<p>大体上就想到这些，总体上，如果我们的需求仅仅需要处理图片，那么Picasso在功能上可以说远远要优于Volley，是我们的第一选择，但如果我们图片的需求并不是特别强烈，同时还在网络上传输一些数据，那么Volley可能更加适合。如果大家有别的看法，一起讨论。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Picasso/" rel="tag"># Picasso</a>
+          
+            <a href="/tags/Volley/" rel="tag"># Volley</a>
+          
+            <a href="/tags/对比/" rel="tag"># 对比</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/27/picasso-source-code-5-architecture/" rel="next" title="Picasso源代码分析：5、Picasso架构分析">
+                <i class="fa fa-chevron-left"></i> Picasso源代码分析：5、Picasso架构分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/29/android-differences-between-activity-start-mode-and-task-affinity/" rel="prev" title="Android中Activity四种启动模式和taskAffinity属性详解 （转载）">
+                Android中Activity四种启动模式和taskAffinity属性详解 （转载） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

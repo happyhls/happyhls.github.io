@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="之前跟随Android Developer Guide学习了Volley的使用，为了更好的理解，现在从其代码的角度去学习Volley。我根据英文的注释和部分自己的理解，将代码中文注释，并托管到Github上，大家可以前去查看。 谷歌的IO大会上，开发者对Volley进行了详细的讲解，地址：https://developers.google.com/events/io/sessions/325304">
+<meta name="keywords" content="Android,Volley">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Volley源代码分析 - 1：任务的添加、删除和取消">
+<meta property="og:url" content="http://yoursite.com/2014/11/19/android-volley-1-task/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="之前跟随Android Developer Guide学习了Volley的使用，为了更好的理解，现在从其代码的角度去学习Volley。我根据英文的注释和部分自己的理解，将代码中文注释，并托管到Github上，大家可以前去查看。 谷歌的IO大会上，开发者对Volley进行了详细的讲解，地址：https://developers.google.com/events/io/sessions/325304">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/volley-arch.png">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/RequestQueue-add.png">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/RequestQueue-finish.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.605Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Volley源代码分析 - 1：任务的添加、删除和取消">
+<meta name="twitter:description" content="之前跟随Android Developer Guide学习了Volley的使用，为了更好的理解，现在从其代码的角度去学习Volley。我根据英文的注释和部分自己的理解，将代码中文注释，并托管到Github上，大家可以前去查看。 谷歌的IO大会上，开发者对Volley进行了详细的讲解，地址：https://developers.google.com/events/io/sessions/325304">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/volley-arch.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/19/android-volley-1-task/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Volley源代码分析 - 1：任务的添加、删除和取消 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/19/android-volley-1-task/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Volley源代码分析 - 1：任务的添加、删除和取消
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-19 16:03:42" itemprop="dateCreated datePublished" datetime="2014-11-19T16:03:42+08:00">2014-11-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Volley/" itemprop="url" rel="index"><span itemprop="name">Volley</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前跟随Android Developer Guide学习了Volley的使用，为了更好的理解，现在从其代码的角度去学习Volley。我根据英文的注释和部分自己的理解，将代码中文注释，并托管到<a href="https://github.com/happyhls/Volley-MyComments" target="_blank" rel="noopener">Github</a>上，大家可以前去查看。 谷歌的IO大会上，开发者对Volley进行了详细的讲解，地址：<a href="https://developers.google.com/events/io/sessions/325304728" target="_blank" rel="noopener">https://developers.google.com/events/io/sessions/325304728</a> 我们先来看一下Volley的架构图： <a href="/images/wordpress/2014/11/volley-arch.png"><img src="/images/wordpress/2014/11/volley-arch.png" alt="volley-arch"></a>   可以看出，Volley至少工作在3个线程当中，其中</p>
+<ul>
+<li>蓝色部分为主线程：主要的工作是将请求按照优先级的顺序添加到cache的队列当中，当发出去的请求的得到相应的时候，在主线程将结果进行分发。</li>
+<li>绿色部分为cache线程：如果cache hit，那么直接将cache中的数据进行解析，并传递给主线程，如果miss，那么则交给NetworkDispatcher进行处理。</li>
+<li>黄色部分则为网络线程：与cache线程不同，cache只有一个线程在工作，而网络线程则可以有多个同时工作，进行网络请求，解析结果，写入cache，最终也是响应结果交给主线程。</li>
+</ul>
+<p>我们以一段代码为例，跟踪代码的流程，对比上面的框架图，看看Volley到底是如何工作的。</p>
+<pre><code>RequestQueue mQueue = Volley.newRequestQueue(MainActivity.this);
+
+JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(&quot;http://m.weather.com.cn/data/101010100.html&quot;, null, new Response.Listener&lt;JSONObject&gt;() {
+
+                              @Override
+                              public void onResponse(JSONObject response) {
+                                // TODO Auto-generated method stub
+                                Log.i(TAG, response.toString());
+                              }},new Response.ErrorListener() {
+
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                  // TODO Auto-generated method stub
+                                  Log.i(TAG, error.getMessage());
+                                }});
+mQueue.add(jsonObjectRequest);
+</code></pre><p>首先，我们新建了一个RequestQueue的实例，当然在实际使用中，我们应该使用Application的Context作为Volley的Context。 然后，我们新建了一个JsonObjectRequest，即一个Json的请求，在其中的回调函数onResponse中添加我们收到结果要做的事情，当然我们知道这部分代码是运行在主线程当中。 最后，将JsonObjectRequest的实例添加到RequestQueue当中。 这就是Volley使用的全部的代码，总体看来，我们所能看到的所有的请求都是进入RequestQueue，然后就等待处理，得到onResponse的响应，因此，我们可以跟随代码，从mQueue.add（jsonObjectRequest）来分析。</p>
+<h3 id="任务的添加：mQueue-add（jsonObjectRequest）"><a href="#任务的添加：mQueue-add（jsonObjectRequest）" class="headerlink" title="任务的添加：mQueue.add（jsonObjectRequest）"></a><strong>任务的添加：mQueue.add（jsonObjectRequest）</strong></h3><pre><code>public &lt;T&gt; Request&lt;T&gt; add(Request&lt;T&gt; request) {
+    // Tag the request as belonging to this queue and add it to the set of current requests.
+    //将request与该任务队列相关联。
+    request.setRequestQueue(this);
+    //将该请求放在任务队列的待做任务当中。
+    synchronized (mCurrentRequests) {
+        mCurrentRequests.add(request);
+    }
+
+    // Process requests in the order they are added.
+    // 设定序列号
+    request.setSequence(getSequenceNumber());
+    // 添加日志
+    request.addMarker(&quot;add-to-queue&quot;);
+
+    // If the request is uncacheable, skip the cache queue and go straight to the network.
+    // 如果该日志不需要Cache的话，那么跳过cache的队列，直接进行网络请求
+    if (!request.shouldCache()) {
+        mNetworkQueue.add(request);
+        return request;
+    }
+
+    // 如果程序运行到这里，说明需要缓存cache，那么进行的操作是，先检查当前的任务有没有在cache的运行当中，
+    // 如果正在进行，或者说cache对应的cacheKey有Reqeust正在执行，那么则直接加入到cacheKey对应的队列当中即可。
+    // 如果需要cache，而且没有正在这行，则添加到等待队列和cache队列当中。
+
+    // Insert request into stage if there&apos;s already a request with the same cache key in flight.
+    // 同步任务队列，根据该请求是否添加到RequestQueue的不同情况，分别处理
+    synchronized (mWaitingRequests) {
+        //判断等待队列是否包含当前添加的任务
+        String cacheKey = request.getCacheKey();
+        if (mWaitingRequests.containsKey(cacheKey)) {
+            // There is already a request in flight. Queue up.
+            // 该cacheKey对应的任务之前添加过，并且还没有处理完成。则取出cacheKey对应的任务队列，将该任务添加进去。
+            Queue&lt;Request&lt;?&gt;&gt; stagedRequests = mWaitingRequests.get(cacheKey);
+            if (stagedRequests == null) {
+                stagedRequests = new LinkedList&lt;Request&lt;?&gt;&gt;();
+            }
+            stagedRequests.add(request);
+            mWaitingRequests.put(cacheKey, stagedRequests);
+            if (VolleyLog.DEBUG) {
+                VolleyLog.v(&quot;Request for cacheKey=%s is in flight, putting on hold.&quot;, cacheKey);
+            }
+        } else {
+            // Insert &apos;null&apos; queue for this cacheKey, indicating there is now a request in
+            // flight.
+            // 与上面不同的是，当前的任务没有处理过，所以将任务添加到等待队列中，然后添加到cache的队列中。
+            mWaitingRequests.put(cacheKey, null);
+            mCacheQueue.add(request);
+        }
+        return request;
+    }
+}
+</code></pre><p>上面的代码就是RequestQueue的add()方法。我们可以画一下它的流程图 <img src="/images/wordpress/2014/11/RequestQueue-add.png" alt="RequestQueue-add"> 从中，可以看出，RequestQueue中add(Request request)所做的工作为</p>
+<ol>
+<li>绑定request到此RequestQueue.this</li>
+<li>将request添加到mCuurentRequest的链表中</li>
+<li>为request设置序列号，并打印Log</li>
+<li>根据request是否需要cache，如果不需要cache，则直接将其放入mNetworkueue当中。</li>
+<li>如果request需要cache，则检查该request对应的cacheKey(一般实际上使用URL)是否已经在mWaitingRequests列表中存在，如果已经存在，那么则更新cacheKey所对应的列表，如果不存在，则将其放进mCacheQueue中，再放入mNetworkQueue中等待执行。</li>
+<li>add(Request request)方法执行完毕，返回。</li>
+</ol>
+<p>此时我们也可以明白在RequestQueue中的几个集合类的作用：</p>
+<p>//该map的作用是用来缓存正在执行的需要Cache的Request，但暂时还没有看到如果Cache执行完毕，或者从Network执行完毕之后，该Map是否删除对应的Request<br>private final Map&lt;String, Queue&lt;Request&lt;?&gt;&gt;&gt; mWaitingRequests = new HashMap&lt;String, Queue&lt;Request&lt;?&gt;&gt;&gt;();<br>//所有的需要处理的Reqeust都会在这个集合当中<br>private final Set&lt;Request&lt;?&gt;&gt; mCurrentRequests = new HashSet&lt;Request&lt;?&gt;&gt;();<br>//mCacheQueue保存的是需要从Cache中获取的Request<br>private final PriorityBlockingQueue&lt;Request&lt;?&gt;&gt; mCacheQueue = new PriorityBlockingQueue&lt;Request&lt;?&gt;&gt;();<br>//mNetworkQueue保存的是需要网络操作的Request<br>private final PriorityBlockingQueue&lt;Request&lt;?&gt;&gt; mNetworkQueue = new PriorityBlockingQueue&lt;Request&lt;?&gt;&gt;();</p>
+<p>对应的RequestQueue的add方法，我们再来看一下对应的finish(Request&lt;?&gt; request)方法。</p>
+<h3 id="任务的结束：finish-Request-lt-gt-request"><a href="#任务的结束：finish-Request-lt-gt-request" class="headerlink" title="任务的结束：finish(Request&lt;?&gt; request)"></a>任务的结束：finish(Request&lt;?&gt; request)</h3><p><a href="/images/wordpress/2014/11/RequestQueue-finish.png"><img src="/images/wordpress/2014/11/RequestQueue-finish.png" alt="RequestQueue-finish"></a> 可以看出，RequestQueue的finish(Request request)主要做了以下的事情：</p>
+<ol>
+<li>将reqeust从当前的任务列表mCurrentRequests中删除</li>
+<li>判断该request是否是需要cache的请求，如果不是，则直接退出即可。</li>
+<li>如果该request需要cache，那么则删除所对应的cacheKey，然后将等待的请求全部加入到mCacheQueue即cache的任务队列当中。（有个小思考：既然要取消对应的request，那么为什么还要加入到mCacheQueue当中，不是Volley说保证任务取消了就不会被派发吗？其实这里的执行和派发并没有关系，而且在request对象当中，还有一个mCanceled的标志，当NetWork或者Cache的worker在操作对应的Request之前，都会检查该标志，如果已经取消，则立刻放弃该任务。这里面是我的理解错误，其实finish()调用的并不是说任务要取消，而是说任务已经完成了，所以对应的也很容易理解了，首先该任务完成了，就应该从RequestQueue中消失，如果不需要cache，那么直接退出就可以啦，如果需要cache，那么就可以删除该cahcheKey(URL)对应的请求列表，因为这个时候网络任务应该已经完成，所以将剩下的任务加入到mCacheQueue当中，让他们从cache中获取就可以。）。</li>
+</ol>
+<p>还有一点需要注意的是，该方法是的访问限定符是默认的，即包访问权限，并且在Volley的源代码中，仅仅是Request.finish(String tag)调用了该方法。 接下来我们进一步分析一下Request中的finish(String tag)方法，同时我们注意到，对于Reqeust主要是一些标记变量和关于请求的内容，在逻辑上其他的相关的代码并不多。</p>
+<pre><code>/\*\*
+ \* Notifies the request queue that this request has finished (successfully or with error).
+ \*
+ \* 通知请求队列，该请求已经完成，或者成功，或者存在错误。
+ \* 
+ \* &lt;p&gt;Also dumps all events from this request&apos;s event log; for debugging.&lt;/p&gt;
+ \* &lt;p&gt;导出event log的所有的时间，用来调试。&lt;/p&gt;
+ \* 
+ \* 该方法可能来自CacheDisptacher，ResponseDelivery，NetworkDispatcher的调用
+ */
+void finish(final String tag) {
+    // 通知RequestQueue停止该任务
+    if (mRequestQueue != null) {
+        mRequestQueue.finish(this);
+    }
+    //如果需要记录日志，则记录之。
+    if (MarkerLog.ENABLED) {
+        //获取线程Id
+        final long threadId = Thread.currentThread().getId();
+        //判断当前的Looper的线程是否为主线程，也就是判断当前的代码是否在主线程上运行。
+        if (Looper.myLooper() != Looper.getMainLooper()) {
+            // If we finish marking off of the main thread, we need to
+            // actually do it on the main thread to ensure correct ordering.
+            // 如果我们是在其他的线程(非main线程)上取消任务，那么我们需要在主线程上来完成以保证正确的顺序。
+            // 这边的顺序没有特别看到，为什么要这样设计。
+
+            //获取主线程的handler
+            Handler mainThread = new Handler(Looper.getMainLooper());
+            //分发取消请求的任务。
+            mainThread.post(new Runnable() {
+                @Override
+                public void run() {
+                    mEventLog.add(tag, threadId);
+                    mEventLog.finish(this.toString());
+                }
+            });
+            return;
+        }
+        //这个地方比较疑惑的是，既然在工作线程中，为什么还要再通知主线程进行处理。
+        mEventLog.add(tag, threadId);
+        mEventLog.finish(this.toString());
+    } else {
+        long requestTime = SystemClock.elapsedRealtime() - mRequestBirthTime;
+        if (requestTime &gt;= SLOW\_REQUEST\_THRESHOLD_MS) {
+            VolleyLog.d(&quot;%d ms: %s&quot;, requestTime, this.toString());
+        }
+    }
+}
+</code></pre><p>此处代码比较简单，Request的finish方法主要是调用了RequestQueue的finish()方法来标记完成任务。进而打印相关的Log信息，此处有一点不太明白的是，为什么一定要在主线程上打印Log？ 任务的取消：cancelAll(final Object tag)</p>
+<pre><code>/\*\*
+ \* Cancels all requests in this queue for which the given filter applies.
+ \* @param filter The filtering function to use
+ */
+public void cancelAll(RequestFilter filter) {
+    synchronized (mCurrentRequests) {
+        for (Request&lt;?&gt; request : mCurrentRequests) {
+            if (filter.apply(request)) {
+                request.cancel();
+            }
+        }
+    }
+}
+
+/\*\*
+ \* Cancels all requests in this queue with the given tag. Tag must be non-null
+ \* and equality is by identity.
+ */
+public void cancelAll(final Object tag) {
+    if (tag == null) {
+        throw new IllegalArgumentException(&quot;Cannot cancelAll with a null tag&quot;);
+    }
+    cancelAll(new RequestFilter() {
+        @Override
+        public boolean apply(Request&lt;?&gt; request) {
+            return request.getTag() == tag;
+        }
+    });
+}
+</code></pre><p>这里面才是真正的取消任务，其主要的工作如下：</p>
+<ol>
+<li>同步mCurrentRequests，因为要遍历任务，所以要同步该集合。</li>
+<li>依次判断Request是否符合tag或者RequestFilter的要去，如果符合，则取消相应的任务。</li>
+</ol>
+<p>而Request的cancel方法则更加简单，如下：</p>
+<pre><code>public void cancel() {
+    mCanceled = true;
+}
+</code></pre><p>现在看来，如果要取消某个Request，Volley不会主动的要求Network或者Cache的工作线程停止当前的正在执行的Request，而是在执行过程中，如果发现Reqeust的mCanceled标记被设置，那么就不再进行下一步操作。 围绕任务所写的任务的添加、删除和取消相关的代码就分析到这里，下一篇文章会从任务调度的角度来分析Network或者Cache怎么从相应的任务队列中取出Request并执行相应的操作的。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Volley/" rel="tag"># Volley</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/18/regex-notes/" rel="next" title="整理-常用正则表达式">
+                <i class="fa fa-chevron-left"></i> 整理-常用正则表达式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/19/android-volley-2-task-execution/" rel="prev" title="Volley源代码分析 – 2：任务的执行，CacheDispatcher、NetworkDispatcher、ResponseDelivery">
+                Volley源代码分析 – 2：任务的执行，CacheDispatcher、NetworkDispatcher、ResponseDelivery <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#任务的添加：mQueue-add（jsonObjectRequest）"><span class="nav-number">1.</span> <span class="nav-text">任务的添加：mQueue.add（jsonObjectRequest）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#任务的结束：finish-Request-lt-gt-request"><span class="nav-number">2.</span> <span class="nav-text">任务的结束：finish(Request&lt;?&gt; request)</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

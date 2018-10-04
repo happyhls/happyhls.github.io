@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一：数组和指针可以相互替代吗？有这样两个定义： char *p  = “abcd”; char data[] = “abcd”; 一直以来，以为数组和指针其实是相通的，也就是说，*(p+1)和data[1]是一样的，都能够取到字符’b’，从来没有考虑过内部是怎么实现的，这两天在看《C专家编程》，里面第4章的标题便是《令人震惊的事实：数组和指针并不相通》，那么实际上到底是怎么样的？大体归纳一下。 里">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数组和指针的区别">
+<meta property="og:url" content="http://yoursite.com/2013/06/17/c-difference-between-array-and-pointer/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一：数组和指针可以相互替代吗？有这样两个定义： char *p  = “abcd”; char data[] = “abcd”; 一直以来，以为数组和指针其实是相通的，也就是说，*(p+1)和data[1]是一样的，都能够取到字符’b’，从来没有考虑过内部是怎么实现的，这两天在看《C专家编程》，里面第4章的标题便是《令人震惊的事实：数组和指针并不相通》，那么实际上到底是怎么样的？大体归纳一下。 里">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2013/06/pointer.jpg">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.545Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="数组和指针的区别">
+<meta name="twitter:description" content="一：数组和指针可以相互替代吗？有这样两个定义： char *p  = “abcd”; char data[] = “abcd”; 一直以来，以为数组和指针其实是相通的，也就是说，*(p+1)和data[1]是一样的，都能够取到字符’b’，从来没有考虑过内部是怎么实现的，这两天在看《C专家编程》，里面第4章的标题便是《令人震惊的事实：数组和指针并不相通》，那么实际上到底是怎么样的？大体归纳一下。 里">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2013/06/pointer.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/06/17/c-difference-between-array-and-pointer/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>数组和指针的区别 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/06/17/c-difference-between-array-and-pointer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">数组和指针的区别
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-06-17 16:39:03" itemprop="dateCreated datePublished" datetime="2013-06-17T16:39:03+08:00">2013-06-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C专家编程/" itemprop="url" rel="index"><span itemprop="name">C专家编程</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C专家编程/读书笔记/" itemprop="url" rel="index"><span itemprop="name">读书笔记</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一：数组和指针可以相互替代吗？"><a href="#一：数组和指针可以相互替代吗？" class="headerlink" title="一：数组和指针可以相互替代吗？"></a>一：数组和指针可以相互替代吗？</h2><p>有这样两个定义： char *p  = “abcd”; char data[] = “abcd”; 一直以来，以为数组和指针其实是相通的，也就是说，*(p+1)和data[1]是一样的，都能够取到字符’b’，从来没有考虑过内部是怎么实现的，这两天在看《C专家编程》，里面第4章的标题便是《令人震惊的事实：数组和指针并不相通》，那么实际上到底是怎么样的？大体归纳一下。 里面举了这样一个例子 文件1中有这样的定义： int mango[100]; 文件2中有这样的声明： extern int *mango; 到底能不能正常工作呢？按照之前的理解，数组和指针是通用的，所以感觉应该是一样的，但实际上去并不是这样，这段程序没办法得到理想的结果，怎么回事？ 这样分析： 对于数组来说，定义了变量 int mango[100];那么就意味着访问mango的时候，mango获取的地址指向的就是一个int的整数，而如果定义的是int * mango;的话，那么访问的时候，mango首先获取一个地址，该地址的内存中存有一个地址A，地址A中才是存放了int类型的变量。也就是说，适用指针来访问的时候，要多经过一步，才能够获取到实际的数据。 当然，其实上面这个例子在gcc下面是无法编译通过的，但可以更好的帮我们理解这个问题， int mango[100];和 extern int *mango;其类型是不相同的，不能够互相替代。</p>
+<h2 id="二、声明和定义到底有什么区别？"><a href="#二、声明和定义到底有什么区别？" class="headerlink" title="二、声明和定义到底有什么区别？"></a>二、声明和定义到底有什么区别？</h2><h3 id="1、声明和定义的区别在于："><a href="#1、声明和定义的区别在于：" class="headerlink" title="1、声明和定义的区别在于："></a>1、声明和定义的区别在于：</h3><p>定义：只能出现在一个地方，确定对象的类型，并且为其分配内存，用来创建新的对象。 声明：可以多次出现，描述对象的类型，用来指代其他地方定义的对象。 换句话讲： 声明相当于普通的声明，其说明的并不是其本身，而是描述的其他的地方创建的对象 定义相当于特殊的声明，是为内存分配内存的。 理解： 因为声明不需要为内存分配空间，所以对于 int data[100];的声明 extern int data[];和extern int data[100]，其本质上是一样的。</p>
+<h3 id="2、左值和右值："><a href="#2、左值和右值：" class="headerlink" title="2、左值和右值："></a>2、左值和右值：</h3><p>有赋值表达式：</p>
+<h3 id="X-Y"><a href="#X-Y" class="headerlink" title="X = Y;"></a>X = Y;</h3><p>X是左值，在编译的时候可以知道，标识存储结果的地方; Y是右值，在运行的时候才能够知道，如果没有特殊的说明，标识“Y的内容”; 左值可以分为：可修改的左值 和 不可修改的左值，比如数组名，是不能被修改的，因此不能直接给数组名赋值。只能够给可以修改的东西来赋值。</p>
+<h3 id="3、如果定义的指针，但以数组来引用"><a href="#3、如果定义的指针，但以数组来引用" class="headerlink" title="3、如果定义的指针，但以数组来引用"></a>3、如果定义的指针，但以数组来引用</h3><p>如果说有定义 char *p = “abcdefgh”; 那么在引用 *(p+i)的时候的，流程为 1、首先取得p的内存单元所保存的值，即5081,将5081作为地址 2、将5081+i作为新的地址 3、使用步骤2中得到的新的地址来获取数据内容 <a href="/images/wordpress/2013/06/pointer.jpg"><img src="/images/wordpress/2013/06/pointer.jpg" alt="pointer"></a>   所以，这就很容易理解标题中出现的，如果定义成指针，但是一数组方式来引用的时候，会出现什么情况。 如上图所示，定义成指针的时候，p中保存的是保存这一组数据的内存单元的地址，但如果用数组的方式来引用的话，那么就会直接把4624作为数据的地址，那么如果取p[3]的时候，是从4624+3=4627的位置将数据取出，而此处的存储单元的定义是不明确的，因此也就不能确定程序到底取出了什么数据。就会出先莫名其妙的错误。 因此我们在使用的时候，要保证声明和定义是相互匹配的。</p>
+<h3 id="3、其他区别"><a href="#3、其他区别" class="headerlink" title="3、其他区别"></a>3、其他区别</h3><p>指针</p>
+<p>数组</p>
+<p>保存数据的地址</p>
+<p>保存数据</p>
+<p>间接的访问数据，首先取得指针的内容，把它作为地址，然后从这个地址提取数据。如果指针如果有一个下标[I]，将指针的内容加上I作为地址，从中提取数据</p>
+<p>直接访问数据，a[I]只是简单的以a+I为地址取得数据</p>
+<p>通常用于动态的数据结构</p>
+<p>通常用于存储固定数目且数据类型相同的元素</p>
+<p>相关的函数为malloc()，free()</p>
+<p>隐式的分配和删除</p>
+<p>通常指向匿名数据</p>
+<p>自身就是数据名</p>
+<p>在定义指针的时候，编译器不会为其指向的对象分配内存空间，仅仅分配的是内存本身的空间，当然除了一种情况。（在定义指针的时候，同时赋值给它一个字符串常量来初始化，除此之外没有其他情况）。 比如 char *p = “abcdefg”;编译器会为其分配存储空间的 但是float *p  = 3.1415;编译器会报错！ 如下段代码</p>
+<p>#include &lt;stdlib.h&gt;</p>
+<p>#include &lt;stdio.h&gt;</p>
+<p>int main(void){</p>
+<p>  char <em>p = “abcdefgh”;<br>  float </em>pp = 3.1415;</p>
+<p>  return 0;<br>}</p>
+<p>  在编译的时候会提示：</p>
+<p>test.c:7:14: 错误： 用‘double’初始化‘float *’时类型不兼容。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/06/09/linux-process-management/" rel="next" title="一、进程管理">
+                <i class="fa fa-chevron-left"></i> 一、进程管理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/06/18/django-add-permission-check-to-view/" rel="prev" title="Django中给model增加view权限的方法">
+                Django中给model增加view权限的方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一：数组和指针可以相互替代吗？"><span class="nav-number">1.</span> <span class="nav-text">一：数组和指针可以相互替代吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、声明和定义到底有什么区别？"><span class="nav-number">2.</span> <span class="nav-text">二、声明和定义到底有什么区别？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、声明和定义的区别在于："><span class="nav-number">2.1.</span> <span class="nav-text">1、声明和定义的区别在于：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、左值和右值："><span class="nav-number">2.2.</span> <span class="nav-text">2、左值和右值：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#X-Y"><span class="nav-number">2.3.</span> <span class="nav-text">X = Y;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、如果定义的指针，但以数组来引用"><span class="nav-number">2.4.</span> <span class="nav-text">3、如果定义的指针，但以数组来引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、其他区别"><span class="nav-number">2.5.</span> <span class="nav-text">3、其他区别</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

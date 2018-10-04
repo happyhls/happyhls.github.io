@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Volley整体框架设计   其实Volley的整体框架就是如上所示，在主线程当中，会维护一个ReqeustQueue，我们要添加的任务，都会添加到这个Reqeust队列当中；任务添加进来之后，运行于cache线程的CacheDispatcher就会取走Reqeust，然后要不从cache中获取结果，要不然发送给NetworkDispatcher；再然后就是NetworkDispatcher从其对">
+<meta name="keywords" content="Android,OOM,Volley">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Volley源代码学习总结">
+<meta property="og:url" content="http://yoursite.com/2014/11/23/android-volley-5-summary/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Volley整体框架设计   其实Volley的整体框架就是如上所示，在主线程当中，会维护一个ReqeustQueue，我们要添加的任务，都会添加到这个Reqeust队列当中；任务添加进来之后，运行于cache线程的CacheDispatcher就会取走Reqeust，然后要不从cache中获取结果，要不然发送给NetworkDispatcher；再然后就是NetworkDispatcher从其对">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/volley-arch.png">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/volley-use-scene.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.705Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Volley源代码学习总结">
+<meta name="twitter:description" content="Volley整体框架设计   其实Volley的整体框架就是如上所示，在主线程当中，会维护一个ReqeustQueue，我们要添加的任务，都会添加到这个Reqeust队列当中；任务添加进来之后，运行于cache线程的CacheDispatcher就会取走Reqeust，然后要不从cache中获取结果，要不然发送给NetworkDispatcher；再然后就是NetworkDispatcher从其对">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/volley-arch.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/23/android-volley-5-summary/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Volley源代码学习总结 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/23/android-volley-5-summary/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Volley源代码学习总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-23 00:20:29" itemprop="dateCreated datePublished" datetime="2014-11-23T00:20:29+08:00">2014-11-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Volley/" itemprop="url" rel="index"><span itemprop="name">Volley</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="Volley整体框架设计"><a href="#Volley整体框架设计" class="headerlink" title="Volley整体框架设计"></a>Volley整体框架设计</h3><p><a href="/images/wordpress/2014/11/volley-arch.png"><img src="/images/wordpress/2014/11/volley-arch.png" alt="volley-arch"></a>   其实Volley的整体框架就是如上所示，在主线程当中，会维护一个ReqeustQueue，我们要添加的任务，都会添加到这个Reqeust队列当中；任务添加进来之后，运行于cache线程的CacheDispatcher就会取走Reqeust，然后要不从cache中获取结果，要不然发送给NetworkDispatcher；再然后就是NetworkDispatcher从其对应的队列取Request，执行操作。 我们以ImageLoader的典型用法，来分析一下其具体的工作流程：</p>
+<p>final ImageView imageView = (ImageView)findViewById(R.id.imageview);<br>RequestQueue queue = Volley.newRequestQueue(getApplicationContext());<br>ImageLoader imageLoader = new ImageLoader(queue, new LruBitmapCache(getApplicationContext()));<br>imageLoader.get(“<a href="http://www.baidu.com/img/bdlogo.png&quot;" target="_blank" rel="noopener">http://www.baidu.com/img/bdlogo.png&quot;</a>, ImageLoader.getImageListener(imageView, R.drawable.ic_launcher, R.drawable.ic_launcher));</p>
+<ol>
+<li>ImageLoader根据传入的Image Url和ImageListener，构建一个ImageContainer以及对应的Reqeust<image><ol>
+<li>尝试从MemoryCache中获取对应的图像，如果成功，则直接调用ImageListener回调方法</li>
+<li>构建ImageContainer，并通过ImageListener通知需要设置默认的图片</li>
+<li>根据当前正在执行的任务，查看是否有可以Batch在一起的请求，打包成为BatchImageRequest，其中包含组合在一起的Reqeust的各种信息</li>
+<li>构建需要提交给Volley的Reqeust<image>。</image></li>
+</ol>
+</image></li>
+<li>ImageLoader将步骤1中构建的Reqeust<image>提交到ReqeustQueue。</image></li>
+<li>ReqeustQueue：该Reqeust是否需要DiskCache？<ol>
+<li>不需要：则直接将Request添加至mNetworkQueue当中。</li>
+<li>需要：首先检查当前的需要DiskCache的任务当中是否有正在执行的与之Cache Key匹配的任务？<ol>
+<li>存在：添加Request到对应的队列当中，等待结果。</li>
+<li>不存在：将Request添加到mCacheQueue当中。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>CacheDispatcher从队列mCacheQueue中获取优先级最高的任务<ol>
+<li>检查该任务在DiskCache中是否已经存在？<ol>
+<li>不存在：将Request添加到mNetworkQueue当中。 </li>
+<li>存在：检查是否超过有效期<ol>
+<li>超过：将Request添加到mNetworkQueue队列当中。</li>
+<li>没有超过：Cache Hit，检查是否需要后台刷新数据？：<ol>
+<li>不需要：通过ResponseDelivery(本质上Handler)，发送Cache Hit结果</li>
+<li>需要：ResponseDelivery(本质上Handler)，发送Cache Hit结果，之后再将任务提交至mNetworkQueue</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>NetworkDispatcher从队列mNetworkQueue当中获取优先级最高的任务<ol>
+<li>执行网络访问请求</li>
+<li>判断该Reqeust是否需要Cache，若需要，则写入Cache</li>
+<li>mDelivery.postResponse(request, response);通知主线程处理结果。</li>
+</ol>
+</li>
+<li>ResponseDelivery中的Handler接收处理结果消息，回调处理具体任务。</li>
+</ol>
+<p>这样一看，整体的流程就很清晰了。这里举例使用的是Imageloader，如果是其他的Reqeust，则是省略步骤1即可。</p>
+<h3 id="那Response回调是怎么保证在UI线程上执行的呢？"><a href="#那Response回调是怎么保证在UI线程上执行的呢？" class="headerlink" title="那Response回调是怎么保证在UI线程上执行的呢？"></a>那Response回调是怎么保证在UI线程上执行的呢？</h3><p>在ReqeustQueue的构造函数中，可以配置DeliverDispatcher，而这个Dispatcher中有一个Handler，该Handler的Looper是主线程的Looper，也就是所有发送到对应的Handler的事件都会在主线程当中得到处理。这样也就是保证了Response回调都是在主线程上进行的。也就是可以直接在回调函数中设置UI控件的属性。</p>
+<h3 id="Volley适用的场景"><a href="#Volley适用的场景" class="headerlink" title="Volley适用的场景"></a>Volley适用的场景</h3><p>想起来Google IO大会上介绍Volley的PPT中，有这样一张图： <a href="/images/wordpress/2014/11/volley-use-scene.png"><img src="/images/wordpress/2014/11/volley-use-scene.png" alt="volley-use-scene"></a> 看到这张图就想起来，适用于同时发生的大量的一次性请求。</p>
+<h3 id="Volley不适用的场景，为什么不适用？"><a href="#Volley不适用的场景，为什么不适用？" class="headerlink" title="Volley不适用的场景，为什么不适用？"></a>Volley不适用的场景，为什么不适用？</h3><p>知道了Volley应该的用处，当然其他的就是不适应的，比如说，下载一个文件？为什么不适应，那下载文件来说，其最大的特点就是，响应稍微慢点也可以，多个任务甚者可以一个一个的来；支持断点续传这是应该必须的吧；Volley接收到的数据都是保存在一个数组当中供后续解析，什么？你要下载个文件，总不能都写到数组里面去吧；Volley没有为这些做优化。</p>
+<h3 id="Volley对于OOM问题的处理"><a href="#Volley对于OOM问题的处理" class="headerlink" title="Volley对于OOM问题的处理"></a>Volley对于OOM问题的处理</h3><p>OOM的问题，Volley处理的还是蛮细致的，当然也没有太消耗体力：</p>
+<ul>
+<li>同一个时刻只解析一张图片</li>
+<li>构建了一个简单的Byte的Pool避免Heap猛增。</li>
+<li>。。。其他的还没想到</li>
+</ul>
+<p>等Picasso分析完了再对比一下。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/OOM/" rel="tag"># OOM</a>
+          
+            <a href="/tags/Volley/" rel="tag"># Volley</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/22/picasso-how-to-use/" rel="next" title="Picasso学习：Picasso的使用">
+                <i class="fa fa-chevron-left"></i> Picasso学习：Picasso的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/23/android-develop-notes/" rel="prev" title="Android开发笔记">
+                Android开发笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Volley整体框架设计"><span class="nav-number">1.</span> <span class="nav-text">Volley整体框架设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#那Response回调是怎么保证在UI线程上执行的呢？"><span class="nav-number">2.</span> <span class="nav-text">那Response回调是怎么保证在UI线程上执行的呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Volley适用的场景"><span class="nav-number">3.</span> <span class="nav-text">Volley适用的场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Volley不适用的场景，为什么不适用？"><span class="nav-number">4.</span> <span class="nav-text">Volley不适用的场景，为什么不适用？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Volley对于OOM问题的处理"><span class="nav-number">5.</span> <span class="nav-text">Volley对于OOM问题的处理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一：进程和线程的概念：进程：是执行期间的程序，不仅仅局限于一段可执行的代码(text section)，还要包含其他的资源,eg.文件、挂起的信号量，数据，处理器状态等等。还有一个或者多个具有内存映射的内存地址空间或者一个或者多个执行线程(thread of execution)。全局变量的数据端。。。等等。进程也称做task 线程(thread)：进程中活动的对象，每个线程都有一个独立的程序计数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一、进程管理">
+<meta property="og:url" content="http://yoursite.com/2013/06/09/linux-process-management/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一：进程和线程的概念：进程：是执行期间的程序，不仅仅局限于一段可执行的代码(text section)，还要包含其他的资源,eg.文件、挂起的信号量，数据，处理器状态等等。还有一个或者多个具有内存映射的内存地址空间或者一个或者多个执行线程(thread of execution)。全局变量的数据端。。。等等。进程也称做task 线程(thread)：进程中活动的对象，每个线程都有一个独立的程序计数">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T14:43:05.088Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一、进程管理">
+<meta name="twitter:description" content="一：进程和线程的概念：进程：是执行期间的程序，不仅仅局限于一段可执行的代码(text section)，还要包含其他的资源,eg.文件、挂起的信号量，数据，处理器状态等等。还有一个或者多个具有内存映射的内存地址空间或者一个或者多个执行线程(thread of execution)。全局变量的数据端。。。等等。进程也称做task 线程(thread)：进程中活动的对象，每个线程都有一个独立的程序计数">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/06/09/linux-process-management/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一、进程管理 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/06/09/linux-process-management/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一、进程管理
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-06-09 16:12:20" itemprop="dateCreated datePublished" datetime="2013-06-09T16:12:20+08:00">2013-06-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 22:43:05" itemprop="dateModified" datetime="2018-10-03T22:43:05+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux内核设计与实现/" itemprop="url" rel="index"><span itemprop="name">Linux内核设计与实现</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux内核设计与实现/读书笔记/" itemprop="url" rel="index"><span itemprop="name">读书笔记</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="一：进程和线程的概念："><a href="#一：进程和线程的概念：" class="headerlink" title="一：进程和线程的概念："></a>一：进程和线程的概念：</h1><p>进程：是执行期间的程序，不仅仅局限于一段可执行的代码(text section)，还要包含其他的资源,eg.文件、挂起的信号量，数据，处理器状态等等。还有一个或者多个具有内存映射的内存地址空间或者一个或者多个执行线程(thread of execution)。全局变量的数据端。。。等等。进程也称做task 线程(thread)：进程中活动的对象，每个线程都有一个独立的程序计数器、进程栈、进程寄存器。线程是内核调度的对象。在Linux中，并不严格的区分线程和进程，一般而言，把线程看作一种特殊的进程。</p>
+<h1 id="二、进程描述符-amp-amp-任务结构"><a href="#二、进程描述符-amp-amp-任务结构" class="headerlink" title="二、进程描述符&amp;&amp;任务结构"></a>二、进程描述符&amp;&amp;任务结构</h1><p>内核将进程列表放入任务队列中(task list)，为一个双向循环列表，每一项都是进程描述符(process descriptor)结构，类型为task_struct，该结构的定义位于 &lt;linux/sched.h&gt;，包含进程运行时的所有信息，占据内存1.7KB</p>
+<h2 id="1、分配进程描述符"><a href="#1、分配进程描述符" class="headerlink" title="1、分配进程描述符"></a>1、分配进程描述符</h2><h3 id="1-、内容"><a href="#1-、内容" class="headerlink" title="(1)、内容"></a>(1)、内容</h3><p>Linux通过slab分配器分配task_struct结构，slab在于实现快速进程创建，关于slab的详细介绍，有篇文章，记录一下<a href="https://www.ibm.com/developerworks/cn/linux/l-linux-slab-allocator/" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/linux/l-linux-slab-allocator/</a> 在&lt;asm/thread_info.h&gt;中有如下定义：</p>
+<p>struct thread_info {<br>    struct pcb_struct    pcb;        /<em> palcode state </em>/</p>
+<pre><code>struct task_struct    \*task;        /\* main task structure */
+unsigned int        flags;        /* low level flags */
+unsigned int        ieee_state;    /* see fpu.h */
+
+struct exec\_domain    \*exec\_domain;    /\* execution domain */
+mm\_segment\_t        addr_limit;    /* thread address space */
+unsigned        cpu;        /* current CPU */
+int            preempt_count; /* 0 =&gt; preemptable, &lt;0 =&gt; BUG */
+
+int bpt_nsaved;
+unsigned long bpt_addr\[2\];        /* breakpoint handling  */
+unsigned int bpt_insn\[2\];
+
+struct restart\_block    restart\_block;
+</code></pre><p>};</p>
+<p>slab分配器动态生成时，只需在(相应进程的内核进程栈)的栈顶(栈向上增长)或者栈底(栈向下增长)创建新的struct thread_info就可以。 e.g(向下增长) ___________________________________ |栈顶 | | |<strong><strong><strong><strong><strong><strong><strong><strong>____</strong></strong></strong></strong></strong></strong></strong></strong>     （当前堆栈指针） | | |struct task_struct *task                                                            （current_thread_info）</p>
+<h3 id="2-、存放"><a href="#2-、存放" class="headerlink" title="(2)、存放"></a>(2)、存放</h3><p>系统需保存当前进程的task_struct，以备适用，因此在系统中提供了 current的宏，用来获取当前运行进程的task_struct结构体，但current的具体实现是不一样的，在X86之类 Reg比较紧张的处理器上，是在内核栈尾端创建thread_info结构，通过计算偏移，查找出task，而在PowerPC中，是通过专门寄存器来实现。 PID：Process Identification Value，用来标识唯一进程，在&lt;linux/threads.h&gt;中定义最大的数值，一般为32768,</p>
+<p>#define PID_MAX_DEFAULT (CONFIG_BASE_SMALL ? 0x1000 : 0x8000)</p>
+<p>在使用中，可以通过修改 /proc/sys/kernel/pid_max来修改上限</p>
+<h2 id="2、进程的状态"><a href="#2、进程的状态" class="headerlink" title="2、进程的状态"></a>2、进程的状态</h2><h3 id="1-、定义"><a href="#1-、定义" class="headerlink" title="(1)、定义"></a>(1)、定义</h3><p>进程状态是task_struct中的一个定义，描述了该task的运行状态，定义如下：</p>
+<p>volatile long state;    /<em> -1 unrunnable, 0 runnable, &gt;0 stopped </em>/</p>
+<p>关于具体的状态，有如下定义</p>
+<p>/*<br> * Task state bitmask. NOTE! These bits are also<br> * encoded in fs/proc/array.c: get_task_state().<br> *<br> * We have two separate sets of flags: task-&gt;state<br> * is about runnability, while task-&gt;exit_state are<br> * about the task exiting. Confusing, but this way<br> * modifying one set can’t modify the other one by<br> * mistake.<br> */</p>
+<p>#define TASK_RUNNING        0</p>
+<p>#define TASK_INTERRUPTIBLE    1</p>
+<p>#define TASK_UNINTERRUPTIBLE    2</p>
+<p>#define __TASK_STOPPED        4</p>
+<p>#define __TASK_TRACED        8<br>/* in tsk-&gt;exit_state */</p>
+<p>#define EXIT_ZOMBIE        16</p>
+<p>#define EXIT_DEAD        32<br>/* in tsk-&gt;state again */</p>
+<p>#define TASK_DEAD        64</p>
+<p>#define TASK_WAKEKILL        128</p>
+<p>#define TASK_WAKING        256</p>
+<p>#define TASK_STATE_MAX        512</p>
+<p>一一对应来看，Linux使用一个long类型的state数据来标识状态，如果为0,则说明当前的task是可执行的，如果state的值大于0,说明当前进程是停止的，通过和不同的状态相与就能找到具体是什么状态。其中，每一层的含义为:</p>
+<p>TASK_RUNNING /<em>进程是可执行的：即程序或许正在执行，或者在运行队列中等待调度，是进程在用户空间中唯一可能的状态</em>/</p>
+<p>TASK_INTERRUPTIBLE /<em>进程被阻塞，正在睡眠，并且是可中断的。当接收到相应的信号，就可以被唤醒并随时准备投入运行</em>/</p>
+<p>TASK_UNINTERRUPTIBLE /<em>与TASK_INTERRUPTIBLE状态类似，但该种状态的时候，进程是不会对信号进行相应的，此时进程可能在进行必要的任务，必须等待</em>/</p>
+<p>设置进程的状态，可以使用set_task_state(task,state)命令来实现。 注意：一般的程序在用户空间中执行，当程序执行了系统调用或者触发异常之后，该进程就陷入内核空间，称 内核“代表进程执行”并处于进程上下文中，在此时current宏是有效的，除非调度器调度了优先级更高的进程，否则内核退出时，会回复在用户空间继续执行。</p>
+<h3 id="2-、进程家族树"><a href="#2-、进程家族树" class="headerlink" title="(2)、进程家族树"></a>(2)、进程家族树</h3><p>系统中，所有的进程都是PID为1的init进程的后代。系统中的每一个进程都有一个相应的父进程，同时，有可以拥有零个或者多个子进程。在&lt;linux/sched.h&gt;中的struct task_struct结构体的定义中，有这样一部分</p>
+<pre><code>/\* 
+ \* pointers to (original) parent process, youngest child, younger sibling,
+ \* older sibling, respectively.  (p-&gt;father can be replaced with 
+ \* p-&gt;real_parent-&gt;pid)
+ */
+struct task\_struct \*real\_parent; /\* real parent process */
+struct task_struct \*parent; /\* recipient of SIGCHLD, wait4() reports */
+/\*
+ \* children/sibling forms the list of my natural children
+ */
+struct list_head children;    /* list of my children */
+struct list_head sibling;    /* linkage in my parent&apos;s children list */
+struct task\_struct \*group\_leader;    /\* threadgroup leader */
+</code></pre><p>因此我们可以使用</p>
+<p>struct task_struct *my_parent = current-&gt;parent;</p>
+<p>来获取其父进程的进程描述符。</p>
+<h2 id="3、进程的创建"><a href="#3、进程的创建" class="headerlink" title="3、进程的创建"></a>3、进程的创建</h2><h3 id="1、总述："><a href="#1、总述：" class="headerlink" title="1、总述："></a>1、总述：</h3><p>Unix进程的创建，将整个进程分解为fork()和exec()两个步骤，fork()通过拷贝当前的进程创建一个子进程。其与父进程的区别仅仅在于PID，PPID，一些资源和统计量(挂起的信号等等)。exec负责读取可执行文件并将其在于地址空间中运行，</p>
+<h3 id="2、写时拷贝"><a href="#2、写时拷贝" class="headerlink" title="2、写时拷贝"></a>2、写时拷贝</h3><p>传统的fork()是将所有的资源复制给新创建的进程。效率太低，比方说在子进程立刻创建新进程的时候，拷贝的这些数据都没有意义。Linux的fork()使用了写时拷贝的技术，所谓的写时拷贝，就是说，在复制的时候，内核不会复制整个进程的地址空间，在开始时候，数据都是只读方式共享的，只有在数据需要写入的时候，数据才会被复制到子进程当中，从而实现各个进程拥有自己的拷贝。这样以来，fork()函数的实际开销就在于复制父进程的页表，以及给子线程分配唯一 的进程描述符。</p>
+<h3 id="3、fork"><a href="#3、fork" class="headerlink" title="3、fork()"></a>3、fork()</h3><p>Linux通过clone()系统调用去实现fork(),包括vfork(),__clone()也是如此，然后clone()去调用do_fork()，do_fork()负责完成权限的检查，然后调用copy_process()函数，再然后，开始运行程序。do_fork()代码如下</p>
+<p>/*<br> *  Ok, this is the main fork-routine.<br> *<br> * It copies the process, and if successful kick-starts<br> * it and waits for it to finish using the VM if required.<br> <em>/<br>long do_fork(unsigned long clone_flags,<br>          unsigned long stack_start,<br>          struct pt_regs </em>regs,<br>          unsigned long stack_size,<br>          int __user <em>parent_tidptr,<br>          int __user </em>child_tidptr)<br>{<br>    struct task_struct *p;<br>    int trace = 0;<br>    long nr;</p>
+<pre><code>/\*
+ \* Do some preliminary argument and permissions checking before we
+ \* actually start allocating stuff
+ */
+if (clone\_flags &amp; CLONE\_NEWUSER) {
+    if (clone\_flags &amp; CLONE\_THREAD)
+        return -EINVAL;
+    /\* hopefully this check will go away when userns support is
+     \* complete
+     */
+    if (!capable(CAP\_SYS\_ADMIN) || !capable(CAP_SETUID) ||
+            !capable(CAP_SETGID))
+        return -EPERM;
+}
+
+/\*
+ \* Determine whether and which event to report to ptracer.  When
+ \* called from kernel\_thread or CLONE\_UNTRACED is explicitly
+ \* requested, no event is reported; otherwise, report if the event
+ \* for the type of forking is enabled.
+ */
+if (likely(user\_mode(regs)) &amp;&amp; !(clone\_flags &amp; CLONE_UNTRACED)) {
+    if (clone\_flags &amp; CLONE\_VFORK)
+        trace = PTRACE\_EVENT\_VFORK;
+    else if ((clone_flags &amp; CSIGNAL) != SIGCHLD)
+        trace = PTRACE\_EVENT\_CLONE;
+    else
+        trace = PTRACE\_EVENT\_FORK;
+
+    if (likely(!ptrace\_event\_enabled(current, trace)))
+        trace = 0;
+}
+
+p = copy\_process(clone\_flags, stack\_start, regs, stack\_size,
+         child_tidptr, NULL, trace);
+/\*
+ \* Do this prior waking up the new thread - the thread pointer
+ \* might get invalid after that point, if the thread exits quickly.
+ */
+if (!IS_ERR(p)) {
+    struct completion vfork;
+
+    trace\_sched\_process_fork(current, p);
+
+    nr = task\_pid\_vnr(p);
+
+    if (clone\_flags &amp; CLONE\_PARENT_SETTID)
+        put\_user(nr, parent\_tidptr);
+
+    if (clone\_flags &amp; CLONE\_VFORK) {
+        p-&gt;vfork_done = &amp;vfork;
+        init_completion(&amp;vfork);
+    }
+
+    audit\_finish\_fork(p);
+
+    /\*
+     \* We set PF_STARTING at creation in case tracing wants to
+     \* use this to distinguish a fully live task from one that
+     \* hasn&apos;t finished SIGSTOP raising yet.  Now we clear it
+     \* and set the child going.
+     */
+    p-&gt;flags &amp;= ~PF_STARTING;
+
+    wake\_up\_new_task(p);
+
+    /\* forking complete and child started to run, tell ptracer */
+    if (unlikely(trace))
+        ptrace_event(trace, nr);
+
+    if (clone\_flags &amp; CLONE\_VFORK) {
+        freezer\_do\_not_count();
+        wait\_for\_completion(&amp;vfork);
+        freezer_count();
+        ptrace\_event(PTRACE\_EVENT\_VFORK\_DONE, nr);
+    }
+} else {
+    nr = PTR_ERR(p);
+}
+return nr;
+</code></pre><p>}</p>
+<p>在copy_process()中， 完成以下的工作： (1)调用dup_task_struct()创建新的内核栈、thread_info、task_struct结构，并且与父进程相同 (2)各种检查数据范围 (3)设置子进程状态为TASK_UNINTERRUPTIBLE; (4)copy——process更新task_struct的flags成员 (5)alloc_pid为新进程分配有效PID (7)传递clone参数标志，扫尾工作，并返回指向子进程的指针。</p>
+<h3 id="4、vfork"><a href="#4、vfork" class="headerlink" title="4、vfork()"></a>4、vfork()</h3><p>除了不拷贝父进程的页表项，其他与fork相同</p>
+<h2 id="4、线程"><a href="#4、线程" class="headerlink" title="4、线程"></a>4、线程</h2><p>Linux中，没有单独的线程的概念，所有的线程都是特殊的进程</p>
+<h3 id="1、线程的创建"><a href="#1、线程的创建" class="headerlink" title="1、线程的创建"></a>1、线程的创建</h3><p>其创建与进程一样，同样是调用clone系统调用来实现，只是在调用的时候，会通过传入一些标志参数来指明要共享的资源。 其系统调用为</p>
+<p>clone(CLONE_VM|CLONE_FS|CLONE_FILES|CLONE_SIGHAND,0)</p>
+<p>而对比下的普通的fork()的实现是:</p>
+<p>clone(SIGCHLD,0)</p>
+<p>vfork()的实现是</p>
+<p>clone(CLONE_VFORK|CLONE_VM|SIGCHLD,0)</p>
+<p>所有的参数说明为。</p>
+<p>/*<br> * cloning flags:<br> */</p>
+<p>#define CSIGNAL        0x000000ff    /<em> signal mask to be sent at exit </em>/</p>
+<p>#define CLONE_VM    0x00000100    /<em> set if VM shared between processes </em>/</p>
+<p>#define CLONE_FS    0x00000200    /<em> set if fs info shared between processes </em>/</p>
+<p>#define CLONE_FILES    0x00000400    /<em> set if open files shared between processes </em>/</p>
+<p>#define CLONE_SIGHAND    0x00000800    /<em> set if signal handlers and blocked signals shared </em>/</p>
+<p>#define CLONE_PTRACE    0x00002000    /<em> set if we want to let tracing continue on the child too </em>/</p>
+<p>#define CLONE_VFORK    0x00004000    /<em> set if the parent wants the child to wake it up on mm_release </em>/</p>
+<p>#define CLONE_PARENT    0x00008000    /<em> set if we want to have the same parent as the cloner </em>/</p>
+<p>#define CLONE_THREAD    0x00010000    /<em> Same thread group? </em>/</p>
+<p>#define CLONE_NEWNS    0x00020000    /<em> New namespace group? </em>/</p>
+<p>#define CLONE_SYSVSEM    0x00040000    /<em> share system V SEM_UNDO semantics </em>/</p>
+<p>#define CLONE_SETTLS    0x00080000    /<em> create a new TLS for the child </em>/</p>
+<p>#define CLONE_PARENT_SETTID    0x00100000    /<em> set the TID in the parent </em>/</p>
+<p>#define CLONE_CHILD_CLEARTID    0x00200000    /<em> clear the TID in the child </em>/</p>
+<p>#define CLONE_DETACHED        0x00400000    /<em> Unused, ignored </em>/</p>
+<p>#define CLONE_UNTRACED        0x00800000    /<em> set if the tracing process can’t force CLONE_PTRACE on this clone </em>/</p>
+<p>#define CLONE_CHILD_SETTID    0x01000000    /<em> set the TID in the child </em>/<br>/* 0x02000000 was previously the unused CLONE_STOPPED (Start in stopped state)<br>   and is now available for re-use. */</p>
+<p>#define CLONE_NEWUTS        0x04000000    /<em> New utsname group? </em>/</p>
+<p>#define CLONE_NEWIPC        0x08000000    /<em> New ipcs </em>/</p>
+<p>#define CLONE_NEWUSER        0x10000000    /<em> New user namespace </em>/</p>
+<p>#define CLONE_NEWPID        0x20000000    /<em> New pid namespace </em>/</p>
+<p>#define CLONE_NEWNET        0x40000000    /<em> New network namespace </em>/</p>
+<p>#define CLONE_IO        0x80000000    /<em> Clone io context </em>/</p>
+<h3 id="2、内核线程"><a href="#2、内核线程" class="headerlink" title="2、内核线程"></a>2、内核线程</h3><p>(1)、创建内核线程</p>
+<p>#define kthread_create(threadfn, data, namefmt, arg…) \<br>kthread_create_on_node(threadfn, data, -1, namefmt, ##arg)</p>
+<p>(2)、启动内核线程</p>
+<p>#define kthread_run(threadfn, data, namefmt, …) \<br>({ \<br>struct task_struct *__k \<br>= kthread_create(threadfn, data, namefmt, ## __VA_ARGS__); \<br>if (!IS_ERR(__k)) \<br>wake_up_process(<strong>k); \
+</strong>k; \<br>})</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/04/23/django-template-useage/" rel="next" title="Django 笔记：一、工程部署;模板(template)的使用">
+                <i class="fa fa-chevron-left"></i> Django 笔记：一、工程部署;模板(template)的使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/06/17/c-difference-between-array-and-pointer/" rel="prev" title="数组和指针的区别">
+                数组和指针的区别 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#一：进程和线程的概念："><span class="nav-number">1.</span> <span class="nav-text">一：进程和线程的概念：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、进程描述符-amp-amp-任务结构"><span class="nav-number">2.</span> <span class="nav-text">二、进程描述符&amp;&amp;任务结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、分配进程描述符"><span class="nav-number">2.1.</span> <span class="nav-text">1、分配进程描述符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-、内容"><span class="nav-number">2.1.1.</span> <span class="nav-text">(1)、内容</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-、存放"><span class="nav-number">2.1.2.</span> <span class="nav-text">(2)、存放</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、进程的状态"><span class="nav-number">2.2.</span> <span class="nav-text">2、进程的状态</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-、定义"><span class="nav-number">2.2.1.</span> <span class="nav-text">(1)、定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-、进程家族树"><span class="nav-number">2.2.2.</span> <span class="nav-text">(2)、进程家族树</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3、进程的创建"><span class="nav-number">2.3.</span> <span class="nav-text">3、进程的创建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、总述："><span class="nav-number">2.3.1.</span> <span class="nav-text">1、总述：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、写时拷贝"><span class="nav-number">2.3.2.</span> <span class="nav-text">2、写时拷贝</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、fork"><span class="nav-number">2.3.3.</span> <span class="nav-text">3、fork()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、vfork"><span class="nav-number">2.3.4.</span> <span class="nav-text">4、vfork()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4、线程"><span class="nav-number">2.4.</span> <span class="nav-text">4、线程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、线程的创建"><span class="nav-number">2.4.1.</span> <span class="nav-text">1、线程的创建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、内核线程"><span class="nav-number">2.4.2.</span> <span class="nav-text">2、内核线程</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

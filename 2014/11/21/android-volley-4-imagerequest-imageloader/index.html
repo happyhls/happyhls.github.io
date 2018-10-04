@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="之前把Volley的源代码都分析了一边，基本上整体的思路已经清晰，现在再来分析一下一个具体的Request实现，即ImageRequest。为什么是分析ImageRequest而不是其他的JsonRequest之类。一方面是因为在Android应用开发中，图像的使用比较重要，而且需要小心处理，避免OOM的问题；另外一个原因，相比ImageRequest或者StringRequest，ImageRe">
+<meta name="keywords" content="Android,Volley">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Volley源代码分析 – 4: Request实现之ImageRequest&amp;ImageLoader">
+<meta property="og:url" content="http://yoursite.com/2014/11/21/android-volley-4-imagerequest-imageloader/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="之前把Volley的源代码都分析了一边，基本上整体的思路已经清晰，现在再来分析一下一个具体的Request实现，即ImageRequest。为什么是分析ImageRequest而不是其他的JsonRequest之类。一方面是因为在Android应用开发中，图像的使用比较重要，而且需要小心处理，避免OOM的问题；另外一个原因，相比ImageRequest或者StringRequest，ImageRe">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/ImageLoader-get.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.618Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Volley源代码分析 – 4: Request实现之ImageRequest&amp;ImageLoader">
+<meta name="twitter:description" content="之前把Volley的源代码都分析了一边，基本上整体的思路已经清晰，现在再来分析一下一个具体的Request实现，即ImageRequest。为什么是分析ImageRequest而不是其他的JsonRequest之类。一方面是因为在Android应用开发中，图像的使用比较重要，而且需要小心处理，避免OOM的问题；另外一个原因，相比ImageRequest或者StringRequest，ImageRe">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/ImageLoader-get.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/21/android-volley-4-imagerequest-imageloader/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Volley源代码分析 – 4: Request实现之ImageRequest&ImageLoader | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/21/android-volley-4-imagerequest-imageloader/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Volley源代码分析 – 4: Request实现之ImageRequest&ImageLoader
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-21 17:07:50" itemprop="dateCreated datePublished" datetime="2014-11-21T17:07:50+08:00">2014-11-21</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Volley/" itemprop="url" rel="index"><span itemprop="name">Volley</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>之前把Volley的源代码都分析了一边，基本上整体的思路已经清晰，现在再来分析一下一个具体的Request实现，即ImageRequest。为什么是分析ImageRequest而不是其他的JsonRequest之类。一方面是因为在Android应用开发中，图像的使用比较重要，而且需要小心处理，避免OOM的问题；另外一个原因，相比ImageRequest或者StringRequest，ImageRequest实现稍微复杂，且还有一个辅助的工具类ImageLoader。</p>
+<h2 id="ImageRequest"><a href="#ImageRequest" class="headerlink" title="ImageRequest"></a>ImageRequest</h2><p>/**<br> * A canned request for getting an image at a given URL and calling<br> * back with a decoded Bitmap.<br> * 一个封装的request，用来从指定的URL获取图片，并且回调中返回一个解码的Bitmap<br> <em>/<br>public class ImageRequest extends Request<bitmap> {<br>  /\</bitmap></em>* Socket timeout in milliseconds for image requests <em>/<br>  /\</em>* Socket超时时间设置 */<br>    private static final int IMAGE_TIMEOUT_MS = 1000;</p>
+<pre><code>/\*\* Default number of retries for image requests */
+/\*\* 默认重试次数 */
+private static final int IMAGE\_MAX\_RETRIES = 2;
+
+/\*\* Default backoff multiplier for image requests */
+/\*\* Backoff系数，个人理解的是，失败的次数越多，那么下次应该拖的时间也就越长 */
+private static final float IMAGE\_BACKOFF\_MULT = 2f;
+
+private final Response.Listener&lt;Bitmap&gt; mListener;
+private final Config mDecodeConfig;
+private final int mMaxWidth;
+private final int mMaxHeight;
+
+/\*\* Decoding lock so that we don&apos;t decode more than one image at a time (to avoid OOM&apos;s) */
+/\*\* 锁，用来保证在同一个时刻仅仅有衣服图片用于解码，避免OOM */
+private static final Object sDecodeLock = new Object();
+
+/\*\*
+ \* Creates a new image request, decoding to a maximum specified width and
+ \* height. If both width and height are zero, the image will be decoded to
+ \* its natural size. If one of the two is nonzero, that dimension will be
+ \* clamped and the other one will be set to preserve the image&apos;s aspect
+ \* ratio. If both width and height are nonzero, the image will be decoded to
+ \* be fit in the rectangle of dimensions width x height while keeping its
+ \* aspect ratio.
+ \* 
+ \* 创建一个新的image request，解码最大为现定的最大宽度和高度。如果两者都是0的话，图片会
+ \* 根据其本身的大小进行解码。如果其中一个为0，那么就会根据另外一个边从尺寸进行解码。如果两者
+ \* 都不是0，那么图片会在保持其比例的情况下缩放至最长的边也符合。
+ \*
+ \* @param url URL of the image
+ \* @param listener Listener to receive the decoded bitmap
+ \* @param maxWidth Maximum width to decode this bitmap to, or zero for none
+ \* @param maxHeight Maximum height to decode this bitmap to, or zero for
+ \*            none
+ \* @param decodeConfig Format to decode the bitmap to
+ \* @param errorListener Error listener, or null to ignore errors
+ */
+public ImageRequest(String url, Response.Listener&lt;Bitmap&gt; listener, int maxWidth, int maxHeight,
+        Config decodeConfig, Response.ErrorListener errorListener) {
+    super(Method.GET, url, errorListener);
+    setRetryPolicy(
+            new DefaultRetryPolicy(IMAGE\_TIMEOUT\_MS, IMAGE\_MAX\_RETRIES, IMAGE\_BACKOFF\_MULT));
+    mListener = listener;
+    mDecodeConfig = decodeConfig;
+    mMaxWidth = maxWidth;
+    mMaxHeight = maxHeight;
+}
+
+@Override
+public Priority getPriority() {
+    return Priority.LOW;
+}
+
+/\*\*
+ \* Scales one side of a rectangle to fit aspect ratio.
+ \* 根据其中的一条边求得合适的缩放比例
+ \*
+ \* @param maxPrimary Maximum size of the primary dimension (i.e. width for
+ \*        max width), or zero to maintain aspect ratio with secondary
+ \*        dimension
+ \* @param maxSecondary Maximum size of the secondary dimension, or zero to
+ \*        maintain aspect ratio with primary dimension
+ \* @param actualPrimary Actual size of the primary dimension
+ \* @param actualSecondary Actual size of the secondary dimension
+ */
+private static int getResizedDimension(int maxPrimary, int maxSecondary, int actualPrimary,
+        int actualSecondary) {
+    // If no dominant value at all, just return the actual.
+    if (maxPrimary == 0 &amp;&amp; maxSecondary == 0) {
+        return actualPrimary;
+    }
+
+    // If primary is unspecified, scale primary to match secondary&apos;s scaling ratio.
+    if (maxPrimary == 0) {
+        double ratio = (double) maxSecondary / (double) actualSecondary;
+        return (int) (actualPrimary * ratio);
+    }
+
+    if (maxSecondary == 0) {
+        return maxPrimary;
+    }
+
+    double ratio = (double) actualSecondary / (double) actualPrimary;
+    int resized = maxPrimary;
+    if (resized * ratio &gt; maxSecondary) {
+        resized = (int) (maxSecondary / ratio);
+    }
+    return resized;
+}
+
+/\*\*
+ \* 覆写Request的parseNetworkResponse方法，用来解析网络上获取的二进制流为Bitmap图片
+ */
+@Override
+protected Response&lt;Bitmap&gt; parseNetworkResponse(NetworkResponse response) {
+    // Serialize all decode on a global lock to reduce concurrent heap usage.
+    synchronized (sDecodeLock) {
+        try {
+            return doParse(response);
+        } catch (OutOfMemoryError e) {
+            VolleyLog.e(&quot;Caught OOM for %d byte image, url=%s&quot;, response.data.length, getUrl());
+            return Response.error(new ParseError(e));
+        }
+    }
+}
+
+/\*\*
+ \* The real guts of parseNetworkResponse. Broken out for readability.
+ \* parseNetworkResponse的核心部分，为了易读性放在外面。
+ */
+private Response&lt;Bitmap&gt; doParse(NetworkResponse response) {
+    byte\[\] data = response.data;
+    BitmapFactory.Options decodeOptions = new BitmapFactory.Options();
+    Bitmap bitmap = null;
+    // 判断如果其长度和宽度都指定为0的话，那么就按照原来的尺寸进行解码。
+    if (mMaxWidth == 0 &amp;&amp; mMaxHeight == 0) {
+        decodeOptions.inPreferredConfig = mDecodeConfig;
+        bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, decodeOptions);
+    } else {
+        // If we have to resize this image, first get the natural bounds.
+        // 如果我们需要对image进行缩放的话，首先通过设置inJustDecodeBounds为true，来获取图片真实的大小
+        decodeOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeByteArray(data, 0, data.length, decodeOptions);
+        int actualWidth = decodeOptions.outWidth;
+        int actualHeight = decodeOptions.outHeight;
+
+        // Then compute the dimensions we would ideally like to decode to.
+        // 计算我们实际上要缩放的大小。
+        int desiredWidth = getResizedDimension(mMaxWidth, mMaxHeight,
+                actualWidth, actualHeight);
+        int desiredHeight = getResizedDimension(mMaxHeight, mMaxWidth,
+                actualHeight, actualWidth);
+
+        // Decode to the nearest power of two scaling factor.
+        // 首先将图片缩放到最接近我们所需要的大小的合适的比例，该比例为2^x。
+        decodeOptions.inJustDecodeBounds = false;
+        // TODO(ficus): Do we need this or is it okay since API 8 doesn&apos;t support it?
+        // decodeOptions.inPreferQualityOverSpeed = PREFER\_QUALITY\_OVER_SPEED;
+        decodeOptions.inSampleSize =
+            findBestSampleSize(actualWidth, actualHeight, desiredWidth, desiredHeight);
+        Bitmap tempBitmap =
+            BitmapFactory.decodeByteArray(data, 0, data.length, decodeOptions);
+
+        // If necessary, scale down to the maximal acceptable size.
+        // 如果需要的话，也就是还需要进一步缩放的话，将tempBitmap缩放到合适的大小。
+        if (tempBitmap != null &amp;&amp; (tempBitmap.getWidth() &gt; desiredWidth ||
+                tempBitmap.getHeight() &gt; desiredHeight)) {
+            bitmap = Bitmap.createScaledBitmap(tempBitmap,
+                    desiredWidth, desiredHeight, true);
+            // 回收不用的tempBitmap。
+            tempBitmap.recycle();
+        } else {
+            bitmap = tempBitmap;
+        }
+    }
+
+    if (bitmap == null) {
+        return Response.error(new ParseError(response));
+    } else {
+        return Response.success(bitmap, HttpHeaderParser.parseCacheHeaders(response));
+    }
+}
+
+/\*\*
+ \* 覆写Response的deliverResponse方法，注意该方法是在main线程上运行的。
+ */
+@Override
+protected void deliverResponse(Bitmap response) {
+    mListener.onResponse(response);
+}
+
+/\*\*
+ \* Returns the largest power-of-two divisor for use in downscaling a bitmap
+ \* that will not result in the scaling past the desired dimensions.
+ \* 寻找最接近所需要缩放尺寸的2^x缩放比例
+ \*
+ \* @param actualWidth Actual width of the bitmap
+ \* @param actualHeight Actual height of the bitmap
+ \* @param desiredWidth Desired width of the bitmap
+ \* @param desiredHeight Desired height of the bitmap
+ */
+// Visible for testing.
+static int findBestSampleSize(
+        int actualWidth, int actualHeight, int desiredWidth, int desiredHeight) {
+    double wr = (double) actualWidth / desiredWidth;
+    double hr = (double) actualHeight / desiredHeight;
+    double ratio = Math.min(wr, hr);
+    float n = 1.0f;
+    while ((n * 2) &lt;= ratio) {
+        n *= 2;
+    }
+
+    return (int) n;
+}
+</code></pre><p>}</p>
+<p>其实该部分的核心的代码是doParse(NetworkResponse response)部分，其工作为：</p>
+<ol>
+<li>首先检查，如果不需要缩放，那么就直接解码</li>
+<li>需要缩放，则按照以下步骤进行<ol>
+<li>首先获取图片真实的大小，通过设置BitmapFactory.Options的inJustDecodeBounds属性</li>
+<li>计算我们图片根据边框限制，所需要实际缩放的大小</li>
+<li>由于在decode的时候，可以设定inSamleSize来获取近似的大小，减少内存占用。</li>
+<li>再次判断图片是否完全在给定的范围之内，如果不是，那么进一步缩放。</li>
+</ol>
+</li>
+</ol>
+<h2 id="ImageLoader"><a href="#ImageLoader" class="headerlink" title="ImageLoader"></a>ImageLoader</h2><p>ImageLoader是基于ImageRequest的一个工具类，在ImageLoader的基础上，根据图片访问的特点做了更多的优化。我们首先来分析其结构。 在ImageLoader当中有很多辅助类用于优化设计，我们先看一看这些都是用来做什么的：</p>
+<h3 id="ImageCache"><a href="#ImageCache" class="headerlink" title="ImageCache"></a>ImageCache</h3><p>public interface ImageCache {<br>    public Bitmap getBitmap(String url);<br>    public void putBitmap(String url, Bitmap bitmap);<br>}</p>
+<p>图片消耗较大，因此必须使用Cache进行缓存，在系统资源紧张或者图片已经不需使用的时候，及时的释放内存并复用，以减少内存的消耗。在ImageLoader没有默认的Cache实现，需要用户提供。在Volley的User Guide中，有一个简单的LruBitmap的cache的实现，链接为：<a href="http://blog.happyhls.me/2014/11/14/volley-lesson-2-making-a-standard-request%EF%BC%88%E8%AF%91%EF%BC%89/" target="_blank" rel="noopener">http://blog.happyhls.me/2014/11/14/volley-lesson-2-making-a-standard-request%EF%BC%88%E8%AF%91%EF%BC%89/</a> 。该Cache继承了Android提供的LRUCache，以后需要的话再单独分析。</p>
+<h2 id="ImageListerner"><a href="#ImageListerner" class="headerlink" title="ImageListerner"></a>ImageListerner</h2><pre><code>/\*\*
+ \* Interface for the response handlers on image requests.
+ \* 用来处理response的回调接口
+ \*
+ \* The call flow is this:
+ \* 1\. Upon being  attached to a request, onResponse(response, true) will
+ \* be invoked to reflect any cached data that was already available. If the
+ \* data was available, response.getBitmap() will be non-null.
+ \* 1、如果和一个request绑定之后，onResponse(response, true)会在被调用，表明在cache中有对应的数据。
+ \* 如果数据是可用的，那么response.getBitmap()不是null。
+ \*
+ \* 2\. After a network response returns, only one of the following cases will happen:
+ \*   \- onResponse(response, false) will be called if the image was loaded.
+ \*   or
+ \*   \- onErrorResponse will be called if there was an error loading the image.
+ \* 2、当network的数据返回的时候，仅仅会发生下面的其中一种情况：
+ \*   \- onResponse(response, false)会在image加载之后调用
+ \*   \- onErrorResponse会在出错的时候调用
+ */
+public interface ImageListener extends ErrorListener {
+    /\*\*
+     \* Listens for non-error changes to the loading of the image request.
+     \*
+     \* @param response Holds all information pertaining to the request, as well
+     \* as the bitmap (if it is loaded).
+     \* @param isImmediate True if this was called during ImageLoader.get() variants.
+     \* This can be used to differentiate between a cached image loading and a network
+     \* image loading in order to, for example, run an animation to fade in network loaded
+     \* images.
+     */
+    public void onResponse(ImageContainer response, boolean isImmediate);
+}
+</code></pre><p>注释中拥有比较详细的描述，主要是设定了一个回调的接口，根据isImmediate来决定其显示的图片是默认的还是结果处理得到的结果。 在ImageLoader当中有一个静态方法，用来获取一个ImageListener实现，我们来观察其代码：</p>
+<pre><code>public static ImageListener getImageListener(final ImageView view,
+        final int defaultImageResId, final int errorImageResId) {
+    return new ImageListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+            if (errorImageResId != 0) {
+                view.setImageResource(errorImageResId);
+            }
+        }
+
+        @Override
+        public void onResponse(ImageContainer response, boolean isImmediate) {
+            if (response.getBitmap() != null) {
+                view.setImageBitmap(response.getBitmap());
+            } else if (defaultImageResId != 0) {
+                view.setImageResource(defaultImageResId);
+            }
+        }
+    };
+}
+</code></pre><p>比较简单，不需要多说。</p>
+<h3 id="ImageContainer"><a href="#ImageContainer" class="headerlink" title="ImageContainer"></a>ImageContainer</h3><pre><code>/\*\*
+ \* Container object for all of the data surrounding an image request.
+ \* 一个容器，其中包含了围绕着image请求的所有的数据
+ */
+public class ImageContainer {
+    /\*\*
+     \* The most relevant bitmap for the container. If the image was in cache, the
+     \* Holder to use for the final bitmap (the one that pairs to the requested URL).
+     \* 
+     \* 容器最相关的bitmap。如果图片是在cache中，那么容器会使用这个来指向最终的bitmap。
+     */
+    private Bitmap mBitmap;
+
+    private final ImageListener mListener;
+
+    /\*\* The cache key that was associated with the request */
+    private final String mCacheKey;
+
+    /\*\* The request URL that was specified */
+    private final String mRequestUrl;
+
+    /\*\*
+     \* Constructs a BitmapContainer object.
+     \* @param bitmap The final bitmap (if it exists).
+     \* @param requestUrl The requested URL for this container.
+     \* @param cacheKey The cache key that identifies the requested URL for this container.
+     */
+    public ImageContainer(Bitmap bitmap, String requestUrl,
+            String cacheKey, ImageListener listener) {
+        mBitmap = bitmap;
+        mRequestUrl = requestUrl;
+        mCacheKey = cacheKey;
+        mListener = listener;
+    }
+
+    /\*\*
+     \* Releases interest in the in-flight request (and cancels it if no one else is listening).
+     */
+    public void cancelRequest() {
+        if (mListener == null) {
+            return;
+        }
+
+        BatchedImageRequest request = mInFlightRequests.get(mCacheKey);
+        if (request != null) {
+            //此时reqeust对应的已经开始在执行
+
+            //判断是否需要取消整个任务，即同一个URL是否还有其他的地方在用
+            boolean canceled = request.removeContainerAndCancelIfNecessary(this);
+            if (canceled) {
+                mInFlightRequests.remove(mCacheKey);
+            }
+        } else {
+            // check to see if it is already batched for delivery.
+            //此时尚未执行
+            request = mBatchedResponses.get(mCacheKey);
+            if (request != null) {
+                request.removeContainerAndCancelIfNecessary(this);
+                if (request.mContainers.size() == 0) {
+                    mBatchedResponses.remove(mCacheKey);
+                }
+            }
+        }
+    }
+
+    /\*\*
+     \* Returns the bitmap associated with the request URL if it has been loaded, null otherwise.
+     */
+    public Bitmap getBitmap() {
+        return mBitmap;
+    }
+
+    /\*\*
+     \* Returns the requested URL for this container.
+     */
+    public String getRequestUrl() {
+        return mRequestUrl;
+    }
+}
+</code></pre><p>这是一个容器类，用来存储与图片访问相关的任务信息，那么这个时候大家可能就问了，在Volley中既然已经有了一个默认的实现ImgeRequest，那么为什么还需要再做一个ImageContainer来保存期相关的信息呢？通过读ImageLoader的源代码可以发现，其实Volley为了尽可能减少资源的消耗，会将图片请求进行检查，如果图片的地址是一致的，这里面对应的CacheKey是一样的话，那么就会合并为一个任务，然后再提交给ReqeustQueue去执行。当Network返回结果的时候，就会检查该CacheKey对应的多有的任务信息，依次派发出去。 这个类比较简单，主要存储了Bitmap，ImageListener，CacheKey，ReqeustUrl等。然后还有一个Cancel方法，其思路则是判断该任务是否已经有了请求的结果，如果有的话，那么就删除对应的结果；如果没有请求的结果，则从正在执行的任务队列中删除。</p>
+<h3 id="BatchedImageRequest"><a href="#BatchedImageRequest" class="headerlink" title="BatchedImageRequest"></a>BatchedImageRequest</h3><pre><code>/\*\*
+ \* Wrapper class used to map a Request to the set of active ImageContainer objects that are
+ \* interested in its results.
+ \* 一个包装来，用来包装那些活跃的ImageContainer的集合。
+ */
+private class BatchedImageRequest {
+    /\*\* The request being tracked */
+    private final Request&lt;?&gt; mRequest;
+
+    /\*\* The result of the request being tracked by this item */
+    private Bitmap mResponseBitmap;
+
+    /\*\* Error if one occurred for this response */
+    private VolleyError mError;
+
+    /\*\* List of all of the active ImageContainers that are interested in the request */
+    /\*\* 该图片的所有的请求，注意此reqeust并不是Volley中的Reqeust，而是需要做的任务，使用的ImageContainer类来保存相关的信息 */
+    private final LinkedList&lt;ImageContainer&gt; mContainers = new LinkedList&lt;ImageContainer&gt;();
+
+    /\*\*
+     \* Constructs a new BatchedImageRequest object
+     \* @param request The request being tracked
+     \* @param container The ImageContainer of the person who initiated the request.
+     */
+    public BatchedImageRequest(Request&lt;?&gt; request, ImageContainer container) {
+        mRequest = request;
+        mContainers.add(container);
+    }
+
+    /\*\*
+     \* Set the error for this response
+     */
+    public void setError(VolleyError error) {
+        mError = error;
+    }
+
+    /\*\*
+     \* Get the error for this response
+     */
+    public VolleyError getError() {
+        return mError;
+    }
+
+    /\*\*
+     \* Adds another ImageContainer to the list of those interested in the results of
+     \* the request.
+     */
+    public void addContainer(ImageContainer container) {
+        mContainers.add(container);
+    }
+
+    /\*\*
+     \* Detatches the bitmap container from the request and cancels the request if no one is
+     \* left listening.
+     \* 从容器中删掉对应的任务，如果删掉之后，对应的任务列表为空，则可以取消该任务，否则返回false
+     \* @param container The container to remove from the list
+     \* @return True if the request was canceled, false otherwise.
+     */
+    public boolean removeContainerAndCancelIfNecessary(ImageContainer container) {
+        mContainers.remove(container);
+        if (mContainers.size() == 0) {
+            mRequest.cancel();
+            return true;
+        }
+        return false;
+    }
+}
+</code></pre><p>该类就是完成我们刚刚提到的合并任务的功能。其中有一个链表LinkedList<imagecontainer> mContainers = new LinkedList<imagecontainer>();用来保存所有的同样的请求对应的任务信息。 说到这里，我们刚刚一直说到cacheKey，那么cacheKey到底是怎么样计算的呢？如下：</imagecontainer></imagecontainer></p>
+<pre><code>private static String getCacheKey(String url, int maxWidth, int maxHeight) {
+    return new StringBuilder(url.length() + 12).append(&quot;#W&quot;).append(maxWidth)
+            .append(&quot;#H&quot;).append(maxHeight).append(url).toString();
+</code></pre><p>可以看到包含了两部分内容</p>
+<ul>
+<li>URL</li>
+<li>maxWidth，maxHeight</li>
+</ul>
+<p>到这里的分析，我们还是一头雾水，ImageLoader到底从哪里开始工作呢？最简单的办法是先跟着代码的流程走，一段典型的ImageLoader的使用代码为：</p>
+<pre><code>ImageView imageView = (ImageView) findViewById(R.id.imageview);
+VolleyLog.setTag(getPackageName());
+RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+ImageLoader imageLoader = new ImageLoader(requestQueue, new LruBitmapCache(getApplicationContext()));
+imageLoader.get(&quot;http://www.baidu.com/img/bdlogo.png&quot;, imageLoader.getImageListener(imageView, R.drawable.ic\_launcher, R.drawable.ic\_launcher));
+</code></pre><p>从上面我们可以看出，所有的事件的发起，都是从get()方法开始的，那我们继续分析get方法</p>
+<pre><code>public ImageContainer get(String requestUrl, ImageListener imageListener,
+        int maxWidth, int maxHeight) {
+    // only fulfill requests that were initiated from the main thread.
+    // 仅仅去完成那些在主线程上发起调用的请求，因为最后需要设置ImageView，只能在UI线程，即主线程上操作。
+    throwIfNotOnMainThread();
+
+    final String cacheKey = getCacheKey(requestUrl, maxWidth, maxHeight);
+
+    // Try to look up the request in the cache of remote images.
+    // 尝试从cache中查找对应的图片
+    Bitmap cachedBitmap = mCache.getBitmap(cacheKey);
+    if (cachedBitmap != null) {
+        // Return the cached bitmap.
+        // 如果有，那么就分配一个ImageContainer
+        ImageContainer container = new ImageContainer(cachedBitmap, requestUrl, null, null);
+        // 设置相应的图片
+        imageListener.onResponse(container, true);
+        return container;
+    }
+
+    // The bitmap did not exist in the cache, fetch it!
+    // 图片在cache中不存在，需要从网络上获取
+    ImageContainer imageContainer =
+            new ImageContainer(null, requestUrl, cacheKey, imageListener);
+
+    // Update the caller to let them know that they should use the default bitmap.
+    // 让其显示默认的图片
+    imageListener.onResponse(imageContainer, true);
+
+    // Check to see if a request is already in-flight.
+    // 检查是否有可以合并的请求，已经在处理当中
+    BatchedImageRequest request = mInFlightRequests.get(cacheKey);
+    if (request != null) {
+        // If it is, add this request to the list of listeners.
+        // 如果有，则添加到相应的队列当中，并返回
+        request.addContainer(imageContainer);
+        return imageContainer;
+    }
+
+    // The request is not already in flight. Send the new request to the network and
+    // track it.
+    // 发起一个新的Image请求
+    Request&lt;Bitmap&gt; newRequest = makeImageRequest(requestUrl, maxWidth, maxHeight, cacheKey);
+
+    //添加到RequestQueue当中
+    mRequestQueue.add(newRequest);
+    mInFlightRequests.put(cacheKey,
+            new BatchedImageRequest(newRequest, imageContainer));
+    return imageContainer;
+}
+</code></pre><p>画一下其原理图   <a href="/images/wordpress/2014/11/ImageLoader-get.png"><img src="/images/wordpress/2014/11/ImageLoader-get.png" alt="ImageLoader-get"></a> 好了，从上面的流程图我们也可以看出：</p>
+<ol>
+<li>我们判断该段代码是否工作在UI线程，如果不是工作在主线程，那么则会抛出异常并退出。</li>
+<li>根据图片的URL地址和相关的大小，获取在ImageLoader内部使用的唯一的CacheKey</li>
+<li>根据CacheKey去在ImageCache中查找是否有对应的图片，如果有的话，则将信息保存在ImageContainer当中，然后通过imageListener的回调，返回结果</li>
+<li>在Cache中没有，则说明需要通过网络进行请求<ol>
+<li>先查找该CacheKey是否已经在之前发起过请求，也可能是别处同样的图片地址和大小，也在执行请求。</li>
+<li>根据情况分别进行处理<ol>
+<li>如果已经在BatchedReqeust中存在，那么则直接将这一次的请求添加到正在处理的请求中就可以。</li>
+<li>如果没有，那么则新建一个Volley的Reqeust，并添加到对应的RequestQueue当中。</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>最后返回对应的ImageContainer即可。</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Volley/" rel="tag"># Volley</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/20/android-volley-3-cache-bytearraypool/" rel="next" title="Volley源代码分析 – 3: 缓存之ByteArrayPool">
+                <i class="fa fa-chevron-left"></i> Volley源代码分析 – 3: 缓存之ByteArrayPool
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/22/picasso-how-to-use/" rel="prev" title="Picasso学习：Picasso的使用">
+                Picasso学习：Picasso的使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ImageRequest"><span class="nav-number">1.</span> <span class="nav-text">ImageRequest</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ImageLoader"><span class="nav-number">2.</span> <span class="nav-text">ImageLoader</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ImageCache"><span class="nav-number">2.1.</span> <span class="nav-text">ImageCache</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ImageListerner"><span class="nav-number">3.</span> <span class="nav-text">ImageListerner</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ImageContainer"><span class="nav-number">3.1.</span> <span class="nav-text">ImageContainer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BatchedImageRequest"><span class="nav-number">3.2.</span> <span class="nav-text">BatchedImageRequest</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

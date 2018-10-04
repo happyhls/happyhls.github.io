@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="和以前一样，我们同样从我们最经常使用的代码入手，分析EventBus到底是如何进行工作的。所以，第一步，我们先分析EventBus的初始化代码，看看初始化代码当中，都做了哪些工作？ 一：初始化单例模式12345678910public static EventBus getDefault() &amp;#123;    if (defaultInstance == null) &amp;#123;">
+<meta name="keywords" content="Android,EventBus">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EventBus源代码解析：1、初始化与订阅者注册">
+<meta property="og:url" content="http://yoursite.com/2014/12/16/android-eventbus-1-initialization-register/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="和以前一样，我们同样从我们最经常使用的代码入手，分析EventBus到底是如何进行工作的。所以，第一步，我们先分析EventBus的初始化代码，看看初始化代码当中，都做了哪些工作？ 一：初始化单例模式12345678910public static EventBus getDefault() &amp;#123;    if (defaultInstance == null) &amp;#123;">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/12/findSubscriberMethods.png">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/12/subscribe.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.603Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="EventBus源代码解析：1、初始化与订阅者注册">
+<meta name="twitter:description" content="和以前一样，我们同样从我们最经常使用的代码入手，分析EventBus到底是如何进行工作的。所以，第一步，我们先分析EventBus的初始化代码，看看初始化代码当中，都做了哪些工作？ 一：初始化单例模式12345678910public static EventBus getDefault() &amp;#123;    if (defaultInstance == null) &amp;#123;">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/12/findSubscriberMethods.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/12/16/android-eventbus-1-initialization-register/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>EventBus源代码解析：1、初始化与订阅者注册 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/12/16/android-eventbus-1-initialization-register/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">EventBus源代码解析：1、初始化与订阅者注册
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-12-16 22:32:44" itemprop="dateCreated datePublished" datetime="2014-12-16T22:32:44+08:00">2014-12-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/EventBus/" itemprop="url" rel="index"><span itemprop="name">EventBus</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>和以前一样，我们同样从我们最经常使用的代码入手，分析EventBus到底是如何进行工作的。所以，第一步，我们先分析EventBus的初始化代码，看看初始化代码当中，都做了哪些工作？</p>
+<h2 id="一：初始化"><a href="#一：初始化" class="headerlink" title="一：初始化"></a>一：初始化</h2><h3 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a>单例模式</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> EventBus <span class="title">getDefault</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (defaultInstance == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (EventBus.class) &#123;</span><br><span class="line">            <span class="keyword">if</span> (defaultInstance == <span class="keyword">null</span>) &#123;</span><br><span class="line">                defaultInstance = <span class="keyword">new</span> EventBus();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> defaultInstance;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先，我们最经常使用的EventBus的默认配置，其实就是一个我们常用的单例模式：</p>
+<ul>
+<li>首先尝试获取defaultInstance，如果defaultInstance为null，说明默认的EventBus还没有初始化，因此接下来的工作就是需要对EventBus进行初始化。</li>
+<li>此时，为了同一个时刻只有一个EventBus在初始化，也是为了避免多个线程同时访问的时候，各自生成了不同的EventBus对象，因此我们需要对初始化的代码块进行同步。当然同步的范围选择很重要，同步的范围必须是所有的线程都能够同时看到，因此选用了EventBus的类对象作为同步代码块的同步对象。</li>
+<li>此时，由于进入到同步代码块之后，可能是由于和其他线程竞争，但没有竞争过，那么此时的时候，很有可能其他线程当中已经将EventBus初始化完成了，所以此时需要再次检查EventBus有没有初始化好，没有的话，说明是第一次进行初始化，那进行初始化工作就可以。</li>
+<li>返回唯一的EventBus对象defaultInstance。</li>
+</ul>
+<h3 id="具体的初始化工作"><a href="#具体的初始化工作" class="headerlink" title="具体的初始化工作"></a>具体的初始化工作</h3><h4 id="构造函数："><a href="#构造函数：" class="headerlink" title="构造函数："></a><strong>构造函数：</strong></h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">EventBus</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(DEFAULT_BUILDER);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>构造函数非常简单，调用了另外的构造函数EventBus(EventBusBuilder builder)实现功能，我们还是需要看看这个构造函数中，都做了哪些工作？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">EventBus(EventBusBuilder builder) &#123;</span><br><span class="line">    <span class="comment">// 订阅者们，根据Event类型分类：Key是订阅者的类，Value为对应的订阅者</span></span><br><span class="line">    subscriptionsByEventType = <span class="keyword">new</span> HashMap&lt;Class&lt;?&gt;, CopyOnWriteArrayList&lt;Subscription&gt;&gt;();</span><br><span class="line">    <span class="comment">// 订阅者所支持的Event类型</span></span><br><span class="line">    typesBySubscriber = <span class="keyword">new</span> HashMap&lt;Object, List&lt;Class&lt;?&gt;&gt;&gt;();</span><br><span class="line">    <span class="comment">// 保存Sticky Events，注意，这个地方用的是一个线程安全的HashMap</span></span><br><span class="line">    stickyEvents = <span class="keyword">new</span> ConcurrentHashMap&lt;Class&lt;?&gt;, Object&gt;();</span><br><span class="line">    <span class="comment">// 主线程的Poster</span></span><br><span class="line">    mainThreadPoster = <span class="keyword">new</span> HandlerPoster(<span class="keyword">this</span>, Looper.getMainLooper(), <span class="number">10</span>);</span><br><span class="line">    <span class="comment">// 后台线程的Poster</span></span><br><span class="line">    backgroundPoster = <span class="keyword">new</span> BackgroundPoster(<span class="keyword">this</span>);</span><br><span class="line">    <span class="comment">// 异步的Poster</span></span><br><span class="line">    asyncPoster = <span class="keyword">new</span> AsyncPoster(<span class="keyword">this</span>);</span><br><span class="line">    <span class="comment">// 订阅者方法寻找器</span></span><br><span class="line">    subscriberMethodFinder = <span class="keyword">new</span> SubscriberMethodFinder(builder.skipMethodVerificationForClasses);</span><br><span class="line">    logSubscriberExceptions = builder.logSubscriberExceptions;</span><br><span class="line">    logNoSubscriberMessages = builder.logNoSubscriberMessages;</span><br><span class="line">    sendSubscriberExceptionEvent = builder.sendSubscriberExceptionEvent;</span><br><span class="line">    sendNoSubscriberEvent = builder.sendNoSubscriberEvent;</span><br><span class="line">    throwSubscriberException = builder.throwSubscriberException;</span><br><span class="line">    eventInheritance = builder.eventInheritance;</span><br><span class="line">    executorService = builder.executorService;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>初始化了以下的队列<ul>
+<li>subscriptionsByEventType：Event的类型作为Key的HashMap，需要注意的是，其中用到了一个CopyOnWriteArrayList，当列表中的元素，其读取次数远远超过写入次数的时候，使用该集合类可以大大提高效率，且该类是线程同步保护的。</li>
+<li>typesBySubscriber：同样的一个HashMap，保存了某一个订阅者当中所支持的消息类型。有个细节可以注意到，这个地方HashMap的Key是List&lt;Class&lt;?&gt;&gt;，而subscriptionsByEvent中的Key是指定了OnWriteArrayList<subcription>&gt;，这其中有什么技巧吗？我的理解是这个样子的：<ul>
+<li>从调用的次数上来考虑，当我们POST一个event的时候，按照我们的常规思路，EventBus就应该根据Event的类型，也就是类去找到那些能够处理这个Event的Subcription，那么这些Subcriptions保存在哪里呢？–&gt;CopyOnWriteArrayList。所以对于这一个列表来说，我们很少回去改动其中的元素，除非有新的Subcription注册。但另外一个，还没想到做什么使用，可能是注销的时候依次注销所注册的订阅者？</li>
+</ul>
+</subcription></li>
+<li>stickyEvents：保存stickey的Events，需要注意的是，这里面用到的都是ConcurrentHashMap，是线程安全的。</li>
+</ul>
+</li>
+<li>初始化了以下的Poster（后面会依次分析几种Poster的不同实现）<ul>
+<li>mainThreadPoster：通过运行在main线程上的Handler实现</li>
+<li>backgroundPoster：本质上为一个Runnable</li>
+<li>asyncPoster：本质上同样为一个Runnable</li>
+</ul>
+</li>
+<li>注册了一个subscriberMethodFinder：即查找订阅者类当中对应的Handler方法</li>
+<li><p>初始化了各种参数：需要注意的是，其中有一个executorService，其默认实现为</p>
+<p>private final static ExecutorService DEFAULT_EXECUTOR_SERVICE = Executors.newCachedThreadPool();</p>
+<p>后面我们还看到，很多消息的Post都是通过该线程池实现。</p>
+</li>
+</ul>
+<p>上面，我们分析完成EventBus的初始化工作，下面我们继续来分析一下我们在代码中向EventBus注册订阅者的时候，都发生了什么事情？</p>
+<h2 id="二、订阅者注册"><a href="#二、订阅者注册" class="headerlink" title="二、订阅者注册"></a>二、订阅者注册</h2><h3 id="1、注册："><a href="#1、注册：" class="headerlink" title="1、注册："></a>1、注册：</h3><p>我们一般情况下，使用的注册代码是：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">register(Object subscriber)</span><br></pre></td></tr></table></figure>
+<p>跟踪代码，发现该代码实际上通过调用resiter(Object subscriber, boolean sticky, int priority)实现，我们来看看这段代码都做了哪些工作？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">register</span><span class="params">(Object subscriber, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> priority)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 查找订阅类当中的处理方法（包括其父类的方法）</span></span><br><span class="line">        List&lt;SubscriberMethod&gt; subscriberMethods = subscriberMethodFinder.findSubscriberMethods(subscriber.getClass());</span><br><span class="line">        <span class="comment">// 根据获取的订阅者方法，将其依次订阅</span></span><br><span class="line">        <span class="keyword">for</span> (SubscriberMethod subscriberMethod : subscriberMethods) &#123;</span><br><span class="line">            subscribe(subscriber, subscriberMethod, sticky, priority);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码主要做了两件事情：</p>
+<ol>
+<li>从对应的subscriber类中查找到所有的SubscriberMethod</li>
+<li>依次订阅所有的SubscriberMethod</li>
+</ol>
+<p>SubscriberMethod源代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">List&lt;SubscriberMethod&gt; <span class="title">findSubscriberMethods</span><span class="params">(Class&lt;?&gt; subscriberClass)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取类的全名作为key</span></span><br><span class="line">    String key = subscriberClass.getName();</span><br><span class="line">    <span class="comment">// 订阅者方法列表</span></span><br><span class="line">    List&lt;SubscriberMethod&gt; subscriberMethods;</span><br><span class="line">    <span class="comment">// 尝试从methodCache中获取订阅者方法</span></span><br><span class="line">    <span class="keyword">synchronized</span> (methodCache) &#123;</span><br><span class="line">        subscriberMethods = methodCache.get(key);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果订阅者方法列表已经存在，则直接返回</span></span><br><span class="line">    <span class="keyword">if</span> (subscriberMethods != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> subscriberMethods;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    subscriberMethods = <span class="keyword">new</span> ArrayList&lt;SubscriberMethod&gt;();</span><br><span class="line">    Class&lt;?&gt; clazz = subscriberClass;</span><br><span class="line">    HashSet&lt;String&gt; eventTypesFound = <span class="keyword">new</span> HashSet&lt;String&gt;();</span><br><span class="line">    StringBuilder methodKeyBuilder = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">    <span class="keyword">while</span> (clazz != <span class="keyword">null</span>) &#123;</span><br><span class="line">        String name = clazz.getName();</span><br><span class="line">        <span class="comment">// 如果这些类是java，javax或者android的话，则直接跳过。</span></span><br><span class="line">        <span class="keyword">if</span> (name.startsWith(<span class="string">"java."</span>) || name.startsWith(<span class="string">"javax."</span>) || name.startsWith(<span class="string">"android."</span>)) &#123;</span><br><span class="line">            <span class="comment">// Skip system classes, this just degrades performance</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Starting with EventBus 2.2 we enforced methods to be public (might change with annotations again)</span></span><br><span class="line">        <span class="comment">// 从EventBus2.2开始，强制必须将修饰符设置为public</span></span><br><span class="line">        Method\[\] methods = clazz.getDeclaredMethods();</span><br><span class="line">        <span class="comment">// 依次遍历类的全部方法</span></span><br><span class="line">        <span class="keyword">for</span> (Method method : methods) &#123;</span><br><span class="line">            <span class="comment">// 获取方法名</span></span><br><span class="line">            String methodName = method.getName();</span><br><span class="line">            <span class="comment">// 判断方法名是否以ON\_EVENT\_METHOD_NAME，即是否以"onEvent"开头</span></span><br><span class="line">            <span class="keyword">if</span> (methodName.startsWith(ON\_EVENT\_METHOD_NAME)) &#123;</span><br><span class="line">                <span class="comment">// 获取方法的修饰符</span></span><br><span class="line">                <span class="keyword">int</span> modifiers = method.getModifiers();</span><br><span class="line">                <span class="comment">// 要求方法匹配public修饰符，并且不是(Modifier.ABSTRACT | Modifier.STATIC | BRIDGE | SYNTHETIC)中任一种</span></span><br><span class="line">                <span class="keyword">if</span> ((modifiers &amp; Modifier.PUBLIC) != <span class="number">0</span> &amp;&amp; (modifiers &amp; MODIFIERS_IGNORE) == <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="comment">// 获取参数的类型</span></span><br><span class="line">                    Class&lt;?&gt;\[\] parameterTypes = method.getParameterTypes();</span><br><span class="line">                    <span class="comment">// 如果参数的类型只有一种，也就是说，参数只有一个</span></span><br><span class="line">                    <span class="keyword">if</span> (parameterTypes.length == <span class="number">1</span>) &#123;</span><br><span class="line">                        <span class="comment">// 获取方法名当中去掉onEvent剩下的部分，并根据这一部分判断其工作在哪个县城之上</span></span><br><span class="line">                        String modifierString = methodName.substring(ON\_EVENT\_METHOD_NAME.length());</span><br><span class="line">                        ThreadMode threadMode;</span><br><span class="line">                        <span class="keyword">if</span> (modifierString.length() == <span class="number">0</span>) &#123;</span><br><span class="line">                            <span class="comment">// PostThread</span></span><br><span class="line">                            threadMode = ThreadMode.PostThread;</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (modifierString.equals(<span class="string">"MainThread"</span>)) &#123;</span><br><span class="line">                            <span class="comment">// MainThread</span></span><br><span class="line">                            threadMode = ThreadMode.MainThread;</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (modifierString.equals(<span class="string">"BackgroundThread"</span>)) &#123;</span><br><span class="line">                            <span class="comment">// BackgroundThread</span></span><br><span class="line">                            threadMode = ThreadMode.BackgroundThread;</span><br><span class="line">                        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (modifierString.equals(<span class="string">"Async"</span>)) &#123;</span><br><span class="line">                            <span class="comment">// AsyncThread</span></span><br><span class="line">                            threadMode = ThreadMode.Async;</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            <span class="keyword">if</span> (skipMethodVerificationForClasses.containsKey(clazz)) &#123;</span><br><span class="line">                                <span class="keyword">continue</span>;</span><br><span class="line">                            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                                <span class="keyword">throw</span> <span class="keyword">new</span> EventBusException(<span class="string">"Illegal onEvent method, check for typos: "</span> + method);</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="comment">// 获取订阅者处理方法onEvent方法的参数类型</span></span><br><span class="line">                        Class&lt;?&gt; eventType = parameterTypes\[<span class="number">0</span>\];</span><br><span class="line">                        methodKeyBuilder.setLength(<span class="number">0</span>);</span><br><span class="line">                        <span class="comment">// 添加方法名</span></span><br><span class="line">                        methodKeyBuilder.append(methodName);</span><br><span class="line">                        <span class="comment">// 添加方法类型</span></span><br><span class="line">                        methodKeyBuilder.append(<span class="string">'&gt;'</span>).append(eventType.getName());</span><br><span class="line">                        String methodKey = methodKeyBuilder.toString();</span><br><span class="line">                        <span class="comment">// 将methodKey添加到eventTypesFound当中 true:说明该方法没有被添加过，false:说明该方法已经被添加过</span></span><br><span class="line">                        <span class="keyword">if</span> (eventTypesFound.add(methodKey)) &#123;</span><br><span class="line">                            <span class="comment">// Only add if not already found in a sub class</span></span><br><span class="line">                            <span class="comment">// 如果methodKey在子类当中没有被添加过，则构造SubscriberMethod，并添加到subscriberMethods当中</span></span><br><span class="line">                            subscriberMethods.add(<span class="keyword">new</span> SubscriberMethod(method, threadMode, eventType));</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!skipMethodVerificationForClasses.containsKey(clazz)) &#123;</span><br><span class="line">                    Log.d(EventBus.TAG, <span class="string">"Skipping method (not public, static or abstract): "</span> + clazz + <span class="string">"."</span></span><br><span class="line">                            \+ methodName);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 该类处理完成，继续处理其父类！！！</span></span><br><span class="line">        clazz = clazz.getSuperclass();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 如果该类或者其父类当中不包含订阅者方法，那么则抛出异常</span></span><br><span class="line">    <span class="keyword">if</span> (subscriberMethods.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> EventBusException(<span class="string">"Subscriber "</span> + subscriberClass + <span class="string">" has no public methods called "</span></span><br><span class="line">                \+ ON\_EVENT\_METHOD_NAME);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 该类或者其父类当中，包含订阅者方法，则将其添加到methodCache当中</span></span><br><span class="line">        <span class="keyword">synchronized</span> (methodCache) &#123;</span><br><span class="line">            methodCache.put(key, subscriberMethods);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> subscriberMethods;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>SubscriberMethod方法的程序流程图： <a href="/images/wordpress/2014/12/findSubscriberMethods.png"><img src="/images/wordpress/2014/12/findSubscriberMethods.png" alt="findSubscriberMethods"></a>     简单的理解， findSubscriberMethods的工作就依次遍历指定类中的所有方法，从中找到EventBus的handler并将其添加到subscriberMethods集合当中。具体的步骤如下：</p>
+<ol>
+<li>首先判断clazz类以否是java/javax/android的类，如果是，则说明这个类并不是我们的订阅者(可能是订阅者的父类，不需要处理)。</li>
+<li>然后遍历类中所有的方法，首先挑选出其中以onEvent开头的方法，继续判断是否是我们的Event处理方法。</li>
+<li>判断该方法的修饰符，要求方法匹配public修饰符，并且不是(Modifier.ABSTRACT | Modifier.STATIC | BRIDGE | SYNTHETIC)中任一种。</li>
+<li>获取onEvent方法的参数类型，即要处理的Event的类型。</li>
+<li>构建SubscriberMethod对象，并添加到subscriberMethods</li>
+<li>获取clazz的父类，重复步骤1-6</li>
+</ol>
+<p>subscribe代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Must be called in synchronized block</span></span><br><span class="line"><span class="comment">// 必须要在同步快中执行</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">subscribe</span><span class="params">(Object subscriber, SubscriberMethod subscriberMethod, <span class="keyword">boolean</span> sticky, <span class="keyword">int</span> priority)</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获取订阅者处理方法的参数类型，即Event事件的类型</span></span><br><span class="line">    Class&lt;?&gt; eventType = subscriberMethod.eventType;</span><br><span class="line">    <span class="comment">// 根据类型尝试从subscriptionsByEventType中获取参数类型，即Event事件类型所对应的订阅者列表。</span></span><br><span class="line">    CopyOnWriteArrayList&lt;Subscription&gt; subscriptions = subscriptionsByEventType.get(eventType);</span><br><span class="line">    <span class="comment">// 生成新的订阅者对象</span></span><br><span class="line">    Subscription newSubscription = <span class="keyword">new</span> Subscription(subscriber, subscriberMethod, priority);</span><br><span class="line">    <span class="comment">// 如果订阅者列表为null，则说明是头一次添加该Event类型。</span></span><br><span class="line">    <span class="keyword">if</span> (subscriptions == <span class="keyword">null</span>) &#123;</span><br><span class="line">        subscriptions = <span class="keyword">new</span> CopyOnWriteArrayList&lt;Subscription&gt;();</span><br><span class="line">        subscriptionsByEventType.put(eventType, subscriptions);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (subscriptions.contains(newSubscription)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> EventBusException(<span class="string">"Subscriber "</span> + subscriber.getClass() + <span class="string">" already registered to event "</span></span><br><span class="line">                    \+ eventType);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Starting with EventBus 2.2 we enforced methods to be public (might change with annotations again)</span></span><br><span class="line">    <span class="comment">// subscriberMethod.method.setAccessible(true);</span></span><br><span class="line">    <span class="comment">// 从EventBus2.2之后，设置方法必须为public</span></span><br><span class="line">    <span class="comment">// subscriberMethod.method.setAccessible(true);        </span></span><br><span class="line">    <span class="keyword">int</span> size = subscriptions.size();</span><br><span class="line">    <span class="comment">// 根据优先级，将包含订阅者处理方法的订阅者对象添加到队列的合适位置上</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt;= size; i++) &#123;</span><br><span class="line">        <span class="keyword">if</span> (i == size || newSubscription.priority &gt; subscriptions.get(i).priority) &#123;</span><br><span class="line">            subscriptions.add(i, newSubscription);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 保存订阅者类所能够处理的EventType</span></span><br><span class="line">    List&lt;Class&lt;?&gt;&gt; subscribedEvents = typesBySubscriber.get(subscriber);</span><br><span class="line">    <span class="keyword">if</span> (subscribedEvents == <span class="keyword">null</span>) &#123;</span><br><span class="line">        subscribedEvents = <span class="keyword">new</span> ArrayList&lt;Class&lt;?&gt;&gt;();</span><br><span class="line">        typesBySubscriber.put(subscriber, subscribedEvents);</span><br><span class="line">    &#125;</span><br><span class="line">    subscribedEvents.add(eventType);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果Event设置为sticky</span></span><br><span class="line">    <span class="keyword">if</span> (sticky) &#123;</span><br><span class="line">        Object stickyEvent;</span><br><span class="line">        <span class="keyword">synchronized</span> (stickyEvents) &#123;</span><br><span class="line">            stickyEvent = stickyEvents.get(eventType);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (stickyEvent != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="comment">// If the subscriber is trying to abort the event, it will fail (event is not tracked in posting state)</span></span><br><span class="line">            <span class="comment">// --\&gt; Strange corner case, which we don't take care of here.</span></span><br><span class="line">            postToSubscription(newSubscription, stickyEvent, Looper.getMainLooper() == Looper.myLooper());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其程序架构图如下： <a href="/images/wordpress/2014/12/subscribe.png"><img src="/images/wordpress/2014/12/subscribe.png" alt="subscribe"></a>   这个其实理解起来比较简单，主要分了下面几个步骤：</p>
+<ol>
+<li>根据订阅者所在的类，订阅者的方法，生成相应的订阅者对象，即Subscription对象。</li>
+<li>获取Event的事件类型，查看此事件是否有相应的List，如果有，则说明之前有注册过其他的可以处理该事件类型的Subcription，那么则根据优先级将此次的Subcription对象插入到合适的位置，否则则新建List，并将Subcription对象插入进来。</li>
+</ol>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/EventBus/" rel="tag"># EventBus</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/12/13/android-custom-view-3-custom-viewgroup/" rel="next" title="自定义View：3、编写自己的ViewGroup">
+                <i class="fa fa-chevron-left"></i> 自定义View：3、编写自己的ViewGroup
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/12/17/android-eventbus-1-publish-process/" rel="prev" title="EventBus源代码解析：2、消息的发布与处理">
+                EventBus源代码解析：2、消息的发布与处理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一：初始化"><span class="nav-number">1.</span> <span class="nav-text">一：初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单例模式"><span class="nav-number">1.1.</span> <span class="nav-text">单例模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#具体的初始化工作"><span class="nav-number">1.2.</span> <span class="nav-text">具体的初始化工作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#构造函数："><span class="nav-number">1.2.1.</span> <span class="nav-text">构造函数：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、订阅者注册"><span class="nav-number">2.</span> <span class="nav-text">二、订阅者注册</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、注册："><span class="nav-number">2.1.</span> <span class="nav-text">1、注册：</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

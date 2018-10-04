@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="做Android开发也已经很久了，但发现到现在为止，需要什么功能的时候，仍然需要查来查去，即使是之前做过的也是这样，所以干脆在blog里面加个分类，记录一下自己用过的内容。 本文章主要是记录一下，怎么去获取已经安装的应用程序的各种信息。 首先先定位到相关的API，在Android的Reference中，我们可以看到官方是这样对PackageManager进行介绍的 Class for retrie">
+<meta name="keywords" content="Android,PackageManaer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How Android get information of installed app?">
+<meta property="og:url" content="http://yoursite.com/2013/03/31/how-android-get-information-of-installed-app/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="做Android开发也已经很久了，但发现到现在为止，需要什么功能的时候，仍然需要查来查去，即使是之前做过的也是这样，所以干脆在blog里面加个分类，记录一下自己用过的内容。 本文章主要是记录一下，怎么去获取已经安装的应用程序的各种信息。 首先先定位到相关的API，在Android的Reference中，我们可以看到官方是这样对PackageManager进行介绍的 Class for retrie">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T14:31:22.638Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="How Android get information of installed app?">
+<meta name="twitter:description" content="做Android开发也已经很久了，但发现到现在为止，需要什么功能的时候，仍然需要查来查去，即使是之前做过的也是这样，所以干脆在blog里面加个分类，记录一下自己用过的内容。 本文章主要是记录一下，怎么去获取已经安装的应用程序的各种信息。 首先先定位到相关的API，在Android的Reference中，我们可以看到官方是这样对PackageManager进行介绍的 Class for retrie">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/03/31/how-android-get-information-of-installed-app/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>How Android get information of installed app? | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/03/31/how-android-get-information-of-installed-app/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">How Android get information of installed app?
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-03-31 10:29:41" itemprop="dateCreated datePublished" datetime="2013-03-31T10:29:41+08:00">2013-03-31</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 22:31:22" itemprop="dateModified" datetime="2018-10-03T22:31:22+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>做Android开发也已经很久了，但发现到现在为止，需要什么功能的时候，仍然需要查来查去，即使是之前做过的也是这样，所以干脆在blog里面加个分类，记录一下自己用过的内容。 本文章主要是记录一下，怎么去获取已经安装的应用程序的各种信息。 首先先定位到相关的API，在Android的Reference中，我们可以看到官方是这样对PackageManager进行介绍的 Class for retrieving various kinds of information related to the application packages that are currently installed on the device. You can find this class through <code>[getPackageManager()](http://developer.android.com/reference/android/content/Context.html#getPackageManager())</code>. 由此可见，该类是用来获取在设备上的安装的程序的各种信息，使用Context类中的 getPackageManager()可以获取类的一个实例。看看下面都有什么成员变量和方法，在成员变量中，我们注意到有这些：</p>
+<p>int    GET_ACTIVITIES    PackageInfo flag: return information about activities in the package in activities.<br>int    GET_CONFIGURATIONS    PackageInfo flag: return information about hardware preferences in PackageInfo.configPreferences and requested features in PackageInfo.reqFeatures.<br>int    GET_DISABLED_COMPONENTS    PackageInfo flag: include disabled components in the returned info.<br>int    GET_GIDS    PackageInfo flag: return the group ids that are associated with an application.<br>int    GET_INSTRUMENTATION    PackageInfo flag: return information about instrumentation in the package in instrumentation.<br>int    GET_INTENT_FILTERS    PackageInfo flag: return information about the intent filters supported by the activity.<br>int    GET_META_DATA    ComponentInfo flag: return the metaData data Bundles that are associated with a component.<br>int    GET_PERMISSIONS    PackageInfo flag: return information about permissions in the package in permissions.<br>int    GET_PROVIDERS    PackageInfo flag: return information about content providers in the package in providers.<br>int    GET_RECEIVERS    PackageInfo flag: return information about intent receivers in the package in receivers.<br>int    GET_RESOLVED_FILTER    ResolveInfo flag: return the IntentFilter that was matched for a particular ResolveInfo in filter.<br>int    GET_SERVICES    PackageInfo flag: return information about services in the package in services.<br>int    GET_SHARED_LIBRARY_FILES    ApplicationInfo flag: return the paths to the shared libraries that are associated with an application.<br>int    GET_SIGNATURES    PackageInfo flag: return information about the signatures included in the package.<br>int    GET_UNINSTALLED_PACKAGES    Flag parameter to retrieve some information about all applications (even uninstalled ones) which have data directories.<br>int    GET_URI_PERMISSION_PATTERNS    ProviderInfo flag: return the URI permission patterns that are associated with a content provider.</p>
+<p>似乎接近了，里面有GET_ACTIVITIES，GET_INTENT_FILTERS等等，都是我们很熟悉的，猜想便是用这些来作为标志，获取不同的信息，再看看方法。</p>
+<p>abstract Drawable     getActivityIcon(Intent intent)<br>Retrieve the icon associated with an Intent.<br>abstract Drawable     getActivityIcon(ComponentName activityName)<br>Retrieve the icon associated with an activity.<br>abstract ActivityInfo     getActivityInfo(ComponentName component, int flags)<br>Retrieve all of the information we know about a particular activity class.<br>abstract Drawable     getActivityLogo(Intent intent)<br>Retrieve the logo associated with an Intent.<br>abstract Drawable     getActivityLogo(ComponentName activityName)<br>Retrieve the logo associated with an activity.<br>abstract List<permissiongroupinfo>     getAllPermissionGroups(int flags)<br>Retrieve all of the known permission groups in the system.<br>abstract int     getApplicationEnabledSetting(String packageName)<br>Return the the enabled setting for an application.<br>abstract Drawable     getApplicationIcon(String packageName)<br>Retrieve the icon associated with an application.<br>abstract Drawable     getApplicationIcon(ApplicationInfo info)<br>Retrieve the icon associated with an application.<br>abstract ApplicationInfo     getApplicationInfo(String packageName, int flags)<br>Retrieve all of the information we know about a particular package/application.<br>abstract CharSequence     getApplicationLabel(ApplicationInfo info)<br>Return the label to use for this application.<br>abstract Drawable     getApplicationLogo(String packageName)<br>Retrieve the logo associated with an application.<br>abstract Drawable     getApplicationLogo(ApplicationInfo info)<br>Retrieve the logo associated with an application.<br>abstract int     getComponentEnabledSetting(ComponentName componentName)<br>Return the the enabled setting for a package component (activity, receiver, service, provider).<br>abstract Drawable     getDefaultActivityIcon()<br>Return the generic icon for an activity that is used when no specific icon is defined.<br>abstract Drawable     getDrawable(String packageName, int resid, ApplicationInfo appInfo)<br>Retrieve an image from a package.<br>abstract List<applicationinfo>     getInstalledApplications(int flags)<br>Return a List of all application packages that are installed on the device.<br>abstract List<packageinfo>     getInstalledPackages(int flags)<br>Return a List of all packages that are installed on the device.</packageinfo></applicationinfo></permissiongroupinfo></p>
+<p>看到里面那些以get开头的函数，注意到里面有两个返回值为List<t>的函数，</t></p>
+<p>abstract <a href="http://developer.android.com/reference/java/util/List.html" target="_blank" rel="noopener">List</a>&lt;<a href="http://developer.android.com/reference/android/content/pm/ApplicationInfo.html" target="_blank" rel="noopener">ApplicationInfo</a>&gt;</p>
+<p><a href="http://developer.android.com/reference/android/content/pm/PackageManager.html#getInstalledApplications(int" target="_blank" rel="noopener">getInstalledApplications</a>)(int flags)</p>
+<p>Return a List of all application packages that are installed on the device.</p>
+<p>abstract <a href="http://developer.android.com/reference/java/util/List.html" target="_blank" rel="noopener">List</a>&lt;<a href="http://developer.android.com/reference/android/content/pm/PackageInfo.html" target="_blank" rel="noopener">PackageInfo</a>&gt;</p>
+<p><a href="http://developer.android.com/reference/android/content/pm/PackageManager.html#getInstalledPackages(int" target="_blank" rel="noopener">getInstalledPackages</a>)(int flags)</p>
+<p>Return a List of all packages that are installed on the device.</p>
+<p>貌似这两个函数都能满足我们的需求，那么他们有什么不同呢？其介绍，一个返回的all application packages，一个返回的all packages，看不出什么区别，我们再看看返回值ApplicationInfo和PackageInfo的区别吧：</p>
+<p>ApplicationInfo：Information you can retrieve about a particular application. This corresponds to information collected from the AndroidManifest.xml’s <application> tag. PackageInfo：</application></p>
+<p>Overall information about the contents of a package. This corresponds to all of the information collected from AndroidManifest.xml.</p>
+<p>发现了，原来都是从AndroidManifest.xml中读取的，但一个读的是application标签，一个全部读取。进一步查看其成员变量等，发现PackageInfo要比Application信息要全一下，好了，那明白区别之后，我们就开始写吧，这里用的是PackageInfo。</p>
+<p>首先我们需要获取PackageInfo的List</p>
+<p>List<packageinfo> listPackageInfos=context.getPackageManager().getInstalledPackages(PackageManager.GET_ACTIVITIES);</packageinfo></p>
+<p>这样我们就拿到了一个包含所有安装程序信息的List，这个工作耗时比较长，因此在实际使用的时候，要新开一个线程，否则会将主线程阻塞。然后我们看看PackageInfo都有什么？</p>
+<p>public <a href="http://developer.android.com/reference/android/content/pm/ApplicationInfo.html" target="_blank" rel="noopener">ApplicationInfo</a></p>
+<p><a href="http://developer.android.com/reference/android/content/pm/PackageInfo.html#applicationInfo" target="_blank" rel="noopener">applicationInfo</a></p>
+<p>Information collected from the <application> tag, or null if there was none.</application></p>
+<p>（从这里可以看出，确实从getInstalledPackages函数读到的信息更全面一写）</p>
+<p>public <a href="http://developer.android.com/reference/java/lang/String.html" target="_blank" rel="noopener">String</a></p>
+<p><a href="http://developer.android.com/reference/android/content/pm/PackageInfo.html#packageName" target="_blank" rel="noopener">packageName</a></p>
+<p>The name of this package.</p>
+<p>public int</p>
+<p><a href="http://developer.android.com/reference/android/content/pm/PackageInfo.html#versionCode" target="_blank" rel="noopener">versionCode</a></p>
+<p>The version number of this package, as specified by the <manifest> tag’s <code>[versionCode](http://developer.android.com/reference/android/R.styleable.html#AndroidManifest_versionCode)</code> attribute.</manifest></p>
+<p>public <a href="http://developer.android.com/reference/java/lang/String.html" target="_blank" rel="noopener">String</a></p>
+<p><a href="http://developer.android.com/reference/android/content/pm/PackageInfo.html#versionName" target="_blank" rel="noopener">versionName</a></p>
+<p>The version name of this package, as specified by the <manifest> tag’s<code>[versionName](http://developer.android.com/reference/android/R.styleable.html#AndroidManifest_versionName)</code> attribute.</manifest></p>
+<p>我大体列了几个，但发现里面没有Application的图标啥的，从哪找？我们去看看ApplicationInfo里面有什么？</p>
+<p>void</p>
+<p><a href="http://developer.android.com/reference/android/content/pm/PackageItemInfo.html#dumpBack(android.util.Printer, java.lang.String" target="_blank" rel="noopener">dumpBack</a>)(<a href="http://developer.android.com/reference/android/util/Printer.html" target="_blank" rel="noopener">Printer</a> pw, <a href="http://developer.android.com/reference/java/lang/String.html" target="_blank" rel="noopener">String</a> prefix)</p>
+<p>void</p>
+<p><a href="http://developer.android.com/reference/android/content/pm/PackageItemInfo.html#dumpFront(android.util.Printer, java.lang.String" target="_blank" rel="noopener">dumpFront</a>)(<a href="http://developer.android.com/reference/android/util/Printer.html" target="_blank" rel="noopener">Printer</a> pw, <a href="http://developer.android.com/reference/java/lang/String.html" target="_blank" rel="noopener">String</a> prefix)</p>
+<p><a href="http://developer.android.com/reference/android/graphics/drawable/Drawable.html" target="_blank" rel="noopener">Drawable</a></p>
+<p><a href="http://developer.android.com/reference/android/content/pm/PackageItemInfo.html#loadIcon(android.content.pm.PackageManager" target="_blank" rel="noopener">loadIcon</a>)(<a href="http://developer.android.com/reference/android/content/pm/PackageManager.html" target="_blank" rel="noopener">PackageManager</a> pm)</p>
+<p>Retrieve the current graphical icon associated with this item.</p>
+<p><a href="http://developer.android.com/reference/java/lang/CharSequence.html" target="_blank" rel="noopener">CharSequence</a><a href="http://developer.android.com/reference/android/content/pm/PackageItemInfo.html#loadLabel(android.content.pm.PackageManager" target="_blank" rel="noopener">loadLabel</a>)(<a href="http://developer.android.com/reference/android/content/pm/PackageManager.html" target="_blank" rel="noopener">PackageManager</a> pm)</p>
+<p>Retrieve the current textual label associated with this item.</p>
+<p><a href="http://developer.android.com/reference/android/graphics/drawable/Drawable.html" target="_blank" rel="noopener">Drawable</a><a href="http://developer.android.com/reference/android/content/pm/PackageItemInfo.html#loadLogo(android.content.pm.PackageManager" target="_blank" rel="noopener">loadLogo</a>)(<a href="http://developer.android.com/reference/android/content/pm/PackageManager.html" target="_blank" rel="noopener">PackageManager</a> pm)</p>
+<p>Retrieve the current graphical logo associated with this item.</p>
+<p><a href="http://developer.android.com/reference/android/content/res/XmlResourceParser.html" target="_blank" rel="noopener">XmlResourceParser</a><a href="http://developer.android.com/reference/android/content/pm/PackageItemInfo.html#loadXmlMetaData(android.content.pm.PackageManager, java.lang.String" target="_blank" rel="noopener">loadXmlMetaData</a>)(<a href="http://developer.android.com/reference/android/content/pm/PackageManager.html" target="_blank" rel="noopener">PackageManager</a> pm, <a href="http://developer.android.com/reference/java/lang/String.html" target="_blank" rel="noopener">String</a> name)</p>
+<p>Load an XML resource attached to the meta-data of this item.</p>
+<p>void<a href="http://developer.android.com/reference/android/content/pm/PackageItemInfo.html#writeToParcel(android.os.Parcel, int" target="_blank" rel="noopener">writeToParcel</a>)(<a href="http://developer.android.com/reference/android/os/Parcel.html" target="_blank" rel="noopener">Parcel</a> dest, int parcelableFlags)看到了吧，其从 From class <a href="http://developer.android.com/reference/android/content/pm/PackageItemInfo.html" target="_blank" rel="noopener">android.content.pm.PackageItemInfo</a>继承过来了这些函数，我们就可以读到图标的信息，好了，万事具备了，开工！</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ArrayList&lt;PackManagerHelperApplicationInfo&gt; <span class="title">getUserApplicationInfos</span><span class="params">()</span></span>&#123;</span><br><span class="line">	ArrayList&lt;PackManagerHelperApplicationInfo&gt; applicationInfos=<span class="keyword">new</span> ArrayList&lt;PackManagerHelperApplicationInfo&gt;();</span><br><span class="line">	List&lt;PackageInfo&gt; listPackageInfos=context.getPackageManager().getInstalledPackages(PackageManager.GET_ACTIVITIES);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;listPackageInfos.size();i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span>((listPackageInfos.get(i).applicationInfo.flags&amp;ApplicationInfo.FLAG_SYSTEM)!=<span class="number">0</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">continue</span>;</span><br><span class="line">		&#125;</span><br><span class="line">		PackManagerHelperApplicationInfo tmpApplicationInfo=<span class="keyword">new</span> PackManagerHelperApplicationInfo();</span><br><span class="line">		tmpApplicationInfo.appName=listPackageInfos.get(i).applicationInfo.loadLabel(context.getPackageManager()).toString();</span><br><span class="line">		tmpApplicationInfo.packageName=listPackageInfos.get(i).packageName;</span><br><span class="line">		tmpApplicationInfo.versionName=listPackageInfos.get(i).versionName;</span><br><span class="line">		tmpApplicationInfo.versionCode=listPackageInfos.get(i).versionCode;</span><br><span class="line">		tmpApplicationInfo.appIcon=listPackageInfos.get(i).applicationInfo.loadIcon(context.getPackageManager());</span><br><span class="line"></span><br><span class="line">		applicationInfos.add(tmpApplicationInfo);			</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> applicationInfos;		</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>大家可能注意到，</p>
+<p>if((listPackageInfos.get(i).applicationInfo.flags&amp;ApplicationInfo.FLAG_SYSTEM)!=0</p>
+<p>这句子用来干嘛呢？是用来去掉系统自带的程序的，这个有很多flag，不一一尝试了。 上面这样一折腾，就搞明白了怎么读取信息，也蛮简单。 后记：还有一个小细节，使用</p>
+<p>public abstract Intent getLaunchIntentForPackage (String packageName)</p>
+<p>可以获取到Launcher中启动的action。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/PackageManaer/" rel="tag"># PackageManaer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/03/29/python-file-notes/" rel="next" title="Python读书笔记-文件">
+                <i class="fa fa-chevron-left"></i> Python读书笔记-文件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/04/04/java-io-inputstream-outputstream/" rel="prev" title="Java IO 之一：传统IO (1)InputStream,OutputStream">
+                Java IO 之一：传统IO (1)InputStream,OutputStream <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

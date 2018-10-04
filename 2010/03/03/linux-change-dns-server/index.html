@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在接下来的内容之前，我们先来了解一下DNS,什么叫DNS,DNS是干嘛用的？ DNS 是域名系统 (Domain Name System) 的缩写，该系统用于命名组织到域层次结构中的计算机和网络服务。在Internet上域名与IP地址之间是一对一（或者多对一）的，域名虽然便于人们记忆，但机器之间只能互相认识IP地址，它们之间的转换工作称为域名解析，域名解析需要由专门的域名解析服务器来完成，DNS就">
+<meta name="keywords" content="Linux编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="更改DNS服务器，访问更快，广告更少~">
+<meta property="og:url" content="http://yoursite.com/2010/03/03/linux-change-dns-server/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="在接下来的内容之前，我们先来了解一下DNS,什么叫DNS,DNS是干嘛用的？ DNS 是域名系统 (Domain Name System) 的缩写，该系统用于命名组织到域层次结构中的计算机和网络服务。在Internet上域名与IP地址之间是一对一（或者多对一）的，域名虽然便于人们记忆，但机器之间只能互相认识IP地址，它们之间的转换工作称为域名解析，域名解析需要由专门的域名解析服务器来完成，DNS就">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot-300x237.png">
+<meta property="og:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot-1-200x300.png">
+<meta property="og:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/PAGE12-251x300.png">
+<meta property="og:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/PAGE2-291x300.png">
+<meta property="og:updated_time" content="2018-10-03T14:57:32.268Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="更改DNS服务器，访问更快，广告更少~">
+<meta name="twitter:description" content="在接下来的内容之前，我们先来了解一下DNS,什么叫DNS,DNS是干嘛用的？ DNS 是域名系统 (Domain Name System) 的缩写，该系统用于命名组织到域层次结构中的计算机和网络服务。在Internet上域名与IP地址之间是一对一（或者多对一）的，域名虽然便于人们记忆，但机器之间只能互相认识IP地址，它们之间的转换工作称为域名解析，域名解析需要由专门的域名解析服务器来完成，DNS就">
+<meta name="twitter:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot-300x237.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2010/03/03/linux-change-dns-server/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>更改DNS服务器，访问更快，广告更少~ | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2010/03/03/linux-change-dns-server/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">更改DNS服务器，访问更快，广告更少~
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2010-03-03 13:23:47" itemprop="dateCreated datePublished" datetime="2010-03-03T13:23:47+08:00">2010-03-03</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 22:57:32" itemprop="dateModified" datetime="2018-10-03T22:57:32+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/Linux编程/" itemprop="url" rel="index"><span itemprop="name">Linux编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在接下来的内容之前，我们先来了解一下DNS,什么叫DNS,DNS是干嘛用的？ DNS 是域名系统 (Domain Name System) 的缩写，该系统用于命名组织到域层次结构中的计算机和网络服务。在Internet上域名与IP地址之间是一对一（或者多对一）的，域名虽然便于人们记忆，但机器之间只能互相认识IP地址，它们之间的转换工作称为域名解析，域名解析需要由专门的域名解析服务器来完成，DNS就是进行域名解析的服务器。 DNS 命名用于 Internet 等 TCP/IP 网络中，通过用户友好的名称查找计算机和服务。当用户在应用程序中输入 DNS 名称时，DNS 服务可以将此名称解析为与之相关的其他信息，如 IP 地址。因为，你在上网时输入的网址，是通过域名解析系统解析找到了相对应的IP地址，这样才能上网。其实，域名的最终指向是IP。 （<a href="http://baike.baidu.com/view/22276.htm?fr=ala0_1_1" target="_blank" rel="noopener">http://baike.baidu.com/view/22276.htm?fr=ala0_1_1</a>） 上面是在百度百科中对DNS的解释，简单的理解，DNS就是把便于记忆的域名转换为不便于记忆的IP地址的过程。于是，我们访问互联网的过程就可以这样理解： 首先我们在地址栏中输入要访问的地址，然后操作系统访问本地的设置或者通过DHCP得到的DNS服务器，请求解析，DNS服务器收到请求后将域名解析为IP地址，传送给我们的电脑，然后我们的浏览器再去根据IP地址去访问相应的文件，下载后通过浏览器展示给大家，于是乎，就得到了我们看到的页面。 好了，过程既然明白了，我们来看，既然我们在访问网页的时候会请求DNS服务器，那么DNS的响应速度，以及和你的电脑的连接速度必然会影响到上网速度，说白了，如果DNS服务器访问速度慢的话，你的感觉就是网速太慢！于是，找个速度好的DNS服务器是一个非常重要的问题。 当然，有的地方我们上网时在访问网页时会出现一个广告页面，当我们输入网址错误时，返回的是一个拥有巨多广告内容的出错页面，这些都是DNS服务器的问题，这些都可以通过修改DNS服务器来解决。当然，怎么解决呢？follow me~ 怎么更改DNS呢？这个有很多种方法， 在UBUNTU系统下，这样操作就可： 首先桌面右上角的连接处点击右键，选择“编辑连接”，打开如下窗口 <a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot.png" target="_blank" rel="noopener"><img src="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot-300x237.png" alt="" title="Screenshot"></a> 选中该连接，点击编辑，在窗口中选择   IPV4  选项卡，选择DHCP仅地址，在DNS中填入想要修改的DNS,如下图 <a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot-1.png" target="_blank" rel="noopener"><img src="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot-1-200x300.png" alt="" title="Screenshot-1"></a> 点击应用，就可以了～怎么样，简单吧。 下面是windows下到方法～一样很简单。 修改计算机本地连接属性 方法如下： 打开 本地连接》》属性 ，得到如下窗口 <a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/PAGE12.png" target="_blank" rel="noopener"><img src="http://www.happyhls.org/blog/wp-content/uploads/2010/03/PAGE12-251x300.png" alt="" title="PAGE1"></a> 选中其中的IPv4协议，即上图中选中的选项，点击“属性”按钮，如下图 <a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/PAGE2.png" target="_blank" rel="noopener"><img src="http://www.happyhls.org/blog/wp-content/uploads/2010/03/PAGE2-291x300.png" alt="" title="PAGE2"></a> 看到其中到DNS服务器选项了吧，选中“使用下面的DNS服务器地址”，然后就可以输入你所选的DNS服务器了，点击确定就可以生效了～ 下面列一列比较著名到DNS服务器吧 GOOGLE DNS:    8.8.8.8                              8.8.4.4 看这个IP就知道google有多么强大了，估计，如果这个IP地址到了我国的话，IP的拥有者就会放弃域名地址，来推广自己的IP了，呵呵 :evil: 还有就是OPEN DNS OPEN DNS: 208.67.222.222                208.67.220.220 这个是大名鼎鼎到OPEN DNS 的服务器地址，是比较有名的免费DNS服务器。 当然，使用其他的DNS服务器也非没有缺点，这些服务器都在国外，相应速度肯定一般而言要比ISP提供到要慢一些，但是，当我们访问国外的网站时，这些DNS就要好的多，当然，比较重要的是，这些服务器不会出现想电信，联通那么多到广告。 当然如果你不在乎这些广告，可以使用联通，电信的DNS服务器，这个各地都有，而且速度不一样，可以自己选择，有时候本地的DNS服务器还没有外地的快哦，可以PING一下得到速度。 这是联通的DNS服务器， 202.102.134.68 218.56.57.58 221.205.128.150 202.102.152.3 202.102.154.3 下面是用我联通的网络ping各服务器的结果，系统为UBUNTU PING 202.102.134.68 (202.102.134.68) 56(84) bytes of data. 64 bytes from 202.102.134.68: icmp_seq=1 ttl=251 time=6.68 ms 64 bytes from 202.102.134.68: icmp_seq=2 ttl=251 time=6.69 ms 64 bytes from 202.102.134.68: icmp_seq=3 ttl=251 time=6.72 ms 64 bytes from 202.102.134.68: icmp_seq=4 ttl=251 time=8.85 ms 64 bytes from 202.102.134.68: icmp_seq=5 ttl=251 time=7.02 ms 这个是ping第一个联通DNS服务器的结果，现在没有电信，移动的网络，没法测试，大家可以在自己的网络试试，找个速度最快的，不要因为DNS浪费了自己的上网时间。 :razz: 好了，经过设置，就可以选择比较适合自己的DNS了～</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux编程/" rel="tag"># Linux编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2010/02/28/ubuntu-usb-model-adsl/" rel="next" title="ubuntu下使用usb modem ADSL上网的方法">
+                <i class="fa fa-chevron-left"></i> ubuntu下使用usb modem ADSL上网的方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2010/03/04/windows-dns-pppoe-adsl/" rel="prev" title="PPPoe ADSL更改DNS的方法">
+                PPPoe ADSL更改DNS的方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

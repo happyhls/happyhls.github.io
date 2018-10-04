@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文链接：http://developer.android.com/training/volley/request.html 该文将介绍如何使用常见的Volley支持的请求类型：  StringRequest：定义一个URL，在response中接收原始的字符串。可以参见之前的Setting Up a Request Queue。 ImageRequest：定义一个URL，在response中接收">
+<meta name="keywords" content="Android,Volley">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Volley Lesson 3 -Making a Standard Request（译）">
+<meta property="og:url" content="http://yoursite.com/2014/11/14/android-volley-usage-3-standard-request/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="原文链接：http://developer.android.com/training/volley/request.html 该文将介绍如何使用常见的Volley支持的请求类型：  StringRequest：定义一个URL，在response中接收原始的字符串。可以参见之前的Setting Up a Request Queue。 ImageRequest：定义一个URL，在response中接收">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T15:15:45.045Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Volley Lesson 3 -Making a Standard Request（译）">
+<meta name="twitter:description" content="原文链接：http://developer.android.com/training/volley/request.html 该文将介绍如何使用常见的Volley支持的请求类型：  StringRequest：定义一个URL，在response中接收原始的字符串。可以参见之前的Setting Up a Request Queue。 ImageRequest：定义一个URL，在response中接收">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/14/android-volley-usage-3-standard-request/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Volley Lesson 3 -Making a Standard Request（译） | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/14/android-volley-usage-3-standard-request/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Volley Lesson 3 -Making a Standard Request（译）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-14 14:03:39" itemprop="dateCreated datePublished" datetime="2014-11-14T14:03:39+08:00">2014-11-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 23:15:45" itemprop="dateModified" datetime="2018-10-03T23:15:45+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Volley/" itemprop="url" rel="index"><span itemprop="name">Volley</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>原文链接：<a href="http://developer.android.com/training/volley/request.html" target="_blank" rel="noopener">http://developer.android.com/training/volley/request.html</a> 该文将介绍如何使用常见的Volley支持的请求类型：</p>
+<ul>
+<li>StringRequest：定义一个URL，在response中接收原始的字符串。可以参见之前的Setting Up a Request Queue。</li>
+<li>ImageRequest：定义一个URL，在response中接收图片</li>
+<li>JsonObjectReqeust/JsonArrayRequest：都是JsonReqeust的子类，接收Json object或者array。</li>
+</ul>
+<p>如果我们的数据类型也是上面的几种之一的话，那么我们是不需要自己实现自己的request的。如果需要接收自己特定格式的Request的话，可以参考下一节课程。</p>
+<h2 id="Request-an-Image"><a href="#Request-an-Image" class="headerlink" title="Request an Image"></a>Request an Image</h2><p>Volley提供了以下的类用来请求图像。这些类一次提供了不同级别上的图片处理能力。</p>
+<ul>
+<li>ImageReqeust：一个请求可以用来访问特定URL的图片并且返回一个解码之后的bitmap。并且也提供了方便的特性比如缩放至一个特定的尺寸。其中最大的好处在于Volley的线程调度保证了耗时的图片操作，比如decoding，比如resizing都发生在worker线程中。</li>
+<li>ImageLoader：是一个工具类用来加载和缓存URL的图片。ImageLoader在处理大量的ImageRequest的时候很有用，比如：当我们需要在ListView中放置很多的缩放图片，ImageLoader提供了in-memory级别的cache来作为Volley的前置cache，这样就避免了很多闪烁的现象。这样也使得我们在cache命中，而且又使用disk I/O的时候可以不阻塞main线程。ImageLoader也会负责一些聚合操作，如果没有ImageLoader，那么大部分的response handler都要负责在view上设置图片等操作。ImageLoader的聚合操作使得同时我们可以同时派发得以实现。</li>
+<li>NetworkImageView：基于ImageLoader构建，当图片需要从网络URL中获取的时候，用来代替ImageView。如果使用NewworkImageView的话，当NetworkImageView从视图上剥离的时候回自动的取消等待的请求。</li>
+</ul>
+<h3 id="Use-ImageRequest"><a href="#Use-ImageRequest" class="headerlink" title="Use ImageRequest"></a>Use ImageRequest</h3><p>一个使用ImageRequest的例子，其中使用单利调用RequestQueue。</p>
+<p>ImageView mImageView;<br>String url = “<a href="http://i.imgur.com/7spzG.png&quot;" target="_blank" rel="noopener">http://i.imgur.com/7spzG.png&quot;</a>;<br>mImageView = (ImageView) findViewById(R.id.myImage);<br>…</p>
+<p>// Retrieves an image specified by the URL, displays it in the UI.<br>ImageRequest request = new ImageRequest(url,<br>    new Response.Listener() {<br>        @Override<br>        public void onResponse(Bitmap bitmap) {<br>            mImageView.setImageBitmap(bitmap);<br>        }<br>    }, 0, 0, null,<br>    new Response.ErrorListener() {<br>        public void onErrorResponse(VolleyError error) {<br>            mImageView.setImageResource(R.drawable.image_load_error);<br>        }<br>    });<br>// Access the RequestQueue through your singleton class.<br>MySingleton.getInstance(this).addToRequestQueue(request);</p>
+<h3 id="Use-ImageLoader-and-NetworkImageView"><a href="#Use-ImageLoader-and-NetworkImageView" class="headerlink" title="Use ImageLoader and NetworkImageView"></a>Use ImageLoader and NetworkImageView</h3><p>在需要展示大量的图片的时候，使用ImageLoader或者NetworkImageView会拥有更高的效率，比如ListView。如果使用NetworkImageView，可以像如下使用：</p>
+<p>&lt;com.android.volley.toolbox.NetworkImageView<br>        android:id=”@+id/networkImageView”<br>        android:layout_width=”150dp”<br>        android:layout_height=”170dp”<br>        android:layout_centerHorizontal=”true” /&gt;</p>
+<p>我们可以直接使用ImageLoader来展示图片，如下：</p>
+<p>ImageLoader mImageLoader;<br>ImageView mImageView;<br>// The URL for the image that is being loaded.<br>private static final String IMAGE_URL =<br>    “<a href="http://developer.android.com/images/training/system-ui.png&quot;" target="_blank" rel="noopener">http://developer.android.com/images/training/system-ui.png&quot;</a>;<br>…<br>mImageView = (ImageView) findViewById(R.id.regularImageView);</p>
+<p>// Get the ImageLoader through your singleton class.<br>mImageLoader = MySingleton.getInstance(this).getImageLoader();<br>mImageLoader.get(IMAGE_URL, ImageLoader.getImageListener(mImageView,<br>         R.drawable.def_image, R.drawable.err_image));</p>
+<p>使用NetworkImageView的话如下：</p>
+<p>ImageLoader mImageLoader;<br>NetworkImageView mNetworkImageView;<br>private static final String IMAGE_URL =<br>    “<a href="http://developer.android.com/images/training/system-ui.png&quot;" target="_blank" rel="noopener">http://developer.android.com/images/training/system-ui.png&quot;</a>;<br>…</p>
+<p>// Get the NetworkImageView that will display the image.<br>mNetworkImageView = (NetworkImageView) findViewById(R.id.networkImageView);</p>
+<p>// Get the ImageLoader through your singleton class.<br>mImageLoader = MySingleton.getInstance(this).getImageLoader();</p>
+<p>// Set the URL of the image that should be loaded into this view, and<br>// specify the ImageLoader that will be used to make the request.<br>mNetworkImageView.setImageUrl(IMAGE_URL, mImageLoader);</p>
+<p>要注意的是，以上的ImageLoader都是使用了单例模式，使得在整个APP的生命周期中都可以直接使用。特别注意的是，这种设计模式在使用ImageLoader的时候特别需要重视，因为ImageLoader使用了内存缓存，可以减少图片旋转时候闪烁现象的发生。否则如果我们是在activity中设置ImageLoader，那么当用户每次旋转屏幕的时候，ImageLoader都会重构，就会导致严重的闪烁现象。</p>
+<h4 id="Example-LRU-cache"><a href="#Example-LRU-cache" class="headerlink" title="Example LRU cache"></a>Example LRU cache</h4><p>Volley工具类提供了一个标准的cache实现：DiskBasedCache。该类会在磁盘中特定文件夹中直接缓存文件。但是实用ImageLoader的时候，我们需要自己创建一个内存cache，该cache要实现ImageLaoder.ImageCache接口。 以下是一个in-memory的LruBitmapCache例子，该类继承了LruCache类，并且实现ImageLoader.ImageCache接口。</p>
+<p>import android.graphics.Bitmap;<br>import android.support.v4.util.LruCache;<br>import android.util.DisplayMetrics;<br>import com.android.volley.toolbox.ImageLoader.ImageCache;</p>
+<p>public class LruBitmapCache extends LruCache&lt;String, Bitmap&gt;<br>        implements ImageCache {</p>
+<pre><code>public LruBitmapCache(int maxSize) {
+    super(maxSize);
+}
+
+public LruBitmapCache(Context ctx) {
+    this(getCacheSize(ctx));
+}
+
+@Override
+protected int sizeOf(String key, Bitmap value) {
+    return value.getRowBytes() * value.getHeight();
+}
+
+@Override
+public Bitmap getBitmap(String url) {
+    return get(url);
+}
+
+@Override
+public void putBitmap(String url, Bitmap bitmap) {
+    put(url, bitmap);
+}
+
+// Returns a cache size equal to approximately three screens worth of images.
+public static int getCacheSize(Context ctx) {
+    final DisplayMetrics displayMetrics = ctx.getResources().
+            getDisplayMetrics();
+    final int screenWidth = displayMetrics.widthPixels;
+    final int screenHeight = displayMetrics.heightPixels;
+    // 4 bytes per pixel
+    final int screenBytes = screenWidth * screenHeight * 4;
+
+    return screenBytes * 3;
+}
+</code></pre><p>}</p>
+<p>如下使用：</p>
+<p>RequestQueue mRequestQueue; // assume this exists.<br>ImageLoader mImageLoader = new ImageLoader(mRequestQueue, new LruBitmapCache(<br>            LruBitmapCache.getCacheSize()));</p>
+<h2 id="Request-JSON"><a href="#Request-JSON" class="headerlink" title="Request JSON"></a>Request JSON</h2><p>Volley提供了以下两个类实现JSON请求：</p>
+<ul>
+<li>JsonArrayRequest：请求数组</li>
+<li>JsonObjectRequest：获取JSON Object。可以有一个JSONObject通过request body传递请求。</li>
+</ul>
+<p>两个类都是基于JsonRequest实现，以下是个例子。</p>
+<p>TextView mTxtDisplay;<br>ImageView mImageView;<br>mTxtDisplay = (TextView) findViewById(R.id.txtDisplay);<br>String url = “<a href="http://my-json-feed&quot;" target="_blank" rel="noopener">http://my-json-feed&quot;</a>;</p>
+<p>JsonObjectRequest jsObjRequest = new JsonObjectRequest<br>        (Request.Method.GET, url, null, new Response.Listener() {</p>
+<pre><code>@Override
+public void onResponse(JSONObject response) {
+    mTxtDisplay.setText(&quot;Response: &quot; + response.toString());
+}
+</code></pre><p>}, new Response.ErrorListener() {</p>
+<pre><code>@Override
+public void onErrorResponse(VolleyError error) {
+    // TODO Auto-generated method stub
+
+}
+</code></pre><p>});</p>
+<p>// Access the RequestQueue through your singleton class.<br>MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Volley/" rel="tag"># Volley</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/13/android-volley-usage-2-setting-up-requestqueue/" rel="next" title="Volley Lesson 2 -Setting Up a RequestQueue（译）">
+                <i class="fa fa-chevron-left"></i> Volley Lesson 2 -Setting Up a RequestQueue（译）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/14/android-volley-usage-4-implementing-request/" rel="prev" title="Volley Lesson 4 -Implementing a Custom Request（译）">
+                Volley Lesson 4 -Implementing a Custom Request（译） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Request-an-Image"><span class="nav-number">1.</span> <span class="nav-text">Request an Image</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Use-ImageRequest"><span class="nav-number">1.1.</span> <span class="nav-text">Use ImageRequest</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Use-ImageLoader-and-NetworkImageView"><span class="nav-number">1.2.</span> <span class="nav-text">Use ImageLoader and NetworkImageView</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Example-LRU-cache"><span class="nav-number">1.2.1.</span> <span class="nav-text">Example LRU cache</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Request-JSON"><span class="nav-number">2.</span> <span class="nav-text">Request JSON</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

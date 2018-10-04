@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Android本身为我们提供了View，但很多情况下，仍然无法满足我们自己的需求，那么这个时候就需要自己定制View。自定义View的办法有很多，我们从最基础的开始。  上图就是我们要实现的效果，具体的我们依次来列举一下：  首先要画出上面的界面 饼形图，饼的面积代表其进度。 在饼形图中间可以设定是否显示数字进度。   要可以设置饼形图的各种参数，包括颜色，大小等等 要能够通过UI中其他的控件比如">
+<meta name="keywords" content="Android,自定义View,onMeasure">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自定义View：1、定制自己的饼形图">
+<meta property="og:url" content="http://yoursite.com/2014/12/08/android-custom-view-1-pie-chart/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Android本身为我们提供了View，但很多情况下，仍然无法满足我们自己的需求，那么这个时候就需要自己定制View。自定义View的办法有很多，我们从最基础的开始。  上图就是我们要实现的效果，具体的我们依次来列举一下：  首先要画出上面的界面 饼形图，饼的面积代表其进度。 在饼形图中间可以设定是否显示数字进度。   要可以设置饼形图的各种参数，包括颜色，大小等等 要能够通过UI中其他的控件比如">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/12/device-2014-12-08-145922.png">
+<meta property="og:image" content="https://developer.android.com/assets/images/triangle-closed.png">
+<meta property="og:image" content="https://developer.android.com/assets/images/triangle-closed.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.599Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自定义View：1、定制自己的饼形图">
+<meta name="twitter:description" content="Android本身为我们提供了View，但很多情况下，仍然无法满足我们自己的需求，那么这个时候就需要自己定制View。自定义View的办法有很多，我们从最基础的开始。  上图就是我们要实现的效果，具体的我们依次来列举一下：  首先要画出上面的界面 饼形图，饼的面积代表其进度。 在饼形图中间可以设定是否显示数字进度。   要可以设置饼形图的各种参数，包括颜色，大小等等 要能够通过UI中其他的控件比如">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/12/device-2014-12-08-145922.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/12/08/android-custom-view-1-pie-chart/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>自定义View：1、定制自己的饼形图 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/12/08/android-custom-view-1-pie-chart/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">自定义View：1、定制自己的饼形图
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-12-08 18:31:20" itemprop="dateCreated datePublished" datetime="2014-12-08T18:31:20+08:00">2014-12-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/View/" itemprop="url" rel="index"><span itemprop="name">View</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Android本身为我们提供了View，但很多情况下，仍然无法满足我们自己的需求，那么这个时候就需要自己定制View。自定义View的办法有很多，我们从最基础的开始。 <a href="/images/wordpress/2014/12/device-2014-12-08-145922.png"><img src="/images/wordpress/2014/12/device-2014-12-08-145922.png" alt="device-2014-12-08-145922"></a> 上图就是我们要实现的效果，具体的我们依次来列举一下：</p>
+<ul>
+<li>首先要画出上面的界面<ul>
+<li>饼形图，饼的面积代表其进度。</li>
+<li>在饼形图中间可以设定是否显示数字进度。</li>
+</ul>
+</li>
+<li>要可以设置饼形图的各种参数，包括颜色，大小等等</li>
+<li>要能够通过UI中其他的控件比如SeekBar来设置饼形图的参数。</li>
+<li>要有回调函数能够使得其他的控件接收到饼形图中进度的变化。</li>
+<li>当手指按在饼形图上时，要能够不断自增进度。</li>
+</ul>
+<p>好了，上面就是我们规划的需求，那么我们来依次编写代码，首先来分析我们需要做的工作有哪些？</p>
+<ul>
+<li>资源文件<ul>
+<li>attrs.xml中准备饼形图可设置的参数，这样我们可以直接在Layout中设置饼形图的各个参数</li>
+</ul>
+</li>
+<li>程序代码<ul>
+<li>覆写onMeasure方法来设置界面的大小</li>
+<li>覆写onDraw()方法来绘图</li>
+<li>设计各种回调函数(Listener)</li>
+<li>覆写onTouchEvent()设计触摸事件</li>
+</ul>
+</li>
+</ul>
+<h2 id="资源文件"><a href="#资源文件" class="headerlink" title="资源文件"></a>资源文件</h2><p>首先，我们需要在attrs.xml中为饼形图设计各种参数，我们将饼形图名称定义为ProgressPie，那我们为其设计的属性为：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">declare-styleable</span> <span class="attr">name</span>=<span class="string">"ProgressPie"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"max"</span> <span class="attr">format</span>=<span class="string">"integer"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"progress"</span> <span class="attr">format</span>=<span class="string">"integer"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"showText"</span> <span class="attr">format</span>=<span class="string">"boolean"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"textSize"</span> <span class="attr">format</span>=<span class="string">"dimension"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"textColor"</span> <span class="attr">format</span>=<span class="string">"color"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"textPosition"</span> <span class="attr">format</span>=<span class="string">"enum"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">enum</span> <span class="attr">name</span>=<span class="string">"left"</span> <span class="attr">value</span>=<span class="string">"0"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">enum</span> <span class="attr">name</span>=<span class="string">"middle"</span> <span class="attr">value</span>=<span class="string">"1"</span>/&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">enum</span> <span class="attr">name</span>=<span class="string">"right"</span> <span class="attr">value</span>=<span class="string">"2"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">attr</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"color"</span> <span class="attr">format</span>=<span class="string">"color"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"showBorder"</span> <span class="attr">format</span>=<span class="string">"boolean"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"borderColor"</span> <span class="attr">format</span>=<span class="string">"color"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">declare-styleable</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>我们为ProgressPie声明了一些属性，有一点需要注意的是属性的各种类型，比如整形，尺寸，布尔型，颜色，枚举类型(其中元素要在对应的View中定义)等等。 那怎么使用呢？activity.xml的界面如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">LinearLayout</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:orientation</span>=<span class="string">"vertical"</span> <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"match\_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"match\_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:paddingBottom</span>=<span class="string">"@dimen/activity\_vertical\_margin"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:paddingLeft</span>=<span class="string">"@dimen/activity\_horizontal\_margin"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:paddingRight</span>=<span class="string">"@dimen/activity\_horizontal\_margin"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:paddingTop</span>=<span class="string">"@dimen/activity\_vertical\_margin"</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">CheckBox</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">"Visiablity"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/visiablityCheckBox"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:checked</span>=<span class="string">"true"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">SeekBar</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"match\_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/seekbar"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.ProgressPie</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:progresspie</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"match\_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"match\_parent"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_marginTop</span>=<span class="string">"@dimen/activity\_vertical_margin"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">progresspie:max</span>=<span class="string">"100"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">progresspie:progress</span>=<span class="string">"90"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">progresspie:textColor</span>=<span class="string">"#0000FF"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">progresspie:showText</span>=<span class="string">"true"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">progresspie:textSize</span>=<span class="string">"50sp"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">progresspie:textPosition</span>=<span class="string">"right"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">progresspie:color</span>=<span class="string">"#FF0000"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@+id/progressspie"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">LinearLayout</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>重点我们来看一下我们自己定义的me.happyhls.androiddemo.view.ProgressPie： 首先我们需要申明命名空间，在AndroidStudio中的推荐写法为，将其设为res-auto，即：</p>
+<p>xmlns:progresspie=”<a href="http://schemas.android.com/apk/res-auto&quot;" target="_blank" rel="noopener">http://schemas.android.com/apk/res-auto&quot;</a></p>
+<p>这样就可以自动找到我们的属性设置，需要注意的是，上面是当前的ADT或者AS中的推荐写法。 以前，我们一般是这样写的：</p>
+<p>xmlns:progress=”<a href="http://schemas.android.com/apk/res/me.happyhls.view.ProgressPie" target="_blank" rel="noopener">http://schemas.android.com/apk/res/me.happyhls.view.ProgressPie</a></p>
+<p>但现在最好不要这样写，如果按照以前那样写上自己的包名的话，可以能出现错误，尤其是我们要作为Library提供的时候。参考：<a href="https://stackoverflow.com/questions/10398416/using-activities-from-library-projects" target="_blank" rel="noopener">http://stackoverflow.com/questions/10398416/using-activities-from-library-projects</a> 其他的地方则是我们比较经常使用的，不需要多说，主要来看看代码里面的内容：</p>
+<h2 id="ProgressPie-java"><a href="#ProgressPie-java" class="headerlink" title="ProgressPie.java"></a>ProgressPie.java</h2><h3 id="一：初始化-gt-构造函数"><a href="#一：初始化-gt-构造函数" class="headerlink" title="一：初始化-&gt;构造函数"></a>一：初始化-&gt;构造函数</h3><p>构造函数是我们首先需要写好的，默认的View其中有3个构造函数：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">View</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">View</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(context, attrs, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">View</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyleAttr)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(context);</span><br><span class="line">    TypedArray a = context.obtainStyledAttributes(attrs, com.android.internal.R.styleable.View,defStyleAttr, <span class="number">0</span>);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里面的3个构造函数都有其不同的应用场景，为了使得我们的自定义View更加规范易用，我们同样需要书写类似的3个构造函数，在编写之前，我们需要首先搞明白，这3个构造函数分别应用在什么场景里面呢？自己思考是想不明白的，我们先去看看Button的源代码：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Button</span> <span class="keyword">extends</span> <span class="title">TextView</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Button</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(context, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Button</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(context, attrs, com.android.internal.R.attr.buttonStyle);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Button</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyle)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>(context, attrs, defStyle);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onInitializeAccessibilityEvent</span><span class="params">(AccessibilityEvent event)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onInitializeAccessibilityEvent(event);</span><br><span class="line">        event.setClassName(Button.class.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onInitializeAccessibilityNodeInfo</span><span class="params">(AccessibilityNodeInfo info)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onInitializeAccessibilityNodeInfo(info);</span><br><span class="line">        info.setClassName(Button.class.getName());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从上我们可以看出：</p>
+<ul>
+<li>所有的构造函数最终都是通过public Button(Context context, AttributeSet attrs, int defStyle){}初始化Button。</li>
+<li>如果通过代码创建Button，那么会调用构造器public Button(Context context) {}(来源：View.java源代码注释)，但本质上仍然通过public Button(Context context, AttributeSet attrs, int defStyle) {}实例化，但其中传入的参数attrs为null，defStyle为com.android.internal.R.attr.buttonStyle。</li>
+<li>如果通过XML创建Button，那么此时会调用构造器public Button(Context context, AttributeSet attrs) {}，但本质上仍然通过public Button(Context context, AttributeSet attrs, int defStyle) {}实例化，但其中传入的参数attrs为attrs，defStyle为com.android.internal.R.attr.buttonStyle。</li>
+<li>public Button(Context context, AttributeSet attrs, int defStyle) {}什么时候调用？不太清楚，但Button所有的初始化最终都是通过该构造器，并调用父类TextView对应的构造器实现。</li>
+</ul>
+<p>综上所示，要搞明白，还需要好好看看TextView对应的构造器实现。 TextView的源代码如下，来分析一下public TextView(Context context, AttributeSet attrs, int defStyle)的源代码。 {<a href="https://github.com/happyhls/platform\_frameworks\_base/blob/master/core/java/android/widget/TextView.java}" target="_blank" rel="noopener">https://github.com/happyhls/platform\_frameworks\_base/blob/master/core/java/android/widget/TextView.java}</a> 1、调用父类的构造函数</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">super</span>(context, attrs, defStyle);</span><br></pre></td></tr></table></figure>
+<p>2、为了简化逻辑设计，从系统主题中获取默认的主题，使用设置的attrs及com.android.internal.R.styleable.TextAppearance设置默认属性。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> Resources.Theme theme = context.getTheme();        </span><br><span class="line"> /\*</span><br><span class="line"> \* Look the appearance up without checking first <span class="keyword">if</span> it exists because</span><br><span class="line"> \* almost every TextView has one and it greatly simplifies the logic</span><br><span class="line"> \* to be able to parse the appearance first and then let specific tags</span><br><span class="line"> \* <span class="keyword">for</span> <span class="keyword">this</span> View override it.</span><br><span class="line"> */</span><br><span class="line">TypedArray a = theme.obtainStyledAttributes(</span><br><span class="line">            attrs, com.android.internal.R.styleable.TextViewAppearance, defStyle, <span class="number">0</span>);</span><br><span class="line">TypedArray appearance = <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">int</span> ap = a.getResourceId(</span><br><span class="line">        com.android.internal.R.styleable.TextViewAppearance_textAppearance, -<span class="number">1</span>);</span><br><span class="line">a.recycle();</span><br><span class="line"><span class="keyword">if</span> (ap != -<span class="number">1</span>) &#123;</span><br><span class="line">    appearance = theme.obtainStyledAttributes(</span><br><span class="line">            ap, com.android.internal.R.styleable.TextAppearance);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>  3、使用attrs，并从主题中获取com.android.internal.R.styleable.TextView的属性设置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">a = theme.obtainStyledAttributes(</span><br><span class="line">            attrs, com.android.internal.R.styleable.TextView, defStyle, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> n = a.getIndexCount();</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">    <span class="keyword">int</span> attr = a.getIndex(i);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>4、使用attrs，获取View中定义的focusable,clickable属性值：</p>
+<p>a = context.obtainStyledAttributes(attrs, com.android.internal.R.styleable.View, defStyle, 0);</p>
+<p>可以看出，在TextView中根据用户在XML中设定的属性和系统的默认属性，依次设置TextView的各个属性值。 有一点我们需要想到的是，TextView的设计比较复杂，是因为在Android当中，TextView是大量控件的父类，换句话说，很多的控件都是基于TextView来实现的，比如说：</p>
+<p><a href="http://developer.android.com/reference/android/widget/TextView.html#" target="_blank" rel="noopener"><img src="https://developer.android.com/assets/images/triangle-closed.png" alt=""></a>Known Direct Subclasses</p>
+<p><a href="http://developer.android.com/reference/android/widget/Button.html" target="_blank" rel="noopener">Button</a>, <a href="http://developer.android.com/reference/android/widget/CheckedTextView.html" target="_blank" rel="noopener">CheckedTextView</a>, <a href="http://developer.android.com/reference/android/widget/Chronometer.html" target="_blank" rel="noopener">Chronometer</a>, <a href="http://developer.android.com/reference/android/widget/DigitalClock.html" target="_blank" rel="noopener">DigitalClock</a>, <a href="http://developer.android.com/reference/android/widget/EditText.html" target="_blank" rel="noopener">EditText</a>, <a href="http://developer.android.com/reference/android/support/v17/leanback/widget/RowHeaderView.html" target="_blank" rel="noopener">RowHeaderView</a>, <a href="http://developer.android.com/reference/android/widget/TextClock.html" target="_blank" rel="noopener">TextClock</a></p>
+<p><a href="http://developer.android.com/reference/android/widget/TextView.html#" target="_blank" rel="noopener"><img src="https://developer.android.com/assets/images/triangle-closed.png" alt=""></a>Known Indirect Subclasses</p>
+<p><a href="http://developer.android.com/reference/android/widget/AutoCompleteTextView.html" target="_blank" rel="noopener">AutoCompleteTextView</a>, <a href="http://developer.android.com/reference/android/widget/CheckBox.html" target="_blank" rel="noopener">CheckBox</a>, <a href="http://developer.android.com/reference/android/widget/CompoundButton.html" target="_blank" rel="noopener">CompoundButton</a>, <a href="http://developer.android.com/reference/android/inputmethodservice/ExtractEditText.html" target="_blank" rel="noopener">ExtractEditText</a>, <a href="http://developer.android.com/reference/android/widget/MultiAutoCompleteTextView.html" target="_blank" rel="noopener">MultiAutoCompleteTextView</a>, <a href="http://developer.android.com/reference/android/widget/RadioButton.html" target="_blank" rel="noopener">RadioButton</a>, <a href="http://developer.android.com/reference/android/support/v17/leanback/widget/SearchEditText.html" target="_blank" rel="noopener">SearchEditText</a>, <a href="http://developer.android.com/reference/android/widget/Switch.html" target="_blank" rel="noopener">Switch</a>, <a href="http://developer.android.com/reference/android/support/v7/widget/SwitchCompat.html" target="_blank" rel="noopener">SwitchCompat</a>,<a href="http://developer.android.com/reference/android/widget/ToggleButton.html" target="_blank" rel="noopener">ToggleButton</a></p>
+<p>那我们的代码改怎么写呢？如果不会，那么就模仿，所以，我们模仿TextView，同样声明3个构造函数，在含有3个参数的构造函数中具体的初试话所有需要初始化的属性，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ProgressPie</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(context, <span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ProgressPie</span><span class="params">(Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(context, attrs, <span class="number">0</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ProgressPie</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyleAttr)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>(context, attrs, defStyleAttr);</span><br><span class="line"></span><br><span class="line">    TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ProgressPie, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        mMax = typedArray.getInteger(R.styleable.ProgressPie_max, <span class="number">100</span>);</span><br><span class="line">        mProgress = typedArray.getInteger(R.styleable.ProgressPie_progress, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">if</span> (mProgress &gt; mMax) &#123;</span><br><span class="line">            mProgress = mMax;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mProgress &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            mProgress = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        mShowText = typedArray.getBoolean(R.styleable.ProgressPie_showText, <span class="keyword">false</span>);</span><br><span class="line">        <span class="keyword">if</span> (mShowText) &#123;</span><br><span class="line">            mTextSize = typedArray.getDimensionPixelSize(R.styleable.ProgressPie_textSize, <span class="number">20</span>);</span><br><span class="line">            mTextColor = typedArray.getColor(R.styleable.ProgressPie_textColor, Color.BLACK);</span><br><span class="line">            mTextPosition = typedArray.getInteger(R.styleable.ProgressPie\_textPosition, TEXT\_POSITION_MIDDLE);</span><br><span class="line">        &#125;</span><br><span class="line">        mColor = typedArray.getColor(R.styleable.ProgressPie_color, Color.BLUE);</span><br><span class="line">        mShowBorder = typedArray.getBoolean(R.styleable.ProgressPie_showBorder, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">if</span> (mShowBorder) &#123;</span><br><span class="line">            mBorderColor = typedArray.getColor(R.styleable.ProgressPie_borderColor, Color.GRAY);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        typedArray.recycle();</span><br><span class="line">    &#125;</span><br><span class="line">    init();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mTextPaint = <span class="keyword">new</span> TextPaint(Paint.ANTI\_ALIAS\_FLAG);</span><br><span class="line">    mTextPaint.setColor(mTextColor);</span><br><span class="line">    mTextPaint.setTextSize(mTextSize);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    mPiePaint = <span class="keyword">new</span> Paint(Paint.ANTI\_ALIAS\_FLAG);</span><br><span class="line">    mPiePaint.setColor(mColor);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实整体来说，并不复杂，简单的讲，首先获取XML中的配置的属性，并进行设置，最后初始化了我们所需要的Paint画笔。需要注意的是TypeArray使用完成之后，记得要回收。 直接在XML中定义&gt;style定义&gt;由defStyleAttr和defStyleRes指定的默认值&gt;直接在Theme中指定的值 //参考自<a href="http://www.cnblogs.com/angeldevil/p/3479431.html" target="_blank" rel="noopener">http://www.cnblogs.com/angeldevil/p/3479431.html</a></p>
+<h3 id="二：测量-gt-onMeasure"><a href="#二：测量-gt-onMeasure" class="headerlink" title="二：测量-&gt;onMeasure"></a>二：测量-&gt;onMeasure</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</span><br><span class="line">    Log.i(TAG, <span class="string">"onMeasure"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> widthMode = MeasureSpec.getMode(widthMeasureSpec);</span><br><span class="line">    <span class="keyword">int</span> heightMode = MeasureSpec.getMode(heightMeasureSpec);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</span><br><span class="line">    <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> width, height;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (widthMode == MeasureSpec.EXACTLY) &#123;</span><br><span class="line">        width = widthSize;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        CharSequence charSequence = String.valueOf(mMax);</span><br><span class="line">        width = getTextWidth(charSequence, mTextPaint) &lt;&lt; <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    height = width;</span><br><span class="line">    <span class="keyword">if</span> (width &gt; <span class="number">0</span>) &#123;</span><br><span class="line">       <span class="keyword">this</span>.width = width;</span><br><span class="line">        <span class="keyword">this</span>.height = height;</span><br><span class="line">        rectF.set(<span class="number">0f</span>, <span class="number">0f</span>, width, height);</span><br><span class="line">    &#125;</span><br><span class="line">    setMeasuredDimension(height, width);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在我们的饼形图当中，我们要设定的饼是一个圆形，那么其大小该怎么确定呢？</p>
+<ul>
+<li>最小情况(wrap_content)：首先是一个圆形，如果要显示数字的话，那么最小的饼只要能够覆盖数字的空间就可以。同时，因为我们设计了3种数字的显示方式：靠左，靠右，居中，因此我们可以保证圆的半径为数字所占空间的大小，那么就可以保证在所有的情况下，都能够正常显示</li>
+<li>最大的情况(match_parent)/XML指定控件大小：其实这两种情况下，我们都可以因为是使用到该饼形图的地方已经为我们指定好了大小：如果是XML指定大小的情况，那不用多说，如果是match_parent，那么这个时候其实大小是由容器剩下的空间决定好了的。因此在这些情况下，我们只要采用给定的尺寸就可以。</li>
+</ul>
+<p>首先说明一下<strong>MeasureSpec</strong>这个类： 该类封装了从Layout parent传递给child的Layout参数。MeasureSpec都包含了width和height属性，由size和mode构成。 对于<strong>Mode</strong>，总共有3中类型，由MeasureSpec的最高两位来表示(32位)：</p>
+<ul>
+<li>UNSPECIFIED(0b00)：没有指定</li>
+<li>EXACTLY(0b01)：Layout parent中已经定义了child元素的具体尺寸，不管child所需要的或者设置的尺寸是多少，其最终都使用父控件所指定的大小。</li>
+<li>AT_MOST(0b11)：子元素可以任意获得所需要的大小。</li>
+</ul>
+<p><strong>setMeasuredDimension</strong> 我们可以注意到，在onMeasure()方法的最后，我们调用了View中的setMeasuredDimension方法，需要注意的是，该方法是onMeasure中必须调用的，用来保存我们设置的尺寸大小。如果没有调用该方法的话，会抛出异常。 还有，其中我们使用getTextWidth()方法来获取数字所占用的屏幕大小。我暂时知道的有两种思路</p>
+<ul>
+<li><p>(int)FloatMath.ceil(Layout.getDesiredWidth(charSequence, textPaint)); //Return how wide a layout must be in order to display the specified text slice with one line per paragraph.</p>
+</li>
+<li><p>mTextPaint.getTextBounds(text, 0, text.length(), mBounds); //Return in bounds (allocated by the caller) the smallest rectangle that encloses all of the characters, with an implied origin at (0,0).<br>int textWidth = mBounds.width();</p>
+</li>
+</ul>
+<p>两种办法都可以。</p>
+<h3 id="三、画图-gt-onDraw"><a href="#三、画图-gt-onDraw" class="headerlink" title="三、画图-&gt;onDraw"></a>三、画图-&gt;onDraw</h3><p>前面我们已经看完了，一个自定义View如何进行初始化和确定尺寸的，现在则看看到底是如何来画图的。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</span><br><span class="line">    Log.i(TAG, <span class="string">"onDraw"</span>);</span><br><span class="line">    <span class="keyword">super</span>.onDraw(canvas);</span><br><span class="line">    mPiePaint.setColor(mColor);</span><br><span class="line">    mPiePaint.setStyle(Paint.Style.FILL);</span><br><span class="line">    canvas.drawArc(rectF, <span class="number">180</span>, <span class="number">360</span>*getProgress()/getMax(), <span class="keyword">true</span>, mPiePaint );</span><br><span class="line">    <span class="keyword">if</span> (mShowBorder) &#123;</span><br><span class="line">        mPiePaint.setColor(mBorderColor);</span><br><span class="line">        mPiePaint.setStyle(Paint.Style.STROKE);</span><br><span class="line">        canvas.drawArc(rectF, <span class="number">180</span>, <span class="number">360</span>*getProgress()/getMax(), <span class="keyword">true</span>, mPiePaint );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ( mShowText ) &#123;</span><br><span class="line">        String text = String.valueOf(getProgress());</span><br><span class="line">        mTextPaint.getTextBounds(text, <span class="number">0</span>, text.length(), mBounds);</span><br><span class="line">        <span class="keyword">int</span> textWidth = mBounds.width();</span><br><span class="line">        <span class="keyword">int</span> textHeight = mBounds.height();</span><br><span class="line">        <span class="keyword">switch</span> (mTextPosition) &#123;</span><br><span class="line">            <span class="keyword">case</span> TEXT\_POSITION\_LEFT:</span><br><span class="line">                canvas.drawText(text, width/<span class="number">2</span> - textWidth, height/<span class="number">2</span> + textHeight/<span class="number">2</span>, mTextPaint);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> TEXT\_POSITION\_MIDDLE:</span><br><span class="line">                canvas.drawText(text, width/<span class="number">2</span> - textWidth/<span class="number">2</span>, height/<span class="number">2</span> + textHeight/<span class="number">2</span>, mTextPaint);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> TEXT\_POSITION\_RIGHT:</span><br><span class="line">                canvas.drawText(text, width/<span class="number">2</span>, height/<span class="number">2</span> + textHeight/<span class="number">2</span>, mTextPaint);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>onDraw方法是我们必须要实现的一个方法，说简单一点，该方法就是用来画图的，怎么画呢？ 在onDraw方法中有一个参数Canvas，Canvas即画板，在该画板上画图，则会直接显示在界面上。我们来看看我们具体是怎么画的图。</p>
+<ol>
+<li>我们首先调用了super.onDraw(canvas)：其实分析到这里，我们可以知道，View的onDraw(Canvas canvas)方法中，什么工作也没有做，因此这段代码可以省去。</li>
+<li>在canvas画扇形，需要注意的是，我们同时利用mPiePaint来画扇形和边界，因此此时我们应该先将画笔设置的Style设置为Paint.Style.FILL。</li>
+<li>判断是否需要画边界，则画出边界</li>
+<li>判断是否需要画文字，如果需要，则画出文字。</li>
+</ol>
+<h3 id="四、触摸事件-gt-onTouchEvent"><a href="#四、触摸事件-gt-onTouchEvent" class="headerlink" title="四、触摸事件-&gt;onTouchEvent"></a>四、触摸事件-&gt;onTouchEvent</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTouchEvent</span><span class="params">(MotionEvent event)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (event.getAction()) &#123;</span><br><span class="line">        <span class="keyword">case</span> MotionEvent.ACTION_DOWN:</span><br><span class="line">            mUpdatingThread = <span class="keyword">new</span> UpdatingThread();</span><br><span class="line">            mUpdatingThread.start();;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> MotionEvent.ACTION_UP:</span><br><span class="line">            <span class="keyword">if</span>(mUpdatingThread!=<span class="keyword">null</span> &amp;&amp; mUpdatingThread.isAlive()) &#123;</span><br><span class="line">                mUpdatingThread.finish();;</span><br><span class="line">                mUpdatingThread.interrupt();;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">default</span>:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>触摸事件，我们只需要实现onTouchEvent就可以，需要注意的是，其中的返回值，如果返回true，那么说明此事件已经被View处理，不需要再分发，如果为false，则说明此事件还需要被其他的View处理。 在View的文档中提到，如果说我们要处理点击事件的话，最好的方法不是覆写onTouchEvent方法，而是覆写performClick()方法，可以获得以下的好处：</p>
+<ul>
+<li>obeying click sound preferences</li>
+<li>dispatching OnClickListener calls</li>
+<li>handling <code>[ACTION_CLICK](http://developer.android.com/reference/android/view/accessibility/AccessibilityNodeInfo.html#ACTION_CLICK)</code> when accessibility features are enabled</li>
+</ul>
+<p>我们这里要处理一直按下的状态，当按下的时候，数字每1s加一，当松手的时候停止，因此我们设计的逻辑是，当按下的时候，启动一个线程处理，松手的时候，停止该线程即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="class"><span class="keyword">class</span> <span class="title">UpdatingThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> isRunning = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (!Thread.interrupted() &amp;&amp;isRunning) &#123;</span><br><span class="line">            <span class="keyword">if</span> (mProgress &lt; mMax) &#123;</span><br><span class="line">                ProgressPie.<span class="keyword">this</span>.post(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                        ProgressPie.<span class="keyword">this</span>.setProgress(++mProgress);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                <span class="comment">//e.printStackTrace();;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">finish</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        isRunning = <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>需要注意的是，为了访问UI线程的空间，我们使用了View的post(Runnable runnable)方法。 好了，各个部分就是这样，具体的详细代码可以参考： <a href="https://github.com/happyhls/AndroidDemo/blob/master/app/src/main/java/me/happyhls/androiddemo/view/ProgressPie.java" target="_blank" rel="noopener">https://github.com/happyhls/AndroidDemo/blob/master/app/src/main/java/me/happyhls/androiddemo/view/ProgressPie.java</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/自定义View/" rel="tag"># 自定义View</a>
+          
+            <a href="/tags/onMeasure/" rel="tag"># onMeasure</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/29/android-documents-intents-and-intentfilters/" rel="next" title="App Components : Intents and Intent Filters (译)">
+                <i class="fa fa-chevron-left"></i> App Components : Intents and Intent Filters (译)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/12/09/android-custom-view-2-composition/" rel="prev" title="自定义View：2、组合视图">
+                自定义View：2、组合视图 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#资源文件"><span class="nav-number">1.</span> <span class="nav-text">资源文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ProgressPie-java"><span class="nav-number">2.</span> <span class="nav-text">ProgressPie.java</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一：初始化-gt-构造函数"><span class="nav-number">2.1.</span> <span class="nav-text">一：初始化-&gt;构造函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#二：测量-gt-onMeasure"><span class="nav-number">2.2.</span> <span class="nav-text">二：测量-&gt;onMeasure</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三、画图-gt-onDraw"><span class="nav-number">2.3.</span> <span class="nav-text">三、画图-&gt;onDraw</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四、触摸事件-gt-onTouchEvent"><span class="nav-number">2.4.</span> <span class="nav-text">四、触摸事件-&gt;onTouchEvent</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

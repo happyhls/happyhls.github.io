@@ -1,0 +1,1742 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Fresco学习笔记Fresco是Facebook出品的一款比较新的图片库，相比 Volley 或者 Picasso 具有很多优点，这篇文章主要是记录如何学习使用Fresco。 内容主要来自： http://fresco-cn.org/docs/getting-started.html  配置和使用引用Gradle添加lib dependencies { compile &amp;apos;com.fac">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fresco学习笔记">
+<meta property="og:url" content="http://yoursite.com/2015/08/03/android-fresco-notes/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Fresco学习笔记Fresco是Facebook出品的一款比较新的图片库，相比 Volley 或者 Picasso 具有很多优点，这篇文章主要是记录如何学习使用Fresco。 内容主要来自： http://fresco-cn.org/docs/getting-started.html  配置和使用引用Gradle添加lib dependencies { compile &amp;apos;com.fac">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="https://www.fresco-cn.org/static/imagepipeline.png">
+<meta property="og:updated_time" content="2018-10-03T15:06:48.238Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fresco学习笔记">
+<meta name="twitter:description" content="Fresco学习笔记Fresco是Facebook出品的一款比较新的图片库，相比 Volley 或者 Picasso 具有很多优点，这篇文章主要是记录如何学习使用Fresco。 内容主要来自： http://fresco-cn.org/docs/getting-started.html  配置和使用引用Gradle添加lib dependencies { compile &amp;apos;com.fac">
+<meta name="twitter:image" content="https://www.fresco-cn.org/static/imagepipeline.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2015/08/03/android-fresco-notes/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Fresco学习笔记 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/08/03/android-fresco-notes/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Fresco学习笔记
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2015-08-03 16:58:10" itemprop="dateCreated datePublished" datetime="2015-08-03T16:58:10+08:00">2015-08-03</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 23:06:48" itemprop="dateModified" datetime="2018-10-03T23:06:48+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Fresco/" itemprop="url" rel="index"><span itemprop="name">Fresco</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Fresco学习笔记"><a href="#Fresco学习笔记" class="headerlink" title="Fresco学习笔记"></a>Fresco学习笔记</h1><p><strong>Fresco</strong>是Facebook出品的一款比较新的图片库，相比 <strong>Volley</strong> 或者 <strong>Picasso</strong> 具有很多优点，这篇文章主要是记录如何学习使用Fresco。 内容主要来自： <a href="http://fresco-cn.org/docs/getting-started.html#_" target="_blank" rel="noopener">http://fresco-cn.org/docs/getting-started.html</a></p>
+<hr>
+<h1 id="配置和使用"><a href="#配置和使用" class="headerlink" title="配置和使用"></a>配置和使用</h1><h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p>Gradle添加lib</p>
+<pre><code>dependencies { compile &apos;com.facebook.fresco:fresco:0.5.0+&apos;}
+</code></pre><h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="网络权限"><a href="#网络权限" class="headerlink" title="网络权限"></a>网络权限</h3><h3 id="初始化Fresco"><a href="#初始化Fresco" class="headerlink" title="初始化Fresco"></a>初始化Fresco</h3><p>注意，初始化Fresco的代码必须位于setContentView(ResourceId)代码调用之前。</p>
+<pre><code>Fresco.initialize(context);
+</code></pre><h3 id="xml布局文件命名空间"><a href="#xml布局文件命名空间" class="headerlink" title="xml布局文件命名空间"></a>xml布局文件命名空间</h3><h3 id="使用SimpleDraweeView"><a href="#使用SimpleDraweeView" class="headerlink" title="使用SimpleDraweeView"></a>使用SimpleDraweeView</h3><p>需要注意的是，Fresco的layout_width/height必须要设置，但不能使用wrap_content来根据图片自动调整布局大小，但根据layout_weight属性均分的时候，可以使用wrap_content属性。</p>
+<h3 id="加载图片"><a href="#加载图片" class="headerlink" title="加载图片"></a>加载图片</h3><pre><code>Uri uri = Uri.parse(&quot;https://raw.githubusercontent.com/facebook/fresco/gh-pages/static/fresco-logo.png&quot;);
+SimpleDraweeView draweeView = (SimpleDraweeView) findViewById(R.id.my_image_view);
+draweeView.setImageURI(uri);
+</code></pre><h3 id="剩余的工作，Fresco完成"><a href="#剩余的工作，Fresco完成" class="headerlink" title="剩余的工作，Fresco完成"></a>剩余的工作，Fresco完成</h3><ul>
+<li>显示占位图直到加载完成</li>
+<li>下载图片</li>
+<li>缓存图片</li>
+<li>图片不再显示时，从内存中移除</li>
+</ul>
+<h2 id="几个概念"><a href="#几个概念" class="headerlink" title="几个概念"></a>几个概念</h2><h3 id="Drawees"><a href="#Drawees" class="headerlink" title="Drawees"></a>Drawees</h3><p>Drawees负责图片的显示、包括几个组件，组织上类似MVC架构。</p>
+<h4 id="DraweeView"><a href="#DraweeView" class="headerlink" title="DraweeView"></a>DraweeView</h4><p>继承自View，负责图片的显示。（需要注意的是，Fresco并没有使用自定义View，而使用了View来显示图片） 一般情况下，使用SimpleDraweeView即可。</p>
+<h4 id="DraweeHierarchy"><a href="#DraweeHierarchy" class="headerlink" title="DraweeHierarchy"></a>DraweeHierarchy</h4><p>DraweeHierarchy用于组织和维护Draweeable对象，相比于MVC中的Module，需要在Java代码中自定义图片的显示，可通过该类实现。</p>
+<h4 id="DraweeController"><a href="#DraweeController" class="headerlink" title="DraweeController"></a>DraweeController</h4><p>DraweeController负责和image loader交互(默认情况下使用Fresco的image pipeline)，可创建一个该类的实例，用于实现对图片的更多的控制。</p>
+<h4 id="DraweeControllerBuilder"><a href="#DraweeControllerBuilder" class="headerlink" title="DraweeControllerBuilder"></a>DraweeControllerBuilder</h4><p>DraweeControllers由DraweeControllerBuilder采用Builder构建者模式创建，immutable。</p>
+<h4 id="Liseners"><a href="#Liseners" class="headerlink" title="Liseners"></a>Liseners</h4><p>builder的作用之一就是，当图片从服务器下载时，在某些状态时刻设置需要执行的代码。</p>
+<h3 id="Image-Pipeline"><a href="#Image-Pipeline" class="headerlink" title="Image Pipeline"></a>Image Pipeline</h3><p>Fraesco使用image pipeline来处理图片获取的过程，包括从网络、本地文件、content provider、本地资源中获取，Image pipeline在本地磁盘中保存了一份压缩的图片缓存，在RAM中一份未压缩的图片。 Image pipeline使用特定的技术 <em>pinned purgeables</em> 来在Java heap之外保存图片，这也要求在图片使用完成之后要关闭 <em>close</em> 图片。 <strong>SimpleDraweeView</strong>自动处理这一过程，大部分情况下可以满足我们的使用需求。</p>
+<h2 id="支持的URI"><a href="#支持的URI" class="headerlink" title="支持的URI"></a>支持的URI</h2><p>Fresco <strong>不支持</strong> <strong>相对路径的</strong> URI，因此所有的URI在使用的时候指定绝对路径，包括scheme。 Fresco支持的URI包括：</p>
+<p>Type</p>
+<p>Scheme</p>
+<p>Fetch method used</p>
+<p>File on network</p>
+<p>http://, https://</p>
+<p>HttpURLConnection or <em>network layer</em></p>
+<p>File on device</p>
+<p>file://</p>
+<p>FileInputStream</p>
+<p>Content Provider</p>
+<p>content://</p>
+<p>ContentResolver</p>
+<p>Asset in app</p>
+<p>asset://</p>
+<p>AssetManager</p>
+<p>Resource in app</p>
+<p>res://</p>
+<p>Resource.openRawResource</p>
+<p><strong>注意：</strong>image pipeline仅仅支持图片资源，比如PNG图片格式，并未支持其他的比如String或者XML Drawable等。其中可能困惑的就是使用 <strong>XML</strong> 声明的Drawable，比如ShapeDraable，需要注意的是，ShapeDrawable也并非图片。如果必须要在Fresco中使用XML Drawable，可以将XML drawable指定为 <strong>placeholder</strong>，并指定uri为 <strong>null</strong>.</p>
+<h1 id="Drawee"><a href="#Drawee" class="headerlink" title="Drawee"></a>Drawee</h1><h3 id="在XML中使用Drawees"><a href="#在XML中使用Drawees" class="headerlink" title="在XML中使用Drawees"></a>在XML中使用Drawees</h3><p>xml中支持的可配置属性</p>
+<h4 id="wrap-content"><a href="#wrap-content" class="headerlink" title="wrap_content"></a>wrap_content</h4><p>需要注意的是，必须为Drawees指定layout_width和layout_height，但Drawees不支持wrap_content属性。原因是：占位图和所下载的图像可能大小并不一致，如果不一致，那么下载完成之后，若为warp_content，那么View将会重新layout，改变大小和位置，导致界面跳跃。（其他的Picasso和Volley是怎么处理的？是默认使用placeholder的大小吗？）</p>
+<h4 id="固定宽高比"><a href="#固定宽高比" class="headerlink" title="固定宽高比"></a>固定宽高比</h4><p>如果需要设置固定的宽和高的比例，比如4：3，那么则在XML中，指定width，height设定为warp_content。在代码中指定比例，如下：</p>
+<pre><code>mSimpleDraweeView.setAspectRatio(1.33f);
+</code></pre><h3 id="Java中使用Drawee"><a href="#Java中使用Drawee" class="headerlink" title="Java中使用Drawee"></a>Java中使用Drawee</h3><h4 id="更改图片大小"><a href="#更改图片大小" class="headerlink" title="更改图片大小"></a>更改图片大小</h4><p>最简单的方法是，setImageURI即可。</p>
+<pre><code>mSimpleDraweeView.setImageURI(uri);
+</code></pre><p>如果需要更加复杂的效果，可使用controller builder.</p>
+<h4 id="自定义Hierarchy"><a href="#自定义Hierarchy" class="headerlink" title="自定义Hierarchy"></a>自定义Hierarchy</h4><p>在一般情况下，XML中的配置参数可满足对hierarchy参数设置的需求，但有的时候，用户可能有更多的需求： 首先创建一个hierarchy builder的实例，然后构建hierarchy并传递给Drawee。</p>
+<pre><code>List  backgroundsList;
+List  overlaysList;
+// 创建Hierarchy Builder
+GenericDraweeHierarchyBuilder builder =
+    new GenericDraweeHierarchyBuilder(getResources());
+// 创建Hierarchy
+GenericDraweeHierarchy hierarchy = builder
+    .setFadeDuration(300)
+    .setPlaceholderImage(new MyCustomDrawable())
+    .setBackgrounds(backgroundList)
+    .setOverlays(overlaysList)
+    .build();
+// 设置给DraweeView
+mSimpleDraweeView.setHierarchy(hierarchy);
+</code></pre><p>需要注意的是，对于同一个View，不要调用超过1次的setHierarchy方法，即使该view已经被回收也不可以。 Hierarchy的创建是 <strong>耗时</strong> 的，因此要注意重复利用而不是反复创建。 需要更改显示的图片可通过调用<code>setController</code>或者<code>setImageURI</code>来实现。</p>
+<h4 id="修改Hierarchy的配置"><a href="#修改Hierarchy的配置" class="headerlink" title="修改Hierarchy的配置"></a>修改Hierarchy的配置</h4><p>Hierarchy中的配置可在运行期间进行多次修改，调用下列代码获取Hierarchy</p>
+<pre><code>GenericDraweeHierarchy hierarchy = mSimpleDraweeView.getHierarchy();
+</code></pre><h5 id="修改placeholder"><a href="#修改placeholder" class="headerlink" title="修改placeholder"></a>修改placeholder</h5><pre><code>hierarchy.setPlaceholderImage(R.drawable.placeholderId);
+
+Drawable drawable; 
+// create your drawable
+hierarchy.setPlaceholderImage(drawable);
+</code></pre><h5 id="修改图片"><a href="#修改图片" class="headerlink" title="修改图片"></a>修改图片</h5><p><strong>修改图片缩放方式</strong></p>
+<pre><code>hierarchy.setActualImageScaleType(ScalingUtils.ScaleType.CENTER_INSIDE);
+</code></pre><p>如果设置的缩放方式为 <code>focusCrop</code> , 那么需要设置焦点：</p>
+<pre><code>hierarchy.setActualImageFocusPoint(point);
+</code></pre><p><strong>给图片添加Color Filer</strong></p>
+<pre><code>ColorFilter filter;
+// create your filter
+hierarchy.setActualImageColorFilter(filter);
+</code></pre><h5 id="设置Rounding"><a href="#设置Rounding" class="headerlink" title="设置Rounding"></a>设置Rounding</h5><pre><code>RoundingParams roundingParams = hierarchy.getRoundingParams();
+roundingParams.setCornersRadius(10);
+hierarchy.setRoundingParams(roundingParams);
+</code></pre><h3 id="Drawee-Components"><a href="#Drawee-Components" class="headerlink" title="Drawee Components"></a>Drawee Components</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><p>Drawees中，除了真实的需要显示的图片之外，其他的属性均可通过XML进行配置，在XML中配置的属性，必须为Android drawable或者color资源。 这些属性也可通过GenericDraweeHierarchyBuilder在程序中进行配置，如果在程序中配置，那么配置的资源必须为Drawable的子类。 有些属性可以在程序运行中实时配置，这些拥有可配置的属性都在GenericDraweeHierarchy类中拥有对应的方法。</p>
+<h4 id="Actual"><a href="#Actual" class="headerlink" title="Actual"></a>Actual</h4><p>Actual即对应的需要显示的图片，使用URI指定，可为网络资源、本地文件、本地资源或者content provider。 Actual为controller的属性而不是hierarchy的属性。因此在一个Drawee中配置的Actual不会出现在其他的Drawee中。 可使用setImageURI来设置图片或者通过设置controller来设置。 除了sclale类型之外，hierarchy还公开了设置Acutal图片的其他的方法：</p>
+<ul>
+<li>focus point，当设置scale type为focuesCrop时有效</li>
+<li>color filter</li>
+<li>默认的scale type为：centerCrop</li>
+</ul>
+<h4 id="Placeholder"><a href="#Placeholder" class="headerlink" title="Placeholder"></a>Placeholder</h4><p>当Drawee出现在界面的时候，会首先显示 <em>placeholder</em> ，当调用 <code>setControlelr</code> 或者 <code>setImageURI</code> 设置Drawee显示的图像之后， <em>placeholder</em> 仍会显示直至图片加载完成。如果加载的图片为渐进式JPEG（progressive JPEG），可设置JPEG的清晰度阈值，当清晰度满足条件之后，则placeholder不再显示。</p>
+<ul>
+<li>XML属性：placeholderImage</li>
+<li>Hierarchy builder方法：setPlaceholderImage</li>
+<li>Hierarchy方法：setPlaceholderImage</li>
+<li>默认值：transparent ColorDrawable</li>
+<li>默认sclale方式：centerInside</li>
+</ul>
+<h4 id="Failure"><a href="#Failure" class="headerlink" title="Failure"></a>Failure</h4><p>加载失败的时候，显示Failure</p>
+<ul>
+<li>XML属性：failureImage</li>
+<li>Hierarchy builder方法：setFailureImage</li>
+<li>默认值：*placeholder image*</li>
+<li>默认sclale方式：centerInside</li>
+</ul>
+<h4 id="Retry"><a href="#Retry" class="headerlink" title="Retry"></a>Retry</h4><p>当图片下载失败，且对应的controller设置 <strong>enable tap-to-retry</strong> 属性之后。 必须在 <strong>build your own Controller</strong> 中设置tap-to-retry属性： <code>setTapToRetryEnabled(true)</code> image piple会在用户点击之后重试，最高可重试4次。</p>
+<ul>
+<li>XML属性：retryImage</li>
+<li>Hierarchy builder方法：setRetryImage</li>
+<li>默认值：*placeholder image*</li>
+<li>默认sclale方式：centerInside</li>
+</ul>
+<h4 id="Progress-Bar"><a href="#Progress-Bar" class="headerlink" title="Progress Bar"></a>Progress Bar</h4><p>如果设置该属性，则会在Drawee之上显示一层overlay，直至最终的图片加载完成。</p>
+<ul>
+<li>XML属性：progressBarImage</li>
+<li>Hierarchy builder方法：setProgressBarImage</li>
+<li>默认值：*placeholder image*</li>
+<li>默认sclale方式：centerInside</li>
+</ul>
+<h4 id="Backgrounds"><a href="#Backgrounds" class="headerlink" title="Backgrounds"></a>Backgrounds</h4><p>Background会首先绘制，在hierarchy其余层次之下。 在XML中仅仅可以指定一个Background，但是在Java代码中可以指定多个，这种情况下，则会将第一绘制在地下，然后绘制剩下的Background。 Backgound images不支持scale-types，并且自动缩放至Drawee的尺寸。</p>
+<ul>
+<li>XML属性：backgroundImage</li>
+<li>Hierarchy builder方法：setBackground、setBackgrounds</li>
+<li>默认值：None</li>
+<li>默认sclale方式：N/A</li>
+</ul>
+<h4 id="Overlays"><a href="#Overlays" class="headerlink" title="Overlays"></a>Overlays</h4><p>Overlays会最后绘制，在hierarchy其余层次之上。 在XML中仅仅可以指定一个Overlay，但是在Java代码中可以指定多个，这种情况下，则会将第一绘制在地下，然后绘制剩下的Overlay。 Overlay images不支持scale-types，并且自动缩放至Drawee的尺寸。</p>
+<ul>
+<li>XML属性：overlayImage</li>
+<li>Hierarchy builder方法：setOverlay、setOverlays</li>
+<li>默认值：None</li>
+<li>默认sclale方式：N/A</li>
+</ul>
+<h4 id="Pressed-State-Overlay"><a href="#Pressed-State-Overlay" class="headerlink" title="Pressed State Overlay"></a>Pressed State Overlay</h4><p>如果指定Pressed State Overlay，那么在用户点击Drawee区域之后，则会显示对应的Overlay。比如，Drawee在显示一个button图片，overlay可以用于在用户点击之后改变button的颜色。 不支持scale-types。</p>
+<ul>
+<li>XML属性：pressedStateOverlayImage</li>
+<li>Hierarchy builder方法：setPressedStateOverlay</li>
+<li>默认值：None</li>
+<li>默认sclale方式：N/A</li>
+</ul>
+<h2 id="Progress-Bars"><a href="#Progress-Bars" class="headerlink" title="Progress Bars"></a>Progress Bars</h2><p>在应用程序中，最简单的使用progress bar的方式是在构建hierarchy的时候使用ProgressBarDrawable。</p>
+<pre><code>.setProgressBarImage(new ProgressBarDrawable())
+</code></pre><p>通过该操作可在Drawee下面显示一个黑色蓝角的progress bar。</p>
+<h3 id="定义自己的progress-bar"><a href="#定义自己的progress-bar" class="headerlink" title="定义自己的progress bar"></a>定义自己的progress bar</h3><p>如果我们需要定义自己的progress bar，需要 <strong>注意</strong> 的是 <strong>为了当加载的时候，progress能够动态变化，需要覆写Drawable.onLevelChange方法</strong></p>
+<pre><code>class CustomProgressBar extends Drawable {
+   @Override
+   protected void onLevelChange(int level) {
+     // level is on a scale of 0-10,000
+     // where 10,000 means fully downloaded
+
+     // your app&apos;s logic to change the drawable&apos;s
+     // appearance here based on progress
+   }
+}
+</code></pre><h2 id="Scaling"><a href="#Scaling" class="headerlink" title="Scaling"></a>Scaling</h2><h3 id="可用缩放类型"><a href="#可用缩放类型" class="headerlink" title="可用缩放类型"></a>可用缩放类型</h3><p>ScaleType</p>
+<p>Explanation</p>
+<p>center</p>
+<p>Center the image in the view, but perform no scaling.</p>
+<p>centerCrop</p>
+<p>Scales the image so that both dimensions will be greater than or equal to the corresponding dimension of the parent. One of width or height will fit exactly. The image is centered within parent’s bounds.</p>
+<p>focusCrop</p>
+<p>Same as centerCrop, but based around a caller-specified focus point instead of the center.</p>
+<p>centerInside</p>
+<p>Downscales the image so that it fits entirely inside the parent. Unlike <strong>fitCenter</strong>, no upscaling will be performed. Aspect ratio is preserved. The image is centered within parent’s bounds.</p>
+<p>fitCenter</p>
+<p>Scales the image so that it fits entirely inside the parent. One of width or height will fit exactly. Aspect ratio is preserved. The image is centered within the parent’s bounds.</p>
+<p>fitStart</p>
+<p>Scales the image so that it fits entirely inside the parent. One of width or height will fit exactly. Aspect ratio is preserved. The image is aligned to the top-left corner of the parent.</p>
+<p>fitEnd</p>
+<p>Scales the image so that it fits entirely inside the parent. One of width or height will fit exactly. Aspect ratio is preserved. The image is aligned to the bottom-right corner of the parent.</p>
+<p>fitXY</p>
+<p>Scales width and height independently, so that the image matches the parent exactly. Aspect ratio is not preserved.</p>
+<p>none</p>
+<p>Used for Android’s tile mode.</p>
+<p>以上的ScleType与Android中提供的Scale Type类似，但不同的是Fresco中不提供 <strong>matrix</strong>,然而Fresco中提供 <strong>focusCrop</strong>以实现更好的效果。</p>
+<h3 id="如何设置Scale-Type"><a href="#如何设置Scale-Type" class="headerlink" title="如何设置Scale Type"></a>如何设置Scale Type</h3><p>Actual, placeholder, retry和failure图片均可在XML中配置，使用方法为：<code>fresco:actualImageScaleType</code>，我们同样也可以在GenericDraweeHierachyBuilder类中使用代码设置。 即使在hierarchy设置之后，我们仍然可以通过GenericDraweeHierarchy来配置。 然而， <strong>不要使用</strong> <code>android:scaleType</code>属性，同样 <strong>不要使用</strong> <code>.setScaleType</code>方法，这两种方式对Drawees没有效果。</p>
+<h3 id="focusCrop"><a href="#focusCrop" class="headerlink" title="focusCrop"></a>focusCrop</h3><p>Android和Fresco均提供 <code>centerCrop</code>缩放类型，该类型很常用，但也会存在使用场景的尴尬时刻，比如图片的左上角为头像，则无法通过 <code>centerCrop</code>来获取。 通过设置focus point，我们可以设置获取图片的某些部分，比如我们设置focus point为图片的边上，比如(0.5f, 0f)，Fresco可以保证，无论怎样扩展，该focus point均可以显示。 Focus points使用相对坐标系统，(0f, 0f)为左上角，(1f, 1f)为右下角。 如果focus point设置为(0.5f, 0.5f)，那么则等于 <code>centerCrop</code>。 为了使用focus points，必须在XML中首先设置正确的scale type。</p>
+<pre><code>fresco:actualImageScaleType=&quot;focusCrop&quot;
+</code></pre><p>在Java代码中，必须程序 <strong>显式</strong> 设置正确的focus point。</p>
+<pre><code>PointF focusPoint;
+// your app populates the focus point
+mSimpleDraweeView
+    .getHierarchy()
+    .setActualImageFocusPoint(focusPoint);
+</code></pre><h2 id="Rounded-Corners-and-Circles-Edit-on-GitHub"><a href="#Rounded-Corners-and-Circles-Edit-on-GitHub" class="headerlink" title="Rounded Corners and Circles Edit on GitHub"></a>Rounded Corners and Circles Edit on GitHub</h2><p>在很多时候，APP需要图片有圆角或者是园。Drawee支持各种各样的变化，但不会引入由于复制bitmaps而引入的额外的内存开销。</p>
+<h3 id="图片可以以两种方式制作成圆角"><a href="#图片可以以两种方式制作成圆角" class="headerlink" title="图片可以以两种方式制作成圆角"></a>图片可以以两种方式制作成圆角</h3><ul>
+<li>circle，圆形，设置roundAsCircle为true</li>
+<li>如果图片是个直角，需要圆角，那么同时需要设置roundedCornerRadius。 图片是直角的情况下，支持为4个角分别设置4个不同的圆弧半径，但这种情况下只能在Java中设置而不是XML中设置。</li>
+</ul>
+<h3 id="怎么设置"><a href="#怎么设置" class="headerlink" title="怎么设置"></a>怎么设置</h3><p>图片可以通过两种方式来设置圆弧</p>
+<ul>
+<li>BITMAP_ONLY：使用一个shader来绘制图片以及圆角。这是默认的生成圆角的办法。这种方法在针对actual image和placeholder的时候有效。针对其他的，比如failure和retry的图片，不会生成圆角。此外，这种生成圆角的方式不支持动画效果。</li>
+<li>OVERLAY_COLOR ：通过生成一个solid color的overlay来生成圆角，由调用者指定。在这种情况下，Drawee的背景颜色应该设置为固定的，且与solid color同样。可在XML中设置 <code>roundWithOverlayColor</code>或者在Java代码中调用<code>setOverlayColr</code>方法来设置这种效果。 ###XML 通过在XML中配置此类属性，可以将设置传递给RoundingParams。</li>
+</ul>
+<p><code></code></p>
+<h3 id="Java代码"><a href="#Java代码" class="headerlink" title="Java代码"></a>Java代码</h3><p>当创建hierarchy的时候，我们可以传递一个RoundingParams的实例给GenericDraweeHierarchyBuilder：</p>
+<pre><code>RoundingParams roundingParams = RoundingParams.fromCornersRadius(7f);
+// alternatively use fromCornersRadii or asCircle
+roundingParams.setOverlayColor(R.color.green);
+genericDraweeHierarchyBuilder
+    .setRoundingParams(roundingParams);
+</code></pre><p>我们也可以在代码运行的时候修改大部分的rounding参数：</p>
+<pre><code>RoundingParams roundingParams = RoundingParams.fromCornersRadius(5f);
+roundingParams.setBorder(R.color.red, 1.0);
+roundingParams.setRoundAsCircle(true);
+mSimpleDraweeView.getHierarchy().setRoundingParams(roundingParams);
+</code></pre><h3 id="注意"><a href="#注意" class="headerlink" title="注意"></a>注意</h3><p>在使用BITMAP_ONLY（默认）情况下，有几种使用上的限制：</p>
+<ul>
+<li>并非所有的图片都会圆角处理，只有actual image和placeholder会被处理。当前Fresco的代码在修改支持对background进行处理。</li>
+<li>只有图片可转化为BitmapDrawable或者ColorDrawable可以被rounded处理。对NinePathDrawable、ShapeDrawable以及其他类似的Drawable不会被处理（无论是XML或者Java编程方式）</li>
+<li>动画不会被rounded。</li>
+<li>由于Android中BitmapShader的限制，如果image的大小无法覆盖住整个View，那么不会说不绘制任何东西，而是edges会被不断重复。一种变通的方法是设置不同的scale类型，比如centerCrop来保证整个View被覆盖住。</li>
+</ul>
+<p>OVERLAY_COLOR模式并没有上述限制，但由于其模仿实现rounded的思路是通过在image之上覆盖一层图层的方法实现，因此仅仅在Drawee的背景设置为固定的相同的颜色的时候，具有较好的效果。 Drawee原本拥有CLIPPING模式，但已经取消。 最后，这些问题都可通过设孩子一个临时bitmap的方式解决，但这会引入额外的性能负担，并不推荐。 因此，在Android平台上，没有一个完美的解决方案来实现绘制圆角。</p>
+<h2 id="使用ControllerBuilder"><a href="#使用ControllerBuilder" class="headerlink" title="使用ControllerBuilder"></a>使用ControllerBuilder</h2><p><strong>SimaleDraweeView</strong>可以通过两种方法指定图片，最简单的方式为setImageURI。 如果希望对Drawee拥有更加详细的控制，可以使用DraweeController。</p>
+<h3 id="构建DraweeController"><a href="#构建DraweeController" class="headerlink" title="构建DraweeController"></a>构建DraweeController</h3><p>将image request传递给一个PipelineDraweeControllerBuilder，并为Controller设置更加详尽的设置。</p>
+<pre><code>ControllerListener listener = new BaseControllerListener() {...}
+
+DraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setUri(uri)
+    .setTapToRetryEnabled(true)
+    .setOldController(mSimpleDraweeView.getController())
+    .setControllerListener(listener)
+    .build();
+
+mSimpleDraweeView.setController(controller);
+</code></pre><p><strong>注意</strong> 我们应当记住，当构建一个新的controller的时候，应当调用<code>setOldController</code>以避免不必要的内存开销。</p>
+<h3 id="自定义ImageRequest"><a href="#自定义ImageRequest" class="headerlink" title="自定义ImageRequest"></a>自定义ImageRequest</h3><p>在一些比较高级的应用场合，我们可能需要向pipeline传递一个ImageRequest，而不仅仅是一个URI。其中一个例子就是使用postprocessor。</p>
+<pre><code>Uri uri;
+Postprocessor myPostprocessor = new Postprocessor() { ... }
+ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+    .setPostprocessor(myPostprocessor)
+    .build();
+
+DraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setImageRequest(request)
+    .setOldController(mSimpleDraweeView.getController())
+    // other setters as you need
+    .build();
+</code></pre><h2 id="Progressive-JPEGs-渐进式JPEGs"><a href="#Progressive-JPEGs-渐进式JPEGs" class="headerlink" title="Progressive JPEGs 渐进式JPEGs"></a>Progressive JPEGs 渐进式JPEGs</h2><p>Fresco支持从网络上获取Progressive JPEGs。 渐进式JPEGs仅仅在从网络上获取的时候支持。本地的图片在一次解码中全部完成，因此并不需要这种需求。</p>
+<h3 id="构建image-request"><a href="#构建image-request" class="headerlink" title="构建image request"></a>构建image request</h3><p>如果需要Fresco支持渐进式JPEG，那么必须在配置image request的时候明确指定渲染此类型的image。</p>
+<pre><code>Uri uri;
+ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+    .setProgressiveRenderingEnabled(true)
+    .build();
+DraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setImageRequest(request)
+    .setOldController(mSimpleDraweeView.getController())
+    .build();
+mSimpleDraweeView.setController(controller);
+</code></pre><p>Fresco会考虑在以后的版本中，通过setImageURI支持渐进式JPEGs。</p>
+<h2 id="动画图像"><a href="#动画图像" class="headerlink" title="动画图像"></a>动画图像</h2><p>Fresco支持 <strong>GIF</strong> 动画和 <strong>WebP</strong> 格式的动画。 Fresco 在Android 2.3+ 版本上支持 <strong>WebP</strong> 以及 <strong>WebP extended</strong> 格式的图片，而此类格式在Android原生版本中并未支持。</p>
+<h3 id="自动播放动画"><a href="#自动播放动画" class="headerlink" title="自动播放动画"></a>自动播放动画</h3><p>如果希望当图片出现在屏幕上的时候立刻开始绘制，而当图片不显示的时候停止播放动画，可通过对image request进行配置实现：</p>
+<pre><code>Uri uri;
+DraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setUri(uri)
+    .setAutoPlayAnimations(true)
+    . // other setters
+    .build();
+mSimpleDraweeView.setController(controller);
+</code></pre><h3 id="手动控制播放"><a href="#手动控制播放" class="headerlink" title="手动控制播放"></a>手动控制播放</h3><p>如果希望手动控制播放，那么需要监听图片加载的过程。</p>
+<pre><code>ControllerListener controllerListener = new BaseControllerListener () {
+    @Override
+    public void onFinalImageSet(
+        String id,
+        @Nullable ImageInfo imageInfo,
+        @Nullable Animatable anim) {
+    if (anim != null) {
+      // app-specific logic to enable animation starting
+      anim.start();
+    }
+};
+
+Uri uri;
+DraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setUri(uri)
+    .setControllerListener(controllerListener)
+    // other setters
+    .build();
+mSimpleDraweeView.setController(controller);
+</code></pre><p>此外，controller暴露Animatable的接口。如果non-null，我们可通过该接口直接控制动画播放。</p>
+<pre><code>Animatable animatable = mSimpleDraweeView.getController().getAnimatable();
+if (animatable != null) {
+  animatable.start();
+  // later
+  animatable.stop();
+}
+</code></pre><h3 id="局限性"><a href="#局限性" class="headerlink" title="局限性"></a>局限性</h3><p>动画Animations不支持postprocessors功能。</p>
+<h2 id="Requesting-Multiple-Images-Multi-URI"><a href="#Requesting-Multiple-Images-Multi-URI" class="headerlink" title="Requesting Multiple Images (Multi-URI)"></a>Requesting Multiple Images (Multi-URI)</h2><p>这种方法要求我们实现自己的 <strong>image request</strong> , 主要有以下几种使用场景：</p>
+<h3 id="从低分辨率–-gt-高分辨率"><a href="#从低分辨率–-gt-高分辨率" class="headerlink" title="从低分辨率–&gt;高分辨率"></a>从低分辨率–&gt;高分辨率</h3><p>有的情况下，高分辨率的图片其体积较大，这个时候直接下载的话，就会导致图片很长时间无法显示，在这种情况下，可以先设置一个低分辨率的图片，然后当高分辨率的图片下载完成之后显示。</p>
+<pre><code>Uri lowResUri, highResUri;
+DraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setLowResImageRequest(ImageRequest.fromUri(lowResUri))
+    .setImageRequest(ImageRequest.fromUri(highResUri))
+    .setOldController(mSimpleDraweeView.getController())
+    .build();
+mSimpleDraweeView.setController(controller);
+</code></pre><h3 id="使用缩略预览图"><a href="#使用缩略预览图" class="headerlink" title="使用缩略预览图"></a>使用缩略预览图</h3><p><em>本选项仅供本地URI使用，且仅供JPEG图像使用</em> 如果JPEG图像在其EXIF元信息中保存了缩略图，那么image pioeline可以先返回该缩略图。那么我们的Drawee则会先显示缩略预览图，当完整的图片加载完成并成功解码之后，会更改为显示完整的图像。</p>
+<pre><code>Uri uri;
+ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+    .setLocalThumbnailPreviewsEnabled(true)
+    .build();
+
+DraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setImageRequest(request)
+    .setOldController(mSimpleDraweeView.getController())
+    .build();
+mSimpleDraweeView.setController(controller);
+</code></pre><h3 id="加载第一张下载成功的图片"><a href="#加载第一张下载成功的图片" class="headerlink" title="加载第一张下载成功的图片"></a>加载第一张下载成功的图片</h3><p>一般时候，一张图片仅仅对应一个URI，但有的场景也是例外的。 比如，我们可能拥有一张从Camera获取的已经上传过的图像。原始的图像直接上传的话，体积实在太大，因此需要首先将该图像压缩。在这种场景下，我们就可以先使用压缩的图像(local-downscaled-uri)，如果加载失败之后，则加载Camera原始图像(local-original-uri)，即使失败了，那么则尝试加载网络上的图像(network-uploaded-uri)。 正常情况下，image pipeline会首先从memory cache中搜索图像，然后是disk cache，再然后才是network或者其他的资源。我们可以使得pipeline首先搜索memory cache中所有的图像，而不是一次一次依次操作，只有在没有找到任何图片的时候，再从disk cache中进行搜索。如果仍然没有，则会继续发出其他的请求。 实现起来也很简单，仅仅需要创建一个image request的数组，然后传递给controller的builder。</p>
+<pre><code>Uri uri1, uri2;
+ImageRequest request = ImageRequest.fromUri(uri1);
+ImageRequest request2 = ImageRequest.fromUri(uri2);
+ImageRequest[] requests = { request1, request2 };
+
+DraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setFirstAvailableImageRequests(requests)
+    .setOldController(mSimpleDraweeView.getController())
+    .build();
+mSimpleDraweeView.setController(controller);
+</code></pre><p>以上的两个请求中，仅仅有一个图像可以得到显示，主要取决于哪张图片最先加载成功，无论是memory、disk或者network。pipeline会假设requests数组的顺序为用户所期待的搜索顺序。</p>
+<h3 id="指定自定义DataSource-Supplier"><a href="#指定自定义DataSource-Supplier" class="headerlink" title="指定自定义DataSource Supplier"></a>指定自定义DataSource Supplier</h3><p>为了更加灵活的使用，我们可以在构建Drawee controller的时候，为Drawee controller指定一个自定义的DataSource Supplier。我们可以自定义一个DataSource Supplier或者是组合一些已经有的实现。可以参考 FirstAvailableDataSourceSupplier和InscreasingQualityDataSourceSupplier作为例子。参考AbastractDraweeControllerBuilder来参考怎么组合不同的DataSource Supplier。</p>
+<h2 id="监听Downloads-Events"><a href="#监听Downloads-Events" class="headerlink" title="监听Downloads Events"></a>监听Downloads Events</h2><p><strong>原因</strong> 当图片下载完成的时候，我们可能需要执行一些特殊的操作：比如，显示其他的图片，显示标题等等；或者说当网络故障，提示用户等等。 图片的加载是异步进行的，所以需要额外的操作来监听DraweeController发布的events事件，其原理就是controller listener。 <strong>注意</strong> 此处不允许对图片本上进行修改，如果需要对图片本身进行修改，使用Postprocessor即可。</p>
+<h3 id="使用-1"><a href="#使用-1" class="headerlink" title="使用"></a>使用</h3><p>使用很简单，只要实现ControllerListener接口即可，我们建议集成BaseControllerListener来实现。</p>
+<pre><code>ControllerListener controllerListener = new BaseControllerListener () {
+    @Override
+    public void onFinalImageSet(
+        String id,
+        @Nullable ImageInfo imageInfo,
+        @Nullable Animatable anim) {
+      if (imageInfo == null) {
+        return;
+      }
+      QualityInfo qualityInfo = imageInfo.getQualityInfo();
+      FLog.d(&quot;Final image received! &quot; + 
+          &quot;Size %d x %d&quot;,
+          &quot;Quality level %d, good enough: %s, full quality: %s&quot;,
+          imageInfo.getWidth(),
+          imageInfo.getHeight(),
+          qualityInfo.getQuality(),
+          qualityInfo.isOfGoodEnoughQuality(),
+          qualityInfo.isOfFullQuality());
+    }
+
+    @Override 
+    public void onIntermediateImageSet(String id, @Nullable ImageInfo imageInfo) {
+      FLog.d(&quot;Intermediate image received&quot;);
+    }
+
+    @Override
+    public void onFailure(String id, Throwable throwable) {
+      FLog.e(getClass(), throwable, &quot;Error loading %s&quot;, id)
+    }
+};
+
+Uri uri;
+DraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setControllerListener(controllerListener)
+    .setUri(uri);
+    // other setters
+    .build();
+mSimpleDraweeView.setController(controller);
+</code></pre><p><code>onFinalImageSet</code> or <code>onFailure</code> 对于所有的image加载工作都会起作用。 对于渐进式JPEG，如果允许渐进显示，那么每次解码之后，都会调用<code>onIntermediateImageSet</code>方法。</p>
+<h2 id="Resizing-and-Rotating"><a href="#Resizing-and-Rotating" class="headerlink" title="Resizing and Rotating"></a>Resizing and Rotating</h2><p>调整大小、旋转是图像显示中经常使用的功能，要实现功能，需要手工直接指定image request。</p>
+<h3 id="Resizing-Images"><a href="#Resizing-Images" class="headerlink" title="Resizing Images"></a>Resizing Images</h3><h4 id="Resizing-VS-Scaling"><a href="#Resizing-VS-Scaling" class="headerlink" title="Resizing VS Scaling"></a>Resizing VS Scaling</h4><ul>
+<li>Resizing：是一种软件操作，在pipeline中执行，返回一个完整的拥有不同尺寸的新的图像。</li>
+<li>Scaling：是一种绘制操作，一般采用硬件加速。图像本身大小不变。</li>
+</ul>
+<p><strong>Resize和Scaling如何选择？</strong> Resizing并不经常使用，Scaling经常使用，即使在resizing中，也会使用Scaling。</p>
+<h4 id="Resizing在使用上有几个局限性："><a href="#Resizing在使用上有几个局限性：" class="headerlink" title="Resizing在使用上有几个局限性："></a>Resizing在使用上有几个局限性：</h4><ul>
+<li>Resizing不会返回比原始图像更大的image，Resizing操作只会使得图像更小。</li>
+<li>当前仅仅JPEG支持resized。</li>
+<li>对于图像的Resize的尺寸控制，仅仅有个大约的数字。图像无法调制大小至非常精确的尺寸，这就意味着，图像即使经过Resized，那么在显示的时候，也需要缩放才能使用View大小。</li>
+<li>仅仅支持一下的Resizing尺寸： N/8 with 1 &lt;= N &lt;= 8.</li>
+<li>Resize调整大小是纯软件操作，相比硬件加速的scaling，速度要慢很多。R</li>
+</ul>
+<p>相比之下，Scaling没有以上的局限。Scaling使用Android内置的缩放算法。在Android4.0以上的设备上可以使用GPU硬件加速。在大多数情况下，这也是最快以及最有效的将图片调整至合适尺寸的方法。为一的缺点是，如果图片的尺寸要远远大于界面的话，内存就浪费掉了。 那为什么还要使用Resizing呢？这是一种权衡。我们仅仅在图像的大小远大约View的大小，可以通过Resizing来节约内存的使用。一个具体的例子比如说，我们需要在1280*800（大约1MP）的分辨率上显示相机拍摄的一个8MP的相片。那么这个8MP的图像在ARGB排列的时候大约占据32MB的内存，如果将尺寸Resized，那么可以最低占用4MB的内存。 如果图像是从网络上获取的，在resizing之前，应当考虑能否从网络中获取对应大小尺寸的图像。如果服务器可以返回一个较小尺寸的图像，不要尝试获取8MP的图像。在开发中，要考虑使用者的数据流量消耗。除此之外，获取较小尺寸的图像，还可以节省内存存储空间和CPU时间。如果服务器无法返回一个合适较小尺寸的图片，或者正在使用本地图库，那么应该考虑resizing。除了这些情况之外，我们应当首先考虑使用Rescaling。如果需要Scale，仅仅需要设定SimpleDraweeView的layout_width/layout_height即可。</p>
+<h4 id="Resizing"><a href="#Resizing" class="headerlink" title="Resizing"></a>Resizing</h4><p>Resizing不会修改原先的文件，而是对内存中的图像进行解码。当前的Fresco仅仅支持JPEG调整尺寸。为ImageRequest传递ResizeOptions即可。</p>
+<pre><code>Uri uri = &quot;file:///mnt/sdcard/MyApp/myfile.jpg&quot;;
+int width = 50, height = 50;
+ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+    .setResizeOptions(new ResizeOptions(width, height))
+    .build();
+PipelineDraweeController controller = Fresco.newDraweeControllerBuilder()
+    .setOldController(mDraweeView.getController())
+    .setImageRequest(request)
+    .build();
+mSimpleDraweeView.setController(controller);
+</code></pre><h3 id="Auto-rotation"><a href="#Auto-rotation" class="headerlink" title="Auto-rotation"></a>Auto-rotation</h3><p>自动旋转</p>
+<pre><code>ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+    .setAutoRotateEnabled(true)
+    .build();
+// as above
+</code></pre><h2 id="对图像进行编辑"><a href="#对图像进行编辑" class="headerlink" title="对图像进行编辑"></a>对图像进行编辑</h2><h3 id="原因"><a href="#原因" class="headerlink" title="原因"></a>原因</h3><p>有些情况下，需要对从服务器或者本地获取的图片进行修改，最好的方法是使用Postprocessor，其中组好的实现方式是集成BasePostprocessor类。 例子：在图像上添加红色网：</p>
+<pre><code>Uri uri;
+Postprocessor redMeshPostprocessor = new BasePostprocessor() { 
+  @Override
+  public String getName() {
+    return &quot;redMeshPostprocessor&quot;;
+  }
+
+  @Override
+  public void process(Bitmap bitmap) {
+    for (int x = 0; x  &lt; bitmap.getWidth(); x+=2) {
+      for (int y = 0; y  &lt; bitmap.getHeight(); y+=2) {
+        bitmap.setPixel(x, y, Color.RED);
+      }
+    }
+  }
+}
+
+ImageRequest request = ImageRequestBuilder.newBuilderWithSource(uri)
+    .setPostprocessor(redMeshPostprocessor)
+    .build();
+
+PipelineDraweeController controller = (PipelineDraweeController) 
+    Fresco.newDraweeControllerBuilder()
+    .setImageRequest(request)
+    .setOldController(mSimpleDraweeView.getController())
+    // other setters as you need
+    .build();
+mSimpleDraweeView.setController(controller);
+</code></pre><h3 id="需要明确"><a href="#需要明确" class="headerlink" title="需要明确"></a>需要明确</h3><ul>
+<li>图像进入postprocessor得到修改，但需要注意的是，cache中的图像不会受到此处postprocessor的影响。在Android4.x及以下版本，修改后的图像与原图像一起保存在Java堆之外。</li>
+<li>为了每次都能够展现同样的编辑效果，使用的时候必须每次都指定postprocessor。对于不同请求的同一个图像，可以使用不同的postprocessor。</li>
+<li>动态图像不支持postprocessor</li>
+</ul>
+<h3 id="复制图像"><a href="#复制图像" class="headerlink" title="复制图像"></a>复制图像</h3><p>可能有些原因导致无法针对原图像直接编辑，如果这种情况下，<code>BasePostprocessor</code>拥有另外的方法签名已解决这个问题，此处例子展示了如何将bitmap做水平翻转。</p>
+<pre><code>@Override
+public void process(Bitmap destBitmap, Bitmap sourceBitmap) {
+  for (int x = 0; x  &lt; destBitmap.getWidth(); x++) {
+    for (int y = 0; y  &lt; destBitmap.getHeight(); y++) {
+      destBitmap.setPixel(destBitmap.getWidth() - x, y, sourceBitmap.getPixel(x, y));
+    }
+  }
+}
+</code></pre><p>原图像与目标图像大小完全一样。 <strong>注意：</strong></p>
+<ul>
+<li>不要修改元sourceBitmap，在以后的版本中，如果将sourceBitmap进行修改将会抛出异常。</li>
+<li>不要保存对任一个bitmap对象的引用，此处的bitmap对象均由pipeline管理，destBitmap生命周期与Drawee或者DataSource同样。</li>
+</ul>
+<h3 id="复制图像，且图像尺寸不一致"><a href="#复制图像，且图像尺寸不一致" class="headerlink" title="复制图像，且图像尺寸不一致"></a>复制图像，且图像尺寸不一致</h3><p>如果postprocessed图像需要一个不一样尺寸的图像，此处有第三个方法签名：使用PlatformBitmapFacotry类来安全的创建一个保存在Java heap之外的自定义尺寸的Bitmap。 此处例子展示如何创建一个1/4尺寸的图像：</p>
+<pre><code>@Override
+public CloseableReference  process(
+    Bitmap sourceBitmap,
+    PlatformBitmapFactory bitmapFactory) {
+  CloseableReference  bitmapRef = bitmapFactory.createBitmap(
+      sourceBitmap.getWidth() / 2,
+      sourceBitmap.getHeight() / 2);
+  try {
+    Bitmap destBitmap = bitmapRef.get();
+     for (int x = 0; x  &lt; destBitmap.getWidth(); x+=2) {
+       for (int y = 0; y  &lt; destBitmap.getHeight(); y+=2) {
+         destBitmap.setPixel(x, y, sourceBitmap.getPixel(x, y));
+       }
+     }
+     return CloseableReference.cloneOrNull(bitmapRef);
+  } finally {
+    CloseableReference.closeSafely(bitmapRef);
+  } 
+}
+</code></pre><p>注意，必须遵守closeable reference的使用规范。 <strong>不要使用</strong> Android的Btimap.createBitmap的方法，此方法创建的图像保存在Java heap当中。</p>
+<h3 id="Which-to-override"><a href="#Which-to-override" class="headerlink" title="Which to override?"></a>Which to override?</h3><p>Do not override more than one of the three process methods. Doing so can produce unpredictable results.</p>
+<h3 id="Caching-postprocessed-images"><a href="#Caching-postprocessed-images" class="headerlink" title="Caching postprocessed images"></a>Caching postprocessed images</h3><p>可以将postprocess处理的图像进行保存，为了实现这个效果，自定义的postprocessor必须实现<code>getPostprocessorCacheKey</code>方法并且返回一个not null的值。 为了使得cache命中，在以后的request中的postprocessor必须为同样的类，并且返回同样的cache key。如果不是，那么将会覆盖之前生成的cache entry。</p>
+<pre><code>public class OperationPostprocessor extends BasePostprocessor {
+  private int myParameter;
+
+  public OperationPostprocessor(int param) {
+    myParameter = param;
+  }
+
+  public void process(Bitmap bitmap) { 
+    doSomething(myParameter);
+  }
+
+  public CacheKey getPostprocessorCacheKey() {
+    return new MyCacheKey(myParameter);
+  }
+}
+</code></pre><p>如果希望cache始终命中，则设置getPostprocessorCacheKey方法返回固定常量，如果不想使cache命中，则返回null即可。</p>
+<h3 id="Repeated-Postprocessors"><a href="#Repeated-Postprocessors" class="headerlink" title="Repeated Postprocessors"></a>Repeated Postprocessors</h3><p>可能需要对同一张图片重复处理多次。这种情况下，仅仅需要集成BaseRepeatedPostprocessor即可。 此处的例子允许对图片上的网格在任意时间变换颜色。</p>
+<pre><code>public class MeshPostprocessor extends BaseRepeatedPostprocessor { 
+  private int mColor = Color.TRANSPARENT;
+
+  public void setColor(int color) {
+    mColor = color;
+    update();
+  }
+
+  @Override
+  public String getName() {
+    return &quot;meshPostprocessor&quot;;
+  }
+
+  @Override
+  public void process(Bitmap bitmap) {
+    for (int x = 0; x  &lt; bitmap.getWidth(); x+=2) {
+      for (int y = 0; y  &lt; bitmap.getHeight(); y+=2) {
+        bitmap.setPixel(x, y, mColor);
+      }
+    }
+  }
+}
+MeshPostprocessor meshPostprocessor = new MeshPostprocessor();
+
+/// setPostprocessor as in above example
+
+meshPostprocessor.setColor(Color.RED);
+meshPostprocessor.setColor(Color.BLUE);
+</code></pre><p>需要注意的是，每一个image request仍然需要设置Postprocessor。</p>
+<h2 id="Image-Requests"><a href="#Image-Requests" class="headerlink" title="Image Requests"></a>Image Requests</h2><p>如果简单的通过Image URI设置图像，那么使用<code>ImageRequest.fromURI</code>方法即可，但如果需要更多的设置，则需要ImageRequestBuilder；</p>
+<pre><code>Uri uri;
+
+ImageDecodeOptions decodeOptions = ImageDecodeOptions.newBuilder()
+    .setBackgroundColor(Color.GREEN)
+    .build();
+
+ImageRequest request = ImageRequestBuilder
+    .newBuilderWithSource(uri)
+    .setAutoRotateEnabled(true)
+    .setLocalThumbnailPreviewsEnabled(true)
+    .setLowestPermittedRequestLevel(RequestLevel.FULL_FETCH)
+    .setProgressiveRenderingEnabled(false)
+    .setResizeOptions(new ResizeOptions(width, height))
+    .build();
+</code></pre><h3 id="Fields-in-ImageRequest"><a href="#Fields-in-ImageRequest" class="headerlink" title="Fields in ImageRequest"></a>Fields in ImageRequest</h3><p>Filed</p>
+<p>Description</p>
+<p>uri</p>
+<p>the only mandatory field. See Supported URIs.</p>
+<p>autoRotateEnabled</p>
+<p>whether to enable auto-rotation.</p>
+<p>progressiveEnabled</p>
+<p>whether to enable progressive loading.</p>
+<p>postprocessor</p>
+<p>component to postprocess the decoded image.</p>
+<p>resizeOptions</p>
+<p>desired width and height. Use with caution. See Resizing.</p>
+<h3 id="Lowest-Permitted-Request-Level"><a href="#Lowest-Permitted-Request-Level" class="headerlink" title="Lowest Permitted Request Level"></a>Lowest Permitted Request Level</h3><p>image pipeline根据确定的顺序查找图像</p>
+<ul>
+<li>Check the bitmap cache. This is nearly instant. If found, return.</li>
+<li>Check the encoded memory cache. If found, decode the image and return.</li>
+<li>Check the “disk” (local storage) cache. If found, load from disk, decode, and return.</li>
+<li>Go to the original file on network or local file. Download, resize and/or rotate if requested, decode, and return. For network images in particular, this will be the slowest by a long shot.</li>
+</ul>
+<p><code>setLowestPermittedRequestLevel</code>方法允许设置pipeline可以走多远，其数值为：</p>
+<ul>
+<li>BITMAP_MEMORY_CACHE</li>
+<li>ENCODED_MEMORY_CACHE</li>
+<li>DISK_CACHE</li>
+<li>FULL_FETCH</li>
+</ul>
+<h2 id="自定义View"><a href="#自定义View" class="headerlink" title="自定义View"></a>自定义View</h2><h3 id="DraweeHolders"><a href="#DraweeHolders" class="headerlink" title="DraweeHolders"></a>DraweeHolders</h3><p>总有时候DraweeViews无法满足我们的需求。比如我们可能需要在Image所在的View上添加额外的内容，我们可能需要在一个View中显示多个图片。Fresco提供了各种各样的类用于功能扩展：</p>
+<ul>
+<li>DraweeHolder -&gt; 单个图片</li>
+<li>MultiDraweeHolder -&gt; 多个图片</li>
+</ul>
+<h3 id="自定义View需要做的事情"><a href="#自定义View需要做的事情" class="headerlink" title="自定义View需要做的事情"></a>自定义View需要做的事情</h3><p>Android绘制View中的组件，且这些时间仅仅在Android系统内部调用，DraweeViews使用这些时间可以更好的管理内存，提高内存的高效使用。但我们使用holders的时候，必须手动实现其中的部分功能。</p>
+<h4 id="处理attach-detach事件"><a href="#处理attach-detach事件" class="headerlink" title="处理attach/detach事件"></a>处理attach/detach事件</h4><p><strong>如果不进行该操作，我们的自定义holder可能会出现内存泄露</strong> 当Android界面不再绘制图片的时候，图片也就没有在内存中保存的意义。Drawees通过监听detach事件来及时的释放内存。当Android重新绘制的时候，这些图片也会自动恢复以供显示。 这些操作在DraweeView中是自动处理的，但在自定义View中需要我们手动处理<strong>4个系统调用</strong>，并传递给DraweeHolder，下面为例子： <code>DraweeHolder mDraweeHolder; @Override public void onDetachedFromWindow() { super.onDetachedFromWindow(); mDraweeHolder.onDetach(); } @Override public void onStartTemporaryDetach() { super.onStartTemporaryDetach(); mDraweeHolder.onDetach(); } @Override public void onAttachedToWindow() { super.onAttachedToWindow(); mDraweeHolder.onAttach(); } @Override public void onFinishTemporaryDetach() { super.onFinishTemporaryDetach(); mDraweeHolder.onAttach(); }</code></p>
+<h4 id="处理touch-events"><a href="#处理touch-events" class="headerlink" title="处理touch events"></a>处理touch events</h4><p>如果我们在Drawee中允许tap-to-retry功能，那么需要监听屏幕的触摸事件。</p>
+<pre><code>@Override
+public boolean onTouchEvent(MotionEvent event) {
+  return mDraweeHolder.onTouchEvent(event) || super.onTouchEvent(event);
+}
+</code></pre><h4 id="定制onDraw"><a href="#定制onDraw" class="headerlink" title="定制onDraw"></a>定制onDraw</h4><p>我们必须调用以下代码<code>Drawable drawable = mDraweeHolder.getTopLevelDrawable(); drawable.setBounds(...);</code>否则Drawee不会显示在界面上。</p>
+<ul>
+<li>Do not downcast this Drawable.</li>
+<li>Do not translate it.</li>
+</ul>
+<h3 id="其他需要做的工作"><a href="#其他需要做的工作" class="headerlink" title="其他需要做的工作"></a>其他需要做的工作</h3><h4 id="设置Drawable-Callback"><a href="#设置Drawable-Callback" class="headerlink" title="设置Drawable.Callback"></a>设置Drawable.Callback</h4><pre><code>// When a holder is set to the view for the first time,
+// don&apos;t forget to set the callback to its top-level drawable:
+mDraweeHolder = ...
+mDraweeHolder.getTopLevelDrawable().setCallback(this);
+
+// In case the old holder is no longer needed,
+// don&apos;t forget to clear the callback from its top-level drawable:
+mDraweeHolder.getTopLevelDrawable().setCallback(null);
+mDraweeHolder = ...
+Override verifyDrawable:
+@Override
+protected boolean verifyDrawable(Drawable who) {
+  if (who == mDraweeHolder.getTopLevelDrawable()) {
+    return true;
+  }
+  // other logic for other Drawables in your view, if any
+}
+</code></pre><p>Make sure invalidateDrawable invalidates the region occupied by your Drawee.</p>
+<h3 id="Constructing-a-DraweeHolder"><a href="#Constructing-a-DraweeHolder" class="headerlink" title="Constructing a DraweeHolder"></a>Constructing a DraweeHolder</h3><h4 id="组织构造函数"><a href="#组织构造函数" class="headerlink" title="组织构造函数"></a>组织构造函数</h4><p>推荐构建函数如下安排：</p>
+<ul>
+<li>覆写View的全部3个构造函数</li>
+<li>每个构造函数中调用父类的构造方法，然后调用私有的init方法</li>
+<li>所有的初始化操作放在 init 方法中完成 这样做的初衷是：不要在一个构造方法中调用其他的构造方法。同时保证了无论调用哪个构造方法，其初始化顺序都是正确的。我们的holder在init方法中创建。</li>
+</ul>
+<h4 id="创建Holder"><a href="#创建Holder" class="headerlink" title="创建Holder"></a>创建Holder</h4><p>如果可能，总是在自定义View创建之后立刻创建Drawee。hierarchy的创建开销较大，因此最好仅仅操作一次。</p>
+<pre><code>class CustomView extends View {
+  DraweeHolder  mDraweeHolder;
+
+  // constructors following above pattern
+
+  private void init() {
+    GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(getResources());
+      .set...
+      .set...
+      .build();
+    mDraweeHolder = DraweeHolder.create(hierarchy, context);
+  }
+}
+</code></pre><h4 id="设置图片"><a href="#设置图片" class="headerlink" title="设置图片"></a>设置图片</h4><p>使用controller build实现，但要调用holder的setController方法而不是View中的方法。</p>
+<pre><code>DraweeController controller = Fresco.newControllerBuilder()
+    .setUri(uri)
+    .setOldController(mDraweeHolder.getController())
+    .build();
+mDraweeHolder.setController(controller);
+</code></pre><h3 id="MultiDraweeHolder"><a href="#MultiDraweeHolder" class="headerlink" title="MultiDraweeHolder"></a>MultiDraweeHolder</h3><pre><code>MultiDraweeHolder  mMultiDraweeHolder;
+
+private void init() {
+  GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(getResources());
+    .set...
+    .build();
+  mMultiDraweeHolder = new MultiDraweeHolder ();
+  mMultiDraweeHolder.add(new DraweeHolder (hierarchy, context));
+  // repeat for more hierarchies
+}
+</code></pre><p>其他与DraweeHolder类似。</p>
+<h2 id="一些陷阱"><a href="#一些陷阱" class="headerlink" title="一些陷阱"></a>一些陷阱</h2><h3 id="Don’t-use-ScrollViews"><a href="#Don’t-use-ScrollViews" class="headerlink" title="Don’t use ScrollViews"></a>Don’t use ScrollViews</h3><p>如果想要实现滑动一列图片的功能，要使用RecyclerView, ListView, or GridView.这些可以复用View，因此Fresco可以知道什么时候Drawee显示了，什么时候不显示了，但ScrollView无法实现，ScrollView会始终保持图像直至Fragment或者Activity销毁，因此如果使用ScrollView，那么程序更有可能遇到OOM的问题。</p>
+<h3 id="Don’t-downcast"><a href="#Don’t-downcast" class="headerlink" title="Don’t downcast"></a>Don’t downcast</h3><p>It is tempting to downcast objects returns by Fresco classes into actual objects that appear to give you greater control. At best, this will result in fragile code that gets broken next release; at worst, it will lead to very subtle bugs.</p>
+<h3 id="Don’t-use-getTopLevelDrawable"><a href="#Don’t-use-getTopLevelDrawable" class="headerlink" title="Don’t use getTopLevelDrawable"></a>Don’t use getTopLevelDrawable</h3><p>DraweeHierarchy.getTopLevelDrawable() should only be used by DraweeViews. Client code should almost never interact with it. The sole exception is custom views. Even there, the top-level drawable should never be downcast. We may change the actual type of the drawable in future releases.</p>
+<h3 id="Don’t-re-use-DraweeHierarchies"><a href="#Don’t-re-use-DraweeHierarchies" class="headerlink" title="Don’t re-use DraweeHierarchies"></a>Don’t re-use DraweeHierarchies</h3><p>Never call DraweeView.setHierarchy with the same argument on two different views. Hierarchies are made up of Drawables, and Drawables on Android cannot be shared among multiple views.</p>
+<h3 id="Don’t-use-Drawables-in-more-than-one-DraweeHierarchy"><a href="#Don’t-use-Drawables-in-more-than-one-DraweeHierarchy" class="headerlink" title="Don’t use Drawables in more than one DraweeHierarchy"></a>Don’t use Drawables in more than one DraweeHierarchy</h3><p>This is for the same reason as the above. Drawables cannot be shared in multiple views. You are completely free, of course, to use the same resourceID in multiple hierarchies and views. Android will create a separate instance of each Drawable for each view.</p>
+<h3 id="Don’t-set-images-directly-on-a-DraweeView"><a href="#Don’t-set-images-directly-on-a-DraweeView" class="headerlink" title="Don’t set images directly on a DraweeView"></a>Don’t set images directly on a DraweeView</h3><p>Currently DraweeView is a subclass of Android’s ImageView. This has various methods to set an image (such as setImageBitmap, setImageDrawable) If you set an image directly, you will completely lose your DraweeHierarchy, and will not get any results from the image pipeline.</p>
+<h3 id="Don’t-use-ImageView-attributes-or-methods-with-DraweeView"><a href="#Don’t-use-ImageView-attributes-or-methods-with-DraweeView" class="headerlink" title="Don’t use ImageView attributes or methods with DraweeView"></a>Don’t use ImageView attributes or methods with DraweeView</h3><p>Any XML attribute or method of ImageView not found in View will not work on a DraweeView. Typical cases are scaleType, src, etc. Don’t use those. DraweeView has its own counterparts as explained in the other sections of this documentation. Any ImageView attrribute or method will be removed in the upcoming release, so please don’t use those.</p>
+<h1 id="Image-Pipeline-1"><a href="#Image-Pipeline-1" class="headerlink" title="Image Pipeline"></a>Image Pipeline</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>流水线主要进行以下的操作： 1. 检查bitmap cache，如果存在，则返回。 2. 切换至其他的线程。 3. 检查memory cache，如果存在，则对图像解码、变换、返回，并保存至bitmap cache。 4. 检查disk cache。如果存在，则对图像解码、变换、返回，并保存至memory cache 和 bitmap cache。 5. 检查网络或者其他位置的资源，如果存在，则对图像解码、变换、返回，并保存至disk cache、memory cache 和 bitmap cache。 <img src="https://www.fresco-cn.org/static/imagepipeline.png" alt="Fresco Image Pipeline"> 上图中，’disk’ cache绘制在encode memory cache中来保持流程图正解。 流水线支持从本地文件、网络中获取。支持PNG、GIF、WebP、JPEG文件。</p>
+<h3 id="旧设备上支持WebP"><a href="#旧设备上支持WebP" class="headerlink" title="旧设备上支持WebP"></a>旧设备上支持WebP</h3><p>Android在3.0之后才支持WebP，Extended WebP在Android 4.1.2之后才支持。如果设备不支持WebP，image pipeline会将其转换为JPEG，这样就可以在Android2.3以上的系统中均可使用WebP。</p>
+<h2 id="配置Image-Pipeline"><a href="#配置Image-Pipeline" class="headerlink" title="配置Image Pipeline"></a>配置Image Pipeline</h2><p>大部分程序可通过 <code>Fresco.initialize(context)</code>来简单配置Fresco。 如果程序需要更加自定义的配置，可使用ImagePipelineConfig类。</p>
+<pre><code>ImagePipelineConfig config = ImagePipelineConfig.newBuilder(context)
+    .setBitmapMemoryCacheParamsSupplier(bitmapCacheParamsSupplier)
+    .setCacheKeyFactory(cacheKeyFactory)
+    .setEncodedMemoryCacheParamsSupplier(encodedCacheParamsSupplier)
+    .setExecutorSupplier(executorSupplier)
+    .setImageCacheStatsTracker(imageCacheStatsTracker)
+    .setMainDiskCacheConfig(mainDiskCacheConfig)
+    .setMemoryTrimmableRegistry(memoryTrimmableRegistry) 
+    .setNetworkFetchProducer(networkFetchProducer)
+    .setPoolFactory(poolFactory)
+    .setProgressiveJpegConfig(progressiveJpegConfig)
+    .setRequestListeners(requestListeners)
+    .setSmallImageDiskCacheConfig(smallImageDiskCacheConfig)
+    .build();
+Fresco.initialize(context, config);
+</code></pre><h3 id="理解Suppliers"><a href="#理解Suppliers" class="headerlink" title="理解Suppliers"></a>理解Suppliers</h3><p>在上述参数配置中，很多都配置对应的Supplier的实例，而不是对应的实例。这样看起来可能会麻烦些，但会带来更多的收益，我们可以在程序运行中动态切换Fresco的行为。比如Memory caches，可以每5分钟检查其Supplier。 如果不需要动态调整这些参数，那么可设置Supplier每次返回都一个实例。</p>
+<pre><code>Supplier  xSupplier = new Supplier () {
+  public X get() {
+    return new X(xparam1, xparam2...);
+  }
+);
+// when creating image pipeline
+.setXSupplier(xSupplier);
+</code></pre><h3 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h3><p>默认情况下，Image pipeline使用3个线程池。</p>
+<ul>
+<li>3个线程用于下载；</li>
+<li>2个线程用于所有的disk操作：本地文件读取、disk cache相关</li>
+<li>2个线程用于CPU敏感操作：decodes、transforms、后台操作</li>
+</ul>
+<p>可通过设置自己的network layer来自定义网络的行为。 对于其他的修改，可通过设置ExecutorSupplier完成。</p>
+<h3 id="使用MemoryTrimmableRegistry"><a href="#使用MemoryTrimmableRegistry" class="headerlink" title="使用MemoryTrimmableRegistry"></a>使用MemoryTrimmableRegistry</h3><p>如果我们的程序监听系统内存事件，那么可以将这些事件传递给Fresco以优化memory cache； 最简单的方法是覆写 <code>Avtivity.onTrimMemory</code>。也可以使用ComponmentCallbacks2的子类实现。 我们应当使用MemoryTrimableRegistry。该类用于保存MemoryTrimmable的实例-Fresco的cache也在其中。当接收到系统内存事件的时候，依次调用每个trimmable的MemoryTrimable方法。</p>
+<h3 id="配置memory-caches"><a href="#配置memory-caches" class="headerlink" title="配置memory caches"></a>配置memory caches</h3><p>bitmap cache以及解码memory cache使用MemoryCacheParams中的Supplier配置。</p>
+<h3 id="配置disk-cache"><a href="#配置disk-cache" class="headerlink" title="配置disk cache"></a>配置disk cache</h3><p>使用构造者模式创建DiskCacheConfig实例：</p>
+<pre><code>DiskCacheConfig diskCacheConfig = DiskCacheConfig.newBuilder()
+   .set....
+   .set....
+   .build()
+
+// when building ImagePipelineConfig
+.setMainDiskCacheConfig(diskCacheConfig)
+</code></pre><h3 id="追踪Cache统计信息"><a href="#追踪Cache统计信息" class="headerlink" title="追踪Cache统计信息"></a>追踪Cache统计信息</h3><p>If you want to keep track of metrics like the cache hit rate, you can implement the ImageCacheStatsTracker class. This provides callbacks for every cache event that you can use to keep your own statistics.</p>
+<h2 id="Caching"><a href="#Caching" class="headerlink" title="Caching"></a>Caching</h2><h3 id="总共三种Cache"><a href="#总共三种Cache" class="headerlink" title="总共三种Cache"></a>总共三种Cache</h3><h4 id="Bitmap-cache"><a href="#Bitmap-cache" class="headerlink" title="Bitmap cache"></a>Bitmap cache</h4><p>bitmap cache保存Android Bitmap对象。这里面的对象都已经解码完成，准备用于展示或者用于postprocess。 在Android 4.x或者更低的版本中，bitmap的cache数据放在ashmen heap，而不是Java heap中。这意味着这些图像并不需要运行额外的GC，避免降低app的运行速度。 Android 5.0中已经相比之前的版本对内存管理进行了很好的优化，所以将bitmap的cache数据放在Java heap中是合适的。 当app切换到背景之后，bitmap cache则会被清空。</p>
+<h4 id="Encoded-memory-cache"><a href="#Encoded-memory-cache" class="headerlink" title="Encoded memory cache"></a>Encoded memory cache</h4><p>此处Cache保存了原始的压缩的图像格式。此处的图像在展示之前必须首先解码才行。 如果需要其他的变换，比如resizing、rotating或者转码，那么这些操作在decode解码之前进行。 当app切换到背景之后，encoded memory cache也会被清空。</p>
+<h4 id="Disk-cache"><a href="#Disk-cache" class="headerlink" title="Disk cache"></a>Disk cache</h4><p>Disk cache即保存在local storage中的cache。 与Encoded Memory Cache一样，Disk cache中保存的也是压缩的图像，与encoded memory cache一样，图像在展示之前也必须解码。 与Bitmap cache/Encoded memory cache不同，在app切换到背景之后，Disk cache中的数据并不会被清空。用户可以在Android Setting界面中将这部分数据清除。</p>
+<h3 id="从cache中删除数据"><a href="#从cache中删除数据" class="headerlink" title="从cache中删除数据"></a>从cache中删除数据</h3><p>可以使用ImagePipeline中的方法从cache中清除单独的cache数据。</p>
+<pre><code>ImagePipeline imagePipeline = Fresco.getImagePipeline();
+Uri uri;
+imagePipeline.evictFromMemoryCache(uri);
+imagePipeline.evictFromDiskCache(uri);
+
+// combines above two lines
+imagePipeline.evictFromCache(uri);
+</code></pre><p><code>evictFromDiskCache(Uri)</code> 默认情况下假设使用的是默认的cache key factory。如果自定义了Cache Key，那么则需要调用 <code>evictFromDiskCache(ImageRequest)</code>方法。</p>
+<h3 id="清空cache"><a href="#清空cache" class="headerlink" title="清空cache"></a>清空cache</h3><pre><code>ImagePipeline imagePipeline = Fresco.getImagePipeline();
+imagePipeline.clearMemoryCaches();
+imagePipeline.clearDiskCaches();
+
+// combines above two lines
+imagePipeline.clearCaches();
+</code></pre><h3 id="使用一个disk-cache还是两个？"><a href="#使用一个disk-cache还是两个？" class="headerlink" title="使用一个disk cache还是两个？"></a>使用一个disk cache还是两个？</h3><p>大多数应用程序仅仅使用1个disk cache。但是在某些使用场景中，我们需要将尺寸的图片放在一个单独的cache中以避免由于cache中存放了过多的较大的尺寸的图片而迅速将cache填满，进而导致这小较小的图片从cache中被清楚。 为了实现这种思路，则在配置image pipeline中调用<code>setMainDiskCacheConfig</code>和<code>setSmallImageDiskCacheConfig</code>方法即可。 怎么定义什么叫small，小的图片？我们的程序自己定义，我们在构造一个image request的时候，设置其ImageType：</p>
+<pre><code>ImageRequest request = ImageRequest.newBuilderWithSourceUri(uri)
+    .setImageType(ImageType.SMALL)
+</code></pre><p>如果我们仅仅需要1个cache，那么我们应该避免调用<code>setSmallImageDiskCacheConfig</code>。在这种情况下，pipeline会默认使用同一个cache，设置的ImageType并不会起作用。</p>
+<h3 id="调整caches-Trimming-the-caches"><a href="#调整caches-Trimming-the-caches" class="headerlink" title="调整caches - Trimming the caches"></a>调整caches - Trimming the caches</h3><p>当配置image pipeline的时候，我们可以设置每一个cache的最大空间。但是在某些场景下，我们仍然希望降低cache所占的空间。 Fresco的cache实现了DiskTrimmable或者MemoryTrimmable接口。这些接口中有钩子可以使得我们在app中压缩cache。 然后我们的程序则可以调用DiskTrimmableRegistry和MemoryTrimmableRegistry接口。 These objects must keep a list of trimmables. They must use app-specific logic to determine when memory or disk space must be preserved. They then notify the trimmable objects to carry out their trims.</p>
+<h2 id="直接使用Image-Pipeline"><a href="#直接使用Image-Pipeline" class="headerlink" title="直接使用Image Pipeline"></a>直接使用Image Pipeline</h2><p>在大多数情况下，Image Pipeline不需要单独使用，大多数的APP上使用Drawee来处理与Fresco的交互即可。 由于内存使用的原因，在Fresco上直接使用image pipeline是比较困难的。Drawee可以自动追踪我们的图片是否需要在内存中存储。当不需要的时候，Fresco可以将图片自动转存，当需要的时候图片可以自动将图片重新加载到内存中。如果我们需要直接使用image pipeline，则需要手动处理这些逻辑。 image pipeline中返回的实例都是ClosableReference的包装类。Drawee在处理完成的时候会调用.close()方法。如果我们不是直接使用Drawee，那么也需要这样处理。 Java的GC会在图片out of scope的时候自动回收内存，但这样回收的太迟，而且GC的代价较高，而且对于较大的实例会导致较大的性能损失，尤其是对于Android 4.x即以下的版本中，Android没有单独的内存用于存储Bitmap，这会特别突出。</p>
+<h3 id="调用pipeline"><a href="#调用pipeline" class="headerlink" title="调用pipeline"></a>调用pipeline</h3><p>我们必须构建一个image request，然后将这个image request传递给ImagePipeline:</p>
+<pre><code>ImagePipeline imagePipeline = Fresco.getImagePipeline();
+DataSource &gt; 
+    dataSource = imagePipeline.fetchDecodedImage(imageRequest);
+</code></pre><p>参考DataSource来看怎么从其中获取数据。</p>
+<h3 id="跳过解码"><a href="#跳过解码" class="headerlink" title="跳过解码"></a>跳过解码</h3><p>如果不需要解码，而是直接保持其中压缩的格式，那么仅仅使用fetchEncodedImage即可：</p>
+<pre><code>DataSource &gt; 
+    dataSource = imagePipeline.fetchEncodedImage(imageRequest);
+</code></pre><h3 id="直接使用bitmap-cache中的数据"><a href="#直接使用bitmap-cache中的数据" class="headerlink" title="直接使用bitmap cache中的数据"></a>直接使用bitmap cache中的数据</h3><p>与其他操作不同，bitmap cache的查找工作是直接在UI线程中执行的，如果Bitmap在内存中，那么可以直接获取使用：</p>
+<pre><code>DataSource &gt; dataSource =
+    imagePipeline.fetchImageFromBitmapCache(imageRequest);
+try {
+  CloseableReference  imageReference = dataSource.getResult();
+  if (imageReference != null) {
+    try {
+      CloseableImage image = imageReference.get();
+      // do something with the image
+    } finally {
+      CloseableReference.closeSafely(imageReference);
+    }
+  }
+} finally {
+  dataSource.close();
+}
+</code></pre><p>注意，不要避免finally块中的调用dataSource.close()。</p>
+<h3 id="Prefetching"><a href="#Prefetching" class="headerlink" title="Prefetching"></a>Prefetching</h3><p>对图片进行预取可以降低用户等待的时间，进而优化用户体验，但需要注意的是，这也是一种trade-off。预取图片会增加用户数据流量的使用，增加CPU和内存的使用。因此，对于大多数APP来说，不建议开启图片的预取。 尽管如此，image pipeline允许我们将图片提前预取至disk或者bitmap cache。这两种方案都会增加网络数据的使用，但是区别在于disk cache并不会对图片进行解码，因此其CPU的占用率更低。 预取至disk cache：</p>
+<pre><code>imagePipeline.prefetchToDiskCache(imageRequest);
+</code></pre><p>预取至bitmap cache中：</p>
+<pre><code>imagePipeline.prefetchToBitmapCache(imageRequest);
+</code></pre><h2 id="DataSources和DataSubscribers"><a href="#DataSources和DataSubscribers" class="headerlink" title="DataSources和DataSubscribers"></a>DataSources和DataSubscribers</h2><p>DataSource类似于Java的Future，用于异步返回计算结果。DataSource与Future不同的是，DataSource可以返回单个命令对于的一系列运算结果，而不仅仅是一个。 当提交了一个image request之后，image pipeline会返回一个data source。为了从其中获取运算结果，因此需要使用DataSourceSubScriber。</p>
+<h3 id="I-just-want-a-bitmap…"><a href="#I-just-want-a-bitmap…" class="headerlink" title="I just want a bitmap…"></a>I just want a bitmap…</h3><p>如果我们向image request提交的请求仅仅decoded image - Android Bitmap，我们可以充分利用BaseBitmapDataSubscriber：</p>
+<pre><code>dataSource.subscribe(new BaseBitmapDataSubscriber() {
+    @Override
+    public void onNewResultImpl(@Nullable Bitmap bitmap) {
+       // You can use the bitmap in only limited ways
+      // No need to do any cleanup.
+    }
+
+    @Override
+    public void onFailureImpl(DataSource dataSource) {
+      // No cleanup required here.
+    }
+  },
+  executor);
+</code></pre><p>使用起来很简单，但有几个使用上需要注意的地方： <em> 对于animated images 动画图像无法使用subscriber </em> 不能将bitmap变量赋值给onNewResultImpl方法之外的任何变量。原因是，当subscriber执行完成之后，image pipeline则会复用bitmap并且释放内存。如果在其后绘制图片，则会导致应用程序崩溃并抛出IllegalStateException。 * 将Bimap传递给Android通知或者remote view是安全的。如果Android需要使用Bitmap并传递给系统调用，Fresco会将Bitmap数据在ashmem中复制一份数据。所以Fresco在这种情况下可以自动清理内存。</p>
+<h3 id="通用解决方案"><a href="#通用解决方案" class="headerlink" title="通用解决方案"></a>通用解决方案</h3><p>如果需要使用bitmap，那么不能直接使用Bitmap，可以通过cloaseable reference和BaseDataSubscriber：</p>
+<pre><code>DataSubscriber dataSubscriber =
+    new BaseDataSubscriber &gt;() {
+  @Override
+  public void onNewResultImpl(
+      DataSource &gt; dataSource) {
+
+    if (!dataSource.isFinished()) {
+      FLog.v(&quot;Not yet finished - this is just another progressive scan.&quot;);
+    }  
+
+    CloseableReference  imageReference = dataSource.getResult();
+    if (imageReference != null) {
+      try {
+        CloseableImage image = imageReference.get();
+        // do something with the image
+      } finally {
+        imageReference.close();
+      }
+    }
+  }
+  @Override
+  public void onFailureImpl(DataSource dataSource) {
+    Throwable throwable = dataSource.getFailureCause();
+    // handle failure
+  }
+};
+
+dataSource.subscribe(dataSubscriber, executor);
+</code></pre><p>If you want to deviate from the example above and assign the CloseableReference to another variable somewhere else, you can. Just be sure to follow the rules.</p>
+<h2 id="Closeable-References"><a href="#Closeable-References" class="headerlink" title="Closeable References"></a>Closeable References</h2><p>大多数的应用程序进需要使用Drawee即可，而且不需要担心Drawee关闭的问题。 由于Java是支持垃圾回收的编程语言，因此大多数开发者都是任意创建对象，并且理所当然的认为这些对象最后都会从内存中释放。 但实际上，在Android 5.0以上，这种情况才算得上理想，因此在之前的版本中，这种方法并不适合处理Bitmaps。在Android 5.0以前的版本中，Bitmap会占用APP共享内存中的一大部分，由于Bitmap的存在，会大大增加系统GC的频率，降低程序的执行效果。 Bitmap的问题，使得开发者更加思念C++以及其智能指针，比如Boost。 Fresco的解决方案是CloseableReference类。为了保证能够正确的使用CloseableReference，必须遵守以下的规则：</p>
+<ol>
+<li><p>调用者拥有CloseableReference的引用。 比如，此处我们创建了一个CloseableReference引用，但由于我们将其传递你给caller，因此该CloseableReference引用的所有权移交给该caller：</p>
+<p>CloseableReference  foo() {<br>  Val val;<br>  return CloseableReference.of(val);<br>}</p>
+</li>
+<li><p>引用的所有者在使用完CloseableReference引用之后，必须调用close方法释放该引用。</p>
+</li>
+</ol>
+<p>例子中，我们创建了一个CloseableReference引用，但是没有将其给传递给调用者，因此我们必须手动关闭该引用。</p>
+<pre><code>void gee() {
+  CloseableReference  ref = foo();
+  try {
+    haa(ref);
+  } finally {
+    ref.close();
+  }
+}
+</code></pre><p>一般而言，finally块最适合完成该操作。</p>
+<ol>
+<li><p>其他的，除了CloseableReference引用的所有者之外的，其他代码不能关闭引用。 例子中，我们从参数中获取到一个CloseableReference引用。但caller仍然是其所有者，因此我们不能调用对应的close方法。</p>
+<p>void haa(CloseableReference  ref) {<br>  Log.println(“Haa: “ + ref.get());<br>}</p>
+</li>
+<li><p>在赋值之前，要记得调用clone方法复制CloseableReference引用。 如果需要保持CloseableReference引用，需要调用clone方法：</p>
+<p>class MyClass {<br>  CloseableReference  myValRef;</p>
+<p>  void mmm(CloseableReference  ref) {</p>
+<pre><code>myValRef = ref.clone();
+</code></pre><p>  };<br>  // caller can now safely close its copy as we made our own clone.</p>
+<p>  void close() {</p>
+<pre><code>CloseableReference.closeSafely(myValRef);
+</code></pre><p>  }<br>}<br>// Now the caller of MyClass must close it!</p>
+</li>
+</ol>
+<p>如果在内部类中使用该CloseableReference引用：</p>
+<pre><code>void haa(CloseableReference  ref) {
+  final CloseableReference  refClone = ref.clone();
+  executor.submit(new Runnable() {
+    public void run() {
+      try {
+        Log.println(&quot;Haa Async: &quot; + refClone.get());
+      } finally {
+        refClone.close();
+      }
+    }
+  });
+  // caller can now safely close its copy as we made our own clone.
+}
+</code></pre><p><code></code></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/12/17/android-eventbus-1-publish-process/" rel="next" title="EventBus源代码解析：2、消息的发布与处理">
+                <i class="fa fa-chevron-left"></i> EventBus源代码解析：2、消息的发布与处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/24/android-fresco-source-code-1-initialization/" rel="prev" title="Fresco源代码分析：1、Fresco的初始化">
+                Fresco源代码分析：1、Fresco的初始化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Fresco学习笔记"><span class="nav-number">1.</span> <span class="nav-text">Fresco学习笔记</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置和使用"><span class="nav-number">2.</span> <span class="nav-text">配置和使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#引用"><span class="nav-number">2.1.</span> <span class="nav-text">引用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">2.2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#网络权限"><span class="nav-number">2.2.1.</span> <span class="nav-text">网络权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#初始化Fresco"><span class="nav-number">2.2.2.</span> <span class="nav-text">初始化Fresco</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#xml布局文件命名空间"><span class="nav-number">2.2.3.</span> <span class="nav-text">xml布局文件命名空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用SimpleDraweeView"><span class="nav-number">2.2.4.</span> <span class="nav-text">使用SimpleDraweeView</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载图片"><span class="nav-number">2.2.5.</span> <span class="nav-text">加载图片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#剩余的工作，Fresco完成"><span class="nav-number">2.2.6.</span> <span class="nav-text">剩余的工作，Fresco完成</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#几个概念"><span class="nav-number">2.3.</span> <span class="nav-text">几个概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Drawees"><span class="nav-number">2.3.1.</span> <span class="nav-text">Drawees</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#DraweeView"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">DraweeView</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DraweeHierarchy"><span class="nav-number">2.3.1.2.</span> <span class="nav-text">DraweeHierarchy</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DraweeController"><span class="nav-number">2.3.1.3.</span> <span class="nav-text">DraweeController</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DraweeControllerBuilder"><span class="nav-number">2.3.1.4.</span> <span class="nav-text">DraweeControllerBuilder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Liseners"><span class="nav-number">2.3.1.5.</span> <span class="nav-text">Liseners</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Image-Pipeline"><span class="nav-number">2.3.2.</span> <span class="nav-text">Image Pipeline</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#支持的URI"><span class="nav-number">2.4.</span> <span class="nav-text">支持的URI</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Drawee"><span class="nav-number">3.</span> <span class="nav-text">Drawee</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在XML中使用Drawees"><span class="nav-number">3.0.1.</span> <span class="nav-text">在XML中使用Drawees</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#wrap-content"><span class="nav-number">3.0.1.1.</span> <span class="nav-text">wrap_content</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#固定宽高比"><span class="nav-number">3.0.1.2.</span> <span class="nav-text">固定宽高比</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java中使用Drawee"><span class="nav-number">3.0.2.</span> <span class="nav-text">Java中使用Drawee</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#更改图片大小"><span class="nav-number">3.0.2.1.</span> <span class="nav-text">更改图片大小</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#自定义Hierarchy"><span class="nav-number">3.0.2.2.</span> <span class="nav-text">自定义Hierarchy</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#修改Hierarchy的配置"><span class="nav-number">3.0.2.3.</span> <span class="nav-text">修改Hierarchy的配置</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#修改placeholder"><span class="nav-number">3.0.2.3.1.</span> <span class="nav-text">修改placeholder</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#修改图片"><span class="nav-number">3.0.2.3.2.</span> <span class="nav-text">修改图片</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#设置Rounding"><span class="nav-number">3.0.2.3.3.</span> <span class="nav-text">设置Rounding</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Drawee-Components"><span class="nav-number">3.0.3.</span> <span class="nav-text">Drawee Components</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#定义"><span class="nav-number">3.0.3.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Actual"><span class="nav-number">3.0.3.2.</span> <span class="nav-text">Actual</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Placeholder"><span class="nav-number">3.0.3.3.</span> <span class="nav-text">Placeholder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Failure"><span class="nav-number">3.0.3.4.</span> <span class="nav-text">Failure</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Retry"><span class="nav-number">3.0.3.5.</span> <span class="nav-text">Retry</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Progress-Bar"><span class="nav-number">3.0.3.6.</span> <span class="nav-text">Progress Bar</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Backgrounds"><span class="nav-number">3.0.3.7.</span> <span class="nav-text">Backgrounds</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Overlays"><span class="nav-number">3.0.3.8.</span> <span class="nav-text">Overlays</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pressed-State-Overlay"><span class="nav-number">3.0.3.9.</span> <span class="nav-text">Pressed State Overlay</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Progress-Bars"><span class="nav-number">3.1.</span> <span class="nav-text">Progress Bars</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定义自己的progress-bar"><span class="nav-number">3.1.1.</span> <span class="nav-text">定义自己的progress bar</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scaling"><span class="nav-number">3.2.</span> <span class="nav-text">Scaling</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#可用缩放类型"><span class="nav-number">3.2.1.</span> <span class="nav-text">可用缩放类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何设置Scale-Type"><span class="nav-number">3.2.2.</span> <span class="nav-text">如何设置Scale Type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#focusCrop"><span class="nav-number">3.2.3.</span> <span class="nav-text">focusCrop</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rounded-Corners-and-Circles-Edit-on-GitHub"><span class="nav-number">3.3.</span> <span class="nav-text">Rounded Corners and Circles Edit on GitHub</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#图片可以以两种方式制作成圆角"><span class="nav-number">3.3.1.</span> <span class="nav-text">图片可以以两种方式制作成圆角</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#怎么设置"><span class="nav-number">3.3.2.</span> <span class="nav-text">怎么设置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Java代码"><span class="nav-number">3.3.3.</span> <span class="nav-text">Java代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注意"><span class="nav-number">3.3.4.</span> <span class="nav-text">注意</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用ControllerBuilder"><span class="nav-number">3.4.</span> <span class="nav-text">使用ControllerBuilder</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#构建DraweeController"><span class="nav-number">3.4.1.</span> <span class="nav-text">构建DraweeController</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义ImageRequest"><span class="nav-number">3.4.2.</span> <span class="nav-text">自定义ImageRequest</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Progressive-JPEGs-渐进式JPEGs"><span class="nav-number">3.5.</span> <span class="nav-text">Progressive JPEGs 渐进式JPEGs</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#构建image-request"><span class="nav-number">3.5.1.</span> <span class="nav-text">构建image request</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动画图像"><span class="nav-number">3.6.</span> <span class="nav-text">动画图像</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#自动播放动画"><span class="nav-number">3.6.1.</span> <span class="nav-text">自动播放动画</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#手动控制播放"><span class="nav-number">3.6.2.</span> <span class="nav-text">手动控制播放</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#局限性"><span class="nav-number">3.6.3.</span> <span class="nav-text">局限性</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Requesting-Multiple-Images-Multi-URI"><span class="nav-number">3.7.</span> <span class="nav-text">Requesting Multiple Images (Multi-URI)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#从低分辨率–-gt-高分辨率"><span class="nav-number">3.7.1.</span> <span class="nav-text">从低分辨率–&gt;高分辨率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用缩略预览图"><span class="nav-number">3.7.2.</span> <span class="nav-text">使用缩略预览图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加载第一张下载成功的图片"><span class="nav-number">3.7.3.</span> <span class="nav-text">加载第一张下载成功的图片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#指定自定义DataSource-Supplier"><span class="nav-number">3.7.4.</span> <span class="nav-text">指定自定义DataSource Supplier</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#监听Downloads-Events"><span class="nav-number">3.8.</span> <span class="nav-text">监听Downloads Events</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-1"><span class="nav-number">3.8.1.</span> <span class="nav-text">使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Resizing-and-Rotating"><span class="nav-number">3.9.</span> <span class="nav-text">Resizing and Rotating</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Resizing-Images"><span class="nav-number">3.9.1.</span> <span class="nav-text">Resizing Images</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Resizing-VS-Scaling"><span class="nav-number">3.9.1.1.</span> <span class="nav-text">Resizing VS Scaling</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Resizing在使用上有几个局限性："><span class="nav-number">3.9.1.2.</span> <span class="nav-text">Resizing在使用上有几个局限性：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Resizing"><span class="nav-number">3.9.1.3.</span> <span class="nav-text">Resizing</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Auto-rotation"><span class="nav-number">3.9.2.</span> <span class="nav-text">Auto-rotation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对图像进行编辑"><span class="nav-number">3.10.</span> <span class="nav-text">对图像进行编辑</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#原因"><span class="nav-number">3.10.1.</span> <span class="nav-text">原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#需要明确"><span class="nav-number">3.10.2.</span> <span class="nav-text">需要明确</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复制图像"><span class="nav-number">3.10.3.</span> <span class="nav-text">复制图像</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#复制图像，且图像尺寸不一致"><span class="nav-number">3.10.4.</span> <span class="nav-text">复制图像，且图像尺寸不一致</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Which-to-override"><span class="nav-number">3.10.5.</span> <span class="nav-text">Which to override?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Caching-postprocessed-images"><span class="nav-number">3.10.6.</span> <span class="nav-text">Caching postprocessed images</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Repeated-Postprocessors"><span class="nav-number">3.10.7.</span> <span class="nav-text">Repeated Postprocessors</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Image-Requests"><span class="nav-number">3.11.</span> <span class="nav-text">Image Requests</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Fields-in-ImageRequest"><span class="nav-number">3.11.1.</span> <span class="nav-text">Fields in ImageRequest</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Lowest-Permitted-Request-Level"><span class="nav-number">3.11.2.</span> <span class="nav-text">Lowest Permitted Request Level</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义View"><span class="nav-number">3.12.</span> <span class="nav-text">自定义View</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#DraweeHolders"><span class="nav-number">3.12.1.</span> <span class="nav-text">DraweeHolders</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自定义View需要做的事情"><span class="nav-number">3.12.2.</span> <span class="nav-text">自定义View需要做的事情</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#处理attach-detach事件"><span class="nav-number">3.12.2.1.</span> <span class="nav-text">处理attach/detach事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#处理touch-events"><span class="nav-number">3.12.2.2.</span> <span class="nav-text">处理touch events</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#定制onDraw"><span class="nav-number">3.12.2.3.</span> <span class="nav-text">定制onDraw</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他需要做的工作"><span class="nav-number">3.12.3.</span> <span class="nav-text">其他需要做的工作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#设置Drawable-Callback"><span class="nav-number">3.12.3.1.</span> <span class="nav-text">设置Drawable.Callback</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Constructing-a-DraweeHolder"><span class="nav-number">3.12.4.</span> <span class="nav-text">Constructing a DraweeHolder</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#组织构造函数"><span class="nav-number">3.12.4.1.</span> <span class="nav-text">组织构造函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建Holder"><span class="nav-number">3.12.4.2.</span> <span class="nav-text">创建Holder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置图片"><span class="nav-number">3.12.4.3.</span> <span class="nav-text">设置图片</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MultiDraweeHolder"><span class="nav-number">3.12.5.</span> <span class="nav-text">MultiDraweeHolder</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一些陷阱"><span class="nav-number">3.13.</span> <span class="nav-text">一些陷阱</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Don’t-use-ScrollViews"><span class="nav-number">3.13.1.</span> <span class="nav-text">Don’t use ScrollViews</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Don’t-downcast"><span class="nav-number">3.13.2.</span> <span class="nav-text">Don’t downcast</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Don’t-use-getTopLevelDrawable"><span class="nav-number">3.13.3.</span> <span class="nav-text">Don’t use getTopLevelDrawable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Don’t-re-use-DraweeHierarchies"><span class="nav-number">3.13.4.</span> <span class="nav-text">Don’t re-use DraweeHierarchies</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Don’t-use-Drawables-in-more-than-one-DraweeHierarchy"><span class="nav-number">3.13.5.</span> <span class="nav-text">Don’t use Drawables in more than one DraweeHierarchy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Don’t-set-images-directly-on-a-DraweeView"><span class="nav-number">3.13.6.</span> <span class="nav-text">Don’t set images directly on a DraweeView</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Don’t-use-ImageView-attributes-or-methods-with-DraweeView"><span class="nav-number">3.13.7.</span> <span class="nav-text">Don’t use ImageView attributes or methods with DraweeView</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Image-Pipeline-1"><span class="nav-number">4.</span> <span class="nav-text">Image Pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">4.1.</span> <span class="nav-text">Introduction</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#旧设备上支持WebP"><span class="nav-number">4.1.1.</span> <span class="nav-text">旧设备上支持WebP</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置Image-Pipeline"><span class="nav-number">4.2.</span> <span class="nav-text">配置Image Pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#理解Suppliers"><span class="nav-number">4.2.1.</span> <span class="nav-text">理解Suppliers</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程池"><span class="nav-number">4.2.2.</span> <span class="nav-text">线程池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用MemoryTrimmableRegistry"><span class="nav-number">4.2.3.</span> <span class="nav-text">使用MemoryTrimmableRegistry</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置memory-caches"><span class="nav-number">4.2.4.</span> <span class="nav-text">配置memory caches</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置disk-cache"><span class="nav-number">4.2.5.</span> <span class="nav-text">配置disk cache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#追踪Cache统计信息"><span class="nav-number">4.2.6.</span> <span class="nav-text">追踪Cache统计信息</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Caching"><span class="nav-number">4.3.</span> <span class="nav-text">Caching</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#总共三种Cache"><span class="nav-number">4.3.1.</span> <span class="nav-text">总共三种Cache</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Bitmap-cache"><span class="nav-number">4.3.1.1.</span> <span class="nav-text">Bitmap cache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Encoded-memory-cache"><span class="nav-number">4.3.1.2.</span> <span class="nav-text">Encoded memory cache</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Disk-cache"><span class="nav-number">4.3.1.3.</span> <span class="nav-text">Disk cache</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#从cache中删除数据"><span class="nav-number">4.3.2.</span> <span class="nav-text">从cache中删除数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#清空cache"><span class="nav-number">4.3.3.</span> <span class="nav-text">清空cache</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用一个disk-cache还是两个？"><span class="nav-number">4.3.4.</span> <span class="nav-text">使用一个disk cache还是两个？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调整caches-Trimming-the-caches"><span class="nav-number">4.3.5.</span> <span class="nav-text">调整caches - Trimming the caches</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#直接使用Image-Pipeline"><span class="nav-number">4.4.</span> <span class="nav-text">直接使用Image Pipeline</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调用pipeline"><span class="nav-number">4.4.1.</span> <span class="nav-text">调用pipeline</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#跳过解码"><span class="nav-number">4.4.2.</span> <span class="nav-text">跳过解码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#直接使用bitmap-cache中的数据"><span class="nav-number">4.4.3.</span> <span class="nav-text">直接使用bitmap cache中的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Prefetching"><span class="nav-number">4.4.4.</span> <span class="nav-text">Prefetching</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DataSources和DataSubscribers"><span class="nav-number">4.5.</span> <span class="nav-text">DataSources和DataSubscribers</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#I-just-want-a-bitmap…"><span class="nav-number">4.5.1.</span> <span class="nav-text">I just want a bitmap…</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通用解决方案"><span class="nav-number">4.5.2.</span> <span class="nav-text">通用解决方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Closeable-References"><span class="nav-number">4.6.</span> <span class="nav-text">Closeable References</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

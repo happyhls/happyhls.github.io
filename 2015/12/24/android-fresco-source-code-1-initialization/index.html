@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Fresco源代码分析 之一 默认初始化Fresco被认为是现在最为好用的Android图片加载库，在之前的文章，有根据官方文档分析过Fresco的入门手册，但使用始终无法明白其具体是怎么样工作的，因为，我们还是要从源码上分析Fresco的工作原理。 Fresco的初始化在一般情况下，我们是使用默认的ImagePipeline配置来初始化Fresco的，代码如下： Fresco.initializ">
+<meta name="keywords" content="Android,Fresco,图片库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fresco源代码分析：1、Fresco的初始化">
+<meta property="og:url" content="http://yoursite.com/2015/12/24/android-fresco-source-code-1-initialization/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Fresco源代码分析 之一 默认初始化Fresco被认为是现在最为好用的Android图片加载库，在之前的文章，有根据官方文档分析过Fresco的入门手册，但使用始终无法明白其具体是怎么样工作的，因为，我们还是要从源码上分析Fresco的工作原理。 Fresco的初始化在一般情况下，我们是使用默认的ImagePipeline配置来初始化Fresco的，代码如下： Fresco.initializ">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T15:07:40.236Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fresco源代码分析：1、Fresco的初始化">
+<meta name="twitter:description" content="Fresco源代码分析 之一 默认初始化Fresco被认为是现在最为好用的Android图片加载库，在之前的文章，有根据官方文档分析过Fresco的入门手册，但使用始终无法明白其具体是怎么样工作的，因为，我们还是要从源码上分析Fresco的工作原理。 Fresco的初始化在一般情况下，我们是使用默认的ImagePipeline配置来初始化Fresco的，代码如下： Fresco.initializ">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2015/12/24/android-fresco-source-code-1-initialization/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Fresco源代码分析：1、Fresco的初始化 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/12/24/android-fresco-source-code-1-initialization/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Fresco源代码分析：1、Fresco的初始化
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2015-12-24 20:59:38" itemprop="dateCreated datePublished" datetime="2015-12-24T20:59:38+08:00">2015-12-24</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 23:07:40" itemprop="dateModified" datetime="2018-10-03T23:07:40+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Fresco/" itemprop="url" rel="index"><span itemprop="name">Fresco</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="Fresco源代码分析-之一-默认初始化"><a href="#Fresco源代码分析-之一-默认初始化" class="headerlink" title="Fresco源代码分析 之一 默认初始化"></a>Fresco源代码分析 之一 默认初始化</h1><p>Fresco被认为是现在最为好用的Android图片加载库，在之前的文章，有根据官方文档分析过Fresco的入门手册，但使用始终无法明白其具体是怎么样工作的，因为，我们还是要从源码上分析Fresco的工作原理。</p>
+<h2 id="Fresco的初始化"><a href="#Fresco的初始化" class="headerlink" title="Fresco的初始化"></a>Fresco的初始化</h2><p>在一般情况下，我们是使用默认的ImagePipeline配置来初始化Fresco的，代码如下：</p>
+<pre><code>Fresco.initialize(this);
+</code></pre><p>而实际上，Fresco一共提供了两个初始化方法</p>
+<pre><code>/** Initializes Fresco with the default config. */
+public static void initialize(Context context) {
+  // 初始化了ImagePipelineFactory的默认配置
+  ImagePipelineFactory.initialize(context);
+  initializeDrawee(context);
+}
+/** Initializes Fresco with the specified config. */
+public static void initialize(Context context, ImagePipelineConfig imagePipelineConfig) {
+  ImagePipelineFactory.initialize(imagePipelineConfig);
+  initializeDrawee(context);
+}
+</code></pre><p>可以看到，这两个初始化方法仅仅是初始化ImagePipeline的不同，接下来依次分析。</p>
+<h2 id="初始化ImagePipelineFactory"><a href="#初始化ImagePipelineFactory" class="headerlink" title="初始化ImagePipelineFactory"></a>初始化ImagePipelineFactory</h2><p>同样的，ImagePipelineFactory总共提供了两个初始化方法，代码分别如下：</p>
+<pre><code>/** Initializes {@link ImagePipelineFactory} with default config. */
+public static void initialize(Context context) {
+  initialize(ImagePipelineConfig.newBuilder(context).build());
+}
+/** Initializes {@link ImagePipelineFactory} with the specified config. */
+public static void initialize(ImagePipelineConfig imagePipelineConfig) {
+  sInstance = new ImagePipelineFactory(imagePipelineConfig);
+}
+</code></pre><p>其中可以看到initialize(Context context)本质上也是调用initialize(ImagePipelineConfig)的方法，因此实际上也就是设置的ImagePipelineConfig的不同，而实际上，这个参数也是从Fresco的初始化Fresco.initialize(Context, ImagePipelineFactory)传入的。因此，我们从分析ImagePipelineConfig.newBuilder(context).build()开始。</p>
+<h3 id="ImagePipelineConfig初始化"><a href="#ImagePipelineConfig初始化" class="headerlink" title="ImagePipelineConfig初始化"></a>ImagePipelineConfig初始化</h3><p>ImagePipelineConfig.newBuilder(context)其实是构造了ImagePipelineConfig#Builder对象，build()方法则反悔了ImagePipelineConfig对象，其中设置的属性都有如下：</p>
+<pre><code>@Nullable private final AnimatedImageFactory mAnimatedImageFactory; // 动画工厂
+private final Bitmap.Config mBitmapConfig; // Bitmap配置
+private final Supplier&lt;MemoryCacheParams&gt; mBitmapMemoryCacheParamsSupplier; // 缓存Bitmap所对应的MemoryCacheParams的供应者
+private final CacheKeyFactory mCacheKeyFactory; // CacheKey工厂
+private final Context mContext; // Context上下文
+private final boolean mDownsampleEnabled; // 是否运行下载缩略图
+private final boolean mDecodeFileDescriptorEnabled; // 是否允许解码文件描述否
+private final boolean mDecodeMemoryFileEnabled; // 是否允许解码内存中的文件
+private final Supplier&lt;MemoryCacheParams&gt; mEncodedMemoryCacheParamsSupplier; // 缓存未解码的图像所对应的MemoryCacheParams的供应者
+private final ExecutorSupplier mExecutorSupplier; // 线程池供应商
+private final ImageCacheStatsTracker mImageCacheStatsTracker; // 记录ImageCache各种状态的工具
+@Nullable private final ImageDecoder mImageDecoder; // 图片解码工具类
+private final Supplier&lt;Boolean&gt; mIsPrefetchEnabledSupplier; // 是否允许预取的供应商
+private final DiskCacheConfig mMainDiskCacheConfig; // 磁盘缓存配置
+private final MemoryTrimmableRegistry mMemoryTrimmableRegistry; // 监听内存状态
+private final NetworkFetcher mNetworkFetcher;  // 内存
+@Nullable private final PlatformBitmapFactory mPlatformBitmapFactory; // 不同版本对应的BitmapFactory
+private final PoolFactory mPoolFactory; // Pool的工厂
+private final ProgressiveJpegConfig mProgressiveJpegConfig; // 对于渐进式Jpeg的配置
+private final Set&lt;RequestListener&gt; mRequestListeners; // Request的监听者
+private final boolean mResizeAndRotateEnabledForNetwork; // 是否允许网络请求的图片设置大小或是旋转
+private final DiskCacheConfig mSmallImageDiskCacheConfig; // 小图片的磁盘缓存配置
+</code></pre><p>ImagePipelineConfig内部的构造方法对本身复杂的参数进行设置，具体如下：</p>
+<pre><code>private ImagePipelineConfig(Builder builder) {
+  // 动画工厂
+  mAnimatedImageFactory = builder.mAnimatedImageFactory;
+  // Bitmap 内存缓存参数 Supplier
+  mBitmapMemoryCacheParamsSupplier =
+      builder.mBitmapMemoryCacheParamsSupplier == null ?
+          new DefaultBitmapMemoryCacheParamsSupplier(
+              (ActivityManager) builder.mContext.getSystemService(Context.ACTIVITY_SERVICE)) :
+          builder.mBitmapMemoryCacheParamsSupplier;
+  // 图片的默认格式为 ARGB_8888
+  mBitmapConfig =
+      builder.mBitmapConfig == null ?
+          Bitmap.Config.ARGB_8888 :
+          builder.mBitmapConfig;
+  mCacheKeyFactory =
+      builder.mCacheKeyFactory == null ?
+          DefaultCacheKeyFactory.getInstance() :
+          builder.mCacheKeyFactory;
+  mContext = Preconditions.checkNotNull(builder.mContext);
+  mDecodeFileDescriptorEnabled = builder.mDownsampleEnabled &amp;&amp;
+      builder.mDecodeFileDescriptorEnabled;
+  mDecodeMemoryFileEnabled = builder.mDecodeMemoryFileEnabled;
+  mDownsampleEnabled = builder.mDownsampleEnabled;
+  mEncodedMemoryCacheParamsSupplier =
+      builder.mEncodedMemoryCacheParamsSupplier == null ?
+          new DefaultEncodedMemoryCacheParamsSupplier() :
+          builder.mEncodedMemoryCacheParamsSupplier;
+  // 默认不记录Cache的Stat
+  mImageCacheStatsTracker =
+      builder.mImageCacheStatsTracker == null ?
+          NoOpImageCacheStatsTracker.getInstance() :
+          builder.mImageCacheStatsTracker;
+  mImageDecoder = builder.mImageDecoder;
+  mIsPrefetchEnabledSupplier =
+      builder.mIsPrefetchEnabledSupplier == null ?
+          new Supplier&lt;Boolean&gt;() {
+            @Override
+            public Boolean get() {
+              return true;
+            }
+          } :
+          builder.mIsPrefetchEnabledSupplier;
+  // 磁盘默认 缓存大小配置
+  mMainDiskCacheConfig =
+      builder.mMainDiskCacheConfig == null ?
+          getDefaultMainDiskCacheConfig(builder.mContext) :
+          builder.mMainDiskCacheConfig;
+  // 默认磁盘整理策略,该默认配置什么也不做
+  mMemoryTrimmableRegistry =
+      builder.mMemoryTrimmableRegistry == null ?
+          NoOpMemoryTrimmableRegistry.getInstance() :
+          builder.mMemoryTrimmableRegistry;
+  // 默认的网络Fetcher:HttpURLConnection
+  mNetworkFetcher =
+      builder.mNetworkFetcher == null ?
+          new HttpUrlConnectionNetworkFetcher() :
+          builder.mNetworkFetcher;
+  mPlatformBitmapFactory = builder.mPlatformBitmapFactory;
+  mPoolFactory =
+      builder.mPoolFactory == null ?
+          new PoolFactory(PoolConfig.newBuilder().build()) :
+          builder.mPoolFactory;
+  mProgressiveJpegConfig =
+      builder.mProgressiveJpegConfig == null ?
+          new SimpleProgressiveJpegConfig() :
+          builder.mProgressiveJpegConfig;
+  mRequestListeners =
+      builder.mRequestListeners == null ?
+          new HashSet&lt;RequestListener&gt;() :
+          builder.mRequestListeners;
+  mResizeAndRotateEnabledForNetwork = builder.mResizeAndRotateEnabledForNetwork;
+  mSmallImageDiskCacheConfig =
+      builder.mSmallImageDiskCacheConfig == null ?
+          mMainDiskCacheConfig :
+          builder.mSmallImageDiskCacheConfig;
+  // Below this comment can&apos;t be built in alphabetical order, because of dependencies
+  int numCpuBoundThreads = mPoolFactory.getFlexByteArrayPoolMaxNumThreads();
+  mExecutorSupplier =
+      builder.mExecutorSupplier == null ?
+          new DefaultExecutorSupplier(numCpuBoundThreads) : builder.mExecutorSupplier;
+}
+</code></pre><p>实际上，对于ImagePipeline默认初始化的理解，就在于对这些参数设置的理解上，因此，接下来我们因此分析每一种配置的所表示的意义是什么。</p>
+<h3 id="Supplier-mBitmapMemoryCacheParamsSupplier"><a href="#Supplier-mBitmapMemoryCacheParamsSupplier" class="headerlink" title="Supplier mBitmapMemoryCacheParamsSupplier"></a>Supplier<memorycacheparams> mBitmapMemoryCacheParamsSupplier</memorycacheparams></h3><p>该配置用来表示默认的解码之后的Bitmap的缓存策略，其默认配置如下：</p>
+<pre><code>// Bitmap 内存缓存参数 Supplier
+mBitmapMemoryCacheParamsSupplier =
+    builder.mBitmapMemoryCacheParamsSupplier == null ?
+        new DefaultBitmapMemoryCacheParamsSupplier(
+            (ActivityManager) builder.mContext.getSystemService(Context.ACTIVITY_SERVICE)) :
+        builder.mBitmapMemoryCacheParamsSupplier;
+</code></pre><p>可以看到，如果默认情况下没有在builder中提供mBitmapMemoryCacheParamsSupplier中提供配置的话，会通过DefaultBitmapMemoryCacheParamsSupplier创建一个，那创建的内容是什么呢？DefaultBitmapMemoryCacheParamsSupplier代码比较简单，其配置的MemoryCacheParams内容通过表格简单列举一下。 MemoryCacheParams 配置：</p>
+<p>变量名</p>
+<p>默认值</p>
+<p>备注</p>
+<p>maxCacheSize</p>
+<p>不同内存，cache大小不同，见下表</p>
+<p>cache的最大空间，单位kb</p>
+<p>maxCacheEntries</p>
+<p>256</p>
+<p>cache中允许的有效元素的最大数量</p>
+<p>maxEvictionQueueSize</p>
+<p>Integer.MAX_VALUE</p>
+<p>cache待回收空间队列大小，单位kb</p>
+<p>maxEvictionQueueEntries</p>
+<p>Integer.MAX_VALUE</p>
+<p>cache待回收队列最大元素数量</p>
+<p>maxCacheEntrySize</p>
+<p>Integer.MAX_VALUE</p>
+<p>单个cache所能容纳的最大元素数量</p>
+<p>不同机器上，所配置的cache大小分别为：</p>
+<p>序号</p>
+<p>内存</p>
+<p>设定值</p>
+<p>说明</p>
+<p>1</p>
+<p>&lt;32MB</p>
+<p>4MB</p>
+<p>2</p>
+<blockquote>
+<p>=32MB &amp;&amp; &lt;64MB</p>
+</blockquote>
+<p>6MB</p>
+<p>3</p>
+<p>不在1、2之列 &amp;&amp; API &lt; 11</p>
+<p>8MB</p>
+<p>之前版本使用共享内存无法获得足够理想的效果</p>
+<p>4</p>
+<p>不再1、2之列 &amp;&amp; API &gt;= 11</p>
+<p>程序可用Heap大小/4</p>
+<h3 id="CacheKeyFactory-mCacheKeyFactory"><a href="#CacheKeyFactory-mCacheKeyFactory" class="headerlink" title="CacheKeyFactory mCacheKeyFactory"></a>CacheKeyFactory mCacheKeyFactory</h3><p>CacheKeyFactory的配置代码如下：</p>
+<pre><code>mCacheKeyFactory =
+    builder.mCacheKeyFactory == null ?
+        DefaultCacheKeyFactory.getInstance() :
+        builder.mCacheKeyFactory;
+</code></pre><p>对于CacheKeyFactory而言，其配置主要分为两类，一类是未解码的ImageRequest，一类是已经解码的ImageRequest，分别如下：</p>
+<h4 id="未解码的ImageRquest"><a href="#未解码的ImageRquest" class="headerlink" title="未解码的ImageRquest"></a>未解码的ImageRquest</h4><p>对于这种ImageRquest，通过的SimpleCacheKey来实现。</p>
+<pre><code>@Override
+public CacheKey getEncodedCacheKey(ImageRequest request) {
+  return new SimpleCacheKey(getCacheKeySourceUri(request.getSourceUri()).toString());
+}
+</code></pre><p>而实际上，SimpleCache则是简单的对传入的String取.hashCode()，换句话说，就是根据Uri生成了hashCode</p>
+<h4 id="解码的ImageRequest"><a href="#解码的ImageRequest" class="headerlink" title="解码的ImageRequest"></a>解码的ImageRequest</h4><p>剩余情况下，所使用的参数有：</p>
+<p>参数名称</p>
+<p>参数描述</p>
+<p>mSourceString</p>
+<p>一般对应Uri</p>
+<p>mResizeOptions</p>
+<p>大小调整参数</p>
+<p>mAutoRotated</p>
+<p>自动旋转参数</p>
+<p>mImageDecodeOptions</p>
+<p>解码配置</p>
+<p>mPostprocessorCacheKey</p>
+<p>后处理器CacheKey</p>
+<p>mPostprocessorName</p>
+<p>后处理器名称</p>
+<h3 id="Supplier-mEncodedMemoryCacheParams"><a href="#Supplier-mEncodedMemoryCacheParams" class="headerlink" title="Supplier mEncodedMemoryCacheParams"></a>Supplier<memorycacheparams> mEncodedMemoryCacheParams</memorycacheparams></h3><p>该变量提供未解码图片缓存配置策略，代码如下：</p>
+<pre><code>mEncodedMemoryCacheParamsSupplier =
+    builder.mEncodedMemoryCacheParamsSupplier == null ?
+        new DefaultEncodedMemoryCacheParamsSupplier() :
+        builder.mEncodedMemoryCacheParamsSupplier;
+</code></pre><p>看看DefaultEncodedMemoryCacheparamsSupplier都配置了什么？其实与<a href="#cachekeyfactory">CacheKeyFactory mCacheKeyFactory</a>类似。区别在于Cache大小取值不同，具体如下：</p>
+<p>序号</p>
+<p>内存</p>
+<p>&lt;16MB</p>
+<p>1MB</p>
+<p>&lt;32MB</p>
+<p>2MB</p>
+<blockquote>
+<p>=64MB</p>
+</blockquote>
+<p>4MB</p>
+<h3 id="ImageCacheStatsTracker-mImageCacheStatsTracker"><a href="#ImageCacheStatsTracker-mImageCacheStatsTracker" class="headerlink" title="ImageCacheStatsTracker mImageCacheStatsTracker"></a>ImageCacheStatsTracker mImageCacheStatsTracker</h3><p>该配置主要用来控制ImageCache统计信息记录，相关代码如下：</p>
+<pre><code>mImageCacheStatsTracker =
+    builder.mImageCacheStatsTracker == null ?
+        NoOpImageCacheStatsTracker.getInstance() :
+        builder.mImageCacheStatsTracker;
+</code></pre><p>默认配置为：什么ImageCache的统计信息也不记录。</p>
+<h3 id="DiskCacheConfig-mMainDiskCacheConfig"><a href="#DiskCacheConfig-mMainDiskCacheConfig" class="headerlink" title="DiskCacheConfig mMainDiskCacheConfig"></a>DiskCacheConfig mMainDiskCacheConfig</h3><p>磁盘缓存策略配置</p>
+<pre><code>mMainDiskCacheConfig =
+    builder.mMainDiskCacheConfig == null ?
+        getDefaultMainDiskCacheConfig(builder.mContext) :
+        builder.mMainDiskCacheConfig;
+</code></pre><p>默认配置</p>
+<pre><code>private static DiskCacheConfig getDefaultMainDiskCacheConfig(final Context context) {
+  return DiskCacheConfig.newBuilder()
+          // 默认文件路径
+      .setBaseDirectoryPathSupplier(
+          new Supplier&lt;File&gt;() {
+            @Override
+            public File get() {
+              return context.getApplicationContext().getCacheDir();
+            }
+          })
+          // 目录
+      .setBaseDirectoryName(&quot;image_cache&quot;)
+          // 默认大小 40MB
+      .setMaxCacheSize(40 * ByteConstants.MB)
+          // 磁盘空间不足时候,默认大小 10MB
+      .setMaxCacheSizeOnLowDiskSpace(10 * ByteConstants.MB)
+          // 磁盘控件极其不足时,默认 2MB
+      .setMaxCacheSizeOnVeryLowDiskSpace(2 * ByteConstants.MB)
+      .build();
+}
+</code></pre><h3 id="NetworkFetcher-mNetworkFetcher"><a href="#NetworkFetcher-mNetworkFetcher" class="headerlink" title="NetworkFetcher mNetworkFetcher"></a>NetworkFetcher mNetworkFetcher</h3><p>NetworkFetcher,Fresco支持okHttp和Android自带的HttpURLConnection实现。</p>
+<pre><code>mNetworkFetcher =
+    builder.mNetworkFetcher == null ?
+        new HttpUrlConnectionNetworkFetcher() :
+        builder.mNetworkFetcher;
+</code></pre><p>网络的获取部分是一个图片库的重要部分，在后面我们需要重点分析，此处知道在默认情况下，Fresco采用Android自带的网络库即可。</p>
+<h3 id="PoolFactory-mPoolFactory"><a href="#PoolFactory-mPoolFactory" class="headerlink" title="PoolFactory mPoolFactory"></a>PoolFactory mPoolFactory</h3><p>在图形库当中，由于需要频繁小块的内存访问，重复申请空间会花费大量的时间，因此都会采用对象池/数据池的办法重复利用以前的对象，Fresco也不例外：</p>
+<pre><code>mPoolFactory =
+    builder.mPoolFactory == null ?
+        new PoolFactory(PoolConfig.newBuilder().build()) :
+        builder.mPoolFactory;
+</code></pre><p>对应的默认配置代码如下：</p>
+<pre><code>private PoolConfig(Builder builder) {
+  mBitmapPoolParams =
+      builder.mBitmapPoolParams == null ?
+          DefaultBitmapPoolParams.get() :
+          builder.mBitmapPoolParams;
+  mBitmapPoolStatsTracker =
+      builder.mBitmapPoolStatsTracker == null ?
+          NoOpPoolStatsTracker.getInstance() :
+          builder.mBitmapPoolStatsTracker;
+  mFlexByteArrayPoolParams =
+      builder.mFlexByteArrayPoolParams == null ?
+          DefaultFlexByteArrayPoolParams.get() :
+          builder.mFlexByteArrayPoolParams;
+  mMemoryTrimmableRegistry =
+      builder.mMemoryTrimmableRegistry == null ?
+          NoOpMemoryTrimmableRegistry.getInstance() :
+          builder.mMemoryTrimmableRegistry;
+  mNativeMemoryChunkPoolParams =
+      builder.mNativeMemoryChunkPoolParams == null ?
+          DefaultNativeMemoryChunkPoolParams.get() :
+          builder.mNativeMemoryChunkPoolParams;
+  mNativeMemoryChunkPoolStatsTracker =
+      builder.mNativeMemoryChunkPoolStatsTracker == null ?
+          NoOpPoolStatsTracker.getInstance() :
+          builder.mNativeMemoryChunkPoolStatsTracker;
+  mSmallByteArrayPoolParams =
+      builder.mSmallByteArrayPoolParams == null ?
+          DefaultByteArrayPoolParams.get() :
+          builder.mSmallByteArrayPoolParams;
+  mSmallByteArrayPoolStatsTracker =
+      builder.mSmallByteArrayPoolStatsTracker == null ?
+          NoOpPoolStatsTracker.getInstance() :
+          builder.mSmallByteArrayPoolStatsTracker;
+}
+</code></pre><p>依赖来看：</p>
+<h4 id="PoolParams-mBitmapPoolParams"><a href="#PoolParams-mBitmapPoolParams" class="headerlink" title="PoolParams mBitmapPoolParams"></a>PoolParams mBitmapPoolParams</h4><p>默认情况下，Fresco<strong>不缓存</strong>任何Bitmap对象，如果使用完毕，则立刻释放。 PoolParams参数</p>
+<p>名称</p>
+<p>含义</p>
+<p>默认配置</p>
+<p>maxSizeHardCap</p>
+<p>最大实际使用空间，当pool的size达到该设定值时，再申请空间会抛出BasePool.PoolSizeViolationException异常</p>
+<p>内存&gt;16MB -&gt; 0.75Max; 内存&lt;=16MB -&gt; 0.5Max</p>
+<p>maxSizeSoftCap</p>
+<p>一个pool的虚拟容量： 当pool的size达到该设定值时，pool会尝试清理空间，直至size&lt;该设定值 或者 空闲空间=0&lt;</p>
+<p>0：不缓存</p>
+<p>bucketSizes</p>
+<p>pool可以包含各种各样的「size」，一个bucket用来表示一种大小，额外的，每一中bucket包含max-length，用来表示bucket中used+free的总共的元素数量,此处的maxSize是上面的soft类型的maxSize，如果达到限制，不会抛出异常，而仅仅是开始释放空间，如果此时仍有请求过来，则是和简单的alloc+free一样，不会被pool管理。如果该参数null，那么pool会根据需求自动创建bucket</p>
+<p>0：不缓存</p>
+<p>minBucketSize</p>
+<p>表示pool中最小的bucket数量，可以保证任何元素小于等于该参数的都可以保存的bucket中</p>
+<p>0</p>
+<p>maxBucketSize</p>
+<p>仅有元素size小于该参数时，才会保存至bucket中，如果尺寸超过该参数，会抛出异常。</p>
+<p>Integer.MAX_VALUE</p>
+<p>其他的也是各种Pool的配置，此处就不再多分析，需要的时候再过来看。</p>
+<h3 id="ProgressiveJpegConfig"><a href="#ProgressiveJpegConfig" class="headerlink" title="ProgressiveJpegConfig"></a>ProgressiveJpegConfig</h3><p>渐进式照片显示控制。</p>
+<h3 id="RequestListeners"><a href="#RequestListeners" class="headerlink" title="RequestListeners"></a>RequestListeners</h3><p>保存所有的请求监听者对象</p>
+<h3 id="ResizeAndRotateEnabledForNetwork"><a href="#ResizeAndRotateEnabledForNetwork" class="headerlink" title="ResizeAndRotateEnabledForNetwork"></a>ResizeAndRotateEnabledForNetwork</h3><p>是否允许从网络获取的图像，调整大小/缩放</p>
+<h3 id="SmallImageDiskCacheConfig"><a href="#SmallImageDiskCacheConfig" class="headerlink" title="SmallImageDiskCacheConfig"></a>SmallImageDiskCacheConfig</h3><p>较小图片的Disk Cache配置</p>
+<h3 id="ExecutorSupplier"><a href="#ExecutorSupplier" class="headerlink" title="ExecutorSupplier"></a>ExecutorSupplier</h3><p>线程池对象，注意，该对象初始化代码如下：</p>
+<pre><code>int numCpuBoundThreads = mPoolFactory.getFlexByteArrayPoolMaxNumThreads();
+mExecutorSupplier =
+    builder.mExecutorSupplier == null ?
+        new DefaultExecutorSupplier(numCpuBoundThreads) : builder.mExecutorSupplier;
+</code></pre><p>也就是说，这个是依赖于FlexByteArrayPoolMaxNumThreads()的，那么这个方法默认的参数是什么呢？跟进去看一下 FlexByteArrayPool中的线程池数量为：<code>public static final int DEFAULT_MAX_NUM_THREADS = Runtime.getRuntime().availableProcessors();</code></p>
+<h2 id="初始化Drawee"><a href="#初始化Drawee" class="headerlink" title="初始化Drawee"></a>初始化Drawee</h2><p>Drawee的初始化代码如下：</p>
+<pre><code>// 初始化Drawee
+private static void initializeDrawee(Context context) {
+  sDraweeControllerBuilderSupplier = new PipelineDraweeControllerBuilderSupplier(context);
+  SimpleDraweeView.initialize(sDraweeControllerBuilderSupplier);
+}
+</code></pre><p>可以看到Drawee的初始化分为两步：</p>
+<ol>
+<li>实例化PipelineDraweeControllerBuilderSuppplier。</li>
+<li>使用PipelineDraweeControllerBuilderSupplier初始化SimpleDraweeView。</li>
+</ol>
+<h3 id="PipelineDraweeControllerBuilderSupplier"><a href="#PipelineDraweeControllerBuilderSupplier" class="headerlink" title="PipelineDraweeControllerBuilderSupplier"></a>PipelineDraweeControllerBuilderSupplier</h3><p>该对象的实例过程如下：</p>
+<pre><code>public PipelineDraweeControllerBuilderSupplier(
+    Context context,
+    ImagePipelineFactory imagePipelineFactory,
+    Set&lt;ControllerListener&gt; boundControllerListeners) {
+  mContext = context;
+  mImagePipeline = imagePipelineFactory.getImagePipeline();
+  mPipelineDraweeControllerFactory = new PipelineDraweeControllerFactory(
+      context.getResources(),
+      DeferredReleaser.getInstance(),
+      imagePipelineFactory.getAnimatedDrawableFactory(),
+      UiThreadImmediateExecutorService.getInstance());
+  mBoundControllerListeners = boundControllerListeners;
+}
+</code></pre><p>步骤如下：</p>
+<ol>
+<li>获取ImagePipeline</li>
+<li>实例化PipelineDraweeControllerFactory</li>
+<li>设置Controller监听者</li>
+</ol>
+<p>而PipelineDraweeController则设置了一下的属性</p>
+<pre><code>  // 资源所在的Resource
+private Resources mResources;
+  // DeferredReleaser 用于释放任务
+private DeferredReleaser mDeferredReleaser;
+  // 动画Drawable工厂
+private AnimatedDrawableFactory mAnimatedDrawableFactory;
+  // 基于主线程的线程池
+private Executor mUiThreadExecutor;
+</code></pre><p>其中变量的含义比较容易理解，就不再解释，需要注意的是， mUiThreadExecutor是一个封装了主线程Looper的Executor。</p>
+<h3 id="SimpleDraweeView的初始化"><a href="#SimpleDraweeView的初始化" class="headerlink" title="SimpleDraweeView的初始化"></a>SimpleDraweeView的初始化</h3><p>SimpleDraweeView的初始化更加简单，只有一行代码。</p>
+<pre><code>public static void initialize(
+    Supplier&lt;? extends SimpleDraweeControllerBuilder&gt; draweeControllerBuilderSupplier) {
+  sDraweeControllerBuilderSupplier = draweeControllerBuilderSupplier;
+}
+</code></pre><p>就是将前面初始化好的 PipelineDraweeControllerBuilderSupplier 设置给SimpleDraweeView. 好了，Fresco最基本的初始化过程就是这些，但这些还不能向我们解释，Fresco具体是将图片怎么样绘制到界面上的，在下一篇文章中，将对这些内容进行分析。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Fresco/" rel="tag"># Fresco</a>
+          
+            <a href="/tags/图片库/" rel="tag"># 图片库</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/08/03/android-fresco-notes/" rel="next" title="Fresco学习笔记">
+                <i class="fa fa-chevron-left"></i> Fresco学习笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2015/12/27/android-fresco-source-code-2-simpledraweeview/" rel="prev" title="Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？">
+                Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Fresco源代码分析-之一-默认初始化"><span class="nav-number">1.</span> <span class="nav-text">Fresco源代码分析 之一 默认初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Fresco的初始化"><span class="nav-number">1.1.</span> <span class="nav-text">Fresco的初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化ImagePipelineFactory"><span class="nav-number">1.2.</span> <span class="nav-text">初始化ImagePipelineFactory</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ImagePipelineConfig初始化"><span class="nav-number">1.2.1.</span> <span class="nav-text">ImagePipelineConfig初始化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Supplier-mBitmapMemoryCacheParamsSupplier"><span class="nav-number">1.2.2.</span> <span class="nav-text">Supplier mBitmapMemoryCacheParamsSupplier</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CacheKeyFactory-mCacheKeyFactory"><span class="nav-number">1.2.3.</span> <span class="nav-text">CacheKeyFactory mCacheKeyFactory</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#未解码的ImageRquest"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">未解码的ImageRquest</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#解码的ImageRequest"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">解码的ImageRequest</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Supplier-mEncodedMemoryCacheParams"><span class="nav-number">1.2.4.</span> <span class="nav-text">Supplier mEncodedMemoryCacheParams</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ImageCacheStatsTracker-mImageCacheStatsTracker"><span class="nav-number">1.2.5.</span> <span class="nav-text">ImageCacheStatsTracker mImageCacheStatsTracker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DiskCacheConfig-mMainDiskCacheConfig"><span class="nav-number">1.2.6.</span> <span class="nav-text">DiskCacheConfig mMainDiskCacheConfig</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NetworkFetcher-mNetworkFetcher"><span class="nav-number">1.2.7.</span> <span class="nav-text">NetworkFetcher mNetworkFetcher</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PoolFactory-mPoolFactory"><span class="nav-number">1.2.8.</span> <span class="nav-text">PoolFactory mPoolFactory</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#PoolParams-mBitmapPoolParams"><span class="nav-number">1.2.8.1.</span> <span class="nav-text">PoolParams mBitmapPoolParams</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ProgressiveJpegConfig"><span class="nav-number">1.2.9.</span> <span class="nav-text">ProgressiveJpegConfig</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RequestListeners"><span class="nav-number">1.2.10.</span> <span class="nav-text">RequestListeners</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ResizeAndRotateEnabledForNetwork"><span class="nav-number">1.2.11.</span> <span class="nav-text">ResizeAndRotateEnabledForNetwork</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SmallImageDiskCacheConfig"><span class="nav-number">1.2.12.</span> <span class="nav-text">SmallImageDiskCacheConfig</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ExecutorSupplier"><span class="nav-number">1.2.13.</span> <span class="nav-text">ExecutorSupplier</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化Drawee"><span class="nav-number">1.3.</span> <span class="nav-text">初始化Drawee</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PipelineDraweeControllerBuilderSupplier"><span class="nav-number">1.3.1.</span> <span class="nav-text">PipelineDraweeControllerBuilderSupplier</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SimpleDraweeView的初始化"><span class="nav-number">1.3.2.</span> <span class="nav-text">SimpleDraweeView的初始化</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

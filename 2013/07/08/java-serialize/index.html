@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="综述概念：所谓序列化，是指Java可以将任何对象写出到流中，并且在任何时候将其读回，这样我们就可以方便的将Java的对象进行保存、回复。 一：Serializable接口java.io.Serializable接口，该接口是最为常用并且最为简单使用的序列化接口，只要我们在想要序列化的类上继承该接口，就可以自动实现该类的序列化。 1、使用：参考下面的代码： package Serializable;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 序列化">
+<meta property="og:url" content="http://yoursite.com/2013/07/08/java-serialize/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="综述概念：所谓序列化，是指Java可以将任何对象写出到流中，并且在任何时候将其读回，这样我们就可以方便的将Java的对象进行保存、回复。 一：Serializable接口java.io.Serializable接口，该接口是最为常用并且最为简单使用的序列化接口，只要我们在想要序列化的类上继承该接口，就可以自动实现该类的序列化。 1、使用：参考下面的代码： package Serializable;">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T14:43:10.925Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 序列化">
+<meta name="twitter:description" content="综述概念：所谓序列化，是指Java可以将任何对象写出到流中，并且在任何时候将其读回，这样我们就可以方便的将Java的对象进行保存、回复。 一：Serializable接口java.io.Serializable接口，该接口是最为常用并且最为简单使用的序列化接口，只要我们在想要序列化的类上继承该接口，就可以自动实现该类的序列化。 1、使用：参考下面的代码： package Serializable;">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/07/08/java-serialize/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java 序列化 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/07/08/java-serialize/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java 序列化
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-07-08 16:37:05" itemprop="dateCreated datePublished" datetime="2013-07-08T16:37:05+08:00">2013-07-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 22:43:10" itemprop="dateModified" datetime="2018-10-03T22:43:10+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="综述"><a href="#综述" class="headerlink" title="综述"></a>综述</h2><h3 id="概念："><a href="#概念：" class="headerlink" title="概念："></a>概念：</h3><p>所谓序列化，是指Java可以将任何对象写出到流中，并且在任何时候将其读回，这样我们就可以方便的将Java的对象进行保存、回复。</p>
+<h3 id="一：Serializable接口"><a href="#一：Serializable接口" class="headerlink" title="一：Serializable接口"></a>一：Serializable接口</h3><p>java.io.Serializable接口，该接口是最为常用并且最为简单使用的序列化接口，只要我们在想要序列化的类上继承该接口，就可以自动实现该类的序列化。</p>
+<h4 id="1、使用："><a href="#1、使用：" class="headerlink" title="1、使用："></a>1、使用：</h4><p>参考下面的代码：</p>
+<p>package Serializable;</p>
+<p>import java.io.Serializable;</p>
+<p>public class Fruit implements Serializable{<br>    public String name;<br>    public float price;</p>
+<pre><code>public Fruit(String name,float price){
+    this.name = name;
+    this.price = price;
+}
+public void show(){};
+</code></pre><p>}</p>
+<p>package Serializable;</p>
+<p>import java.io.Serializable;</p>
+<p>public class Apple extends Fruit implements Serializable{</p>
+<pre><code>public Apple(String name,float price){
+    super(name, price);
+}
+
+@Override
+public void show(){
+    System.out.println(&quot;A apple named:&quot;+name+&quot; price:&quot;+price);
+}
+</code></pre><p>}</p>
+<p>package Serializable;</p>
+<p>import java.io.Serializable;</p>
+<p>public class Orange extends Fruit implements Serializable{</p>
+<pre><code>public Orange(String name,float price){
+    super(name, price);
+}
+
+@Override
+public void show(){
+    System.out.println(&quot;A orange named:&quot;+name+&quot; price:&quot;+price);
+}
+</code></pre><p>}</p>
+<p>package Serializable;</p>
+<p>import java.io.File;<br>import java.io.FileInputStream;<br>import java.io.FileNotFoundException;<br>import java.io.FileOutputStream;<br>import java.io.IOException;<br>import java.io.ObjectInputStream;<br>import java.io.ObjectOutputStream;</p>
+<p>public class SerializableInterfaceTest {</p>
+<pre><code>private static final long serialVersionUID = 8449604890628424672L;
+
+public static void main(String\[\] args){
+    try {
+        ObjectOutputStream op = new ObjectOutputStream(new FileOutputStream(new File(&quot;testSerializable&quot;)));
+        op.writeObject(new Apple(&quot;apple&quot;, 1.1f));
+        op.writeObject(new Orange(&quot;orange&quot;,2.2f));
+        op.close();
+    } catch (FileNotFoundException e) {
+        // TODO Auto-generated catch block
+        System.out.println(&quot;File not found!&quot;);
+    } catch (IOException e) {
+        // TODO: handle exception
+        e.printStackTrace();
+    }
+
+    try {
+        ObjectInputStream oi = new ObjectInputStream(new FileInputStream(new File(&quot;testSerializable&quot;)));
+        Apple apple = (Apple)oi.readObject();
+        Orange orange = (Orange)oi.readObject();
+        apple.show();
+        orange.show();
+
+    } catch (FileNotFoundException e) {
+        // TODO Auto-generated catch block
+        System.out.println(&quot;File not found!&quot;);
+    } catch (IOException e) {
+        // TODO: handle exception
+        e.printStackTrace();
+    } catch(ClassNotFoundException e){
+        e.printStackTrace();
+    }
+}
+</code></pre><p>}</p>
+<p>程序运行结果：</p>
+<p>A apple named:apple price:1.1<br>A orange named:orange price:2.2</p>
+<p>生成的testSerializable文件内容为：</p>
+<p>��srSerializable.AppleE-�f����xrSerializable.Fruit_,�}�&amp;��FpriceLnametLjava/lang/String;xp?���tapplesrSerializable.Orange���0h�xq~@</p>
+<p>可以看到，通过 java.io.Serializable接口，可以实现类的序列化，并将序列化之后的数据写入文件，并重新从文件读出。</p>
+<h3 id="2、注意事项："><a href="#2、注意事项：" class="headerlink" title="2、注意事项："></a>2、注意事项：</h3><p>仔细观察上面的程序，Fruit基类、Apple子类、Orange子类都实现了序列化，那么问题来了，如果说父类和子类有没有实现该接口的情况下会怎么样呢？ 将Fruit基类去掉对Serializable的接口，重新运行该程序，会发现如下的错误：</p>
+<p>java.io.InvalidClassException: Serializable.Apple; no valid constructor<br>    at java.io.ObjectStreamClass$ExceptionInfo.newInvalidClassException(ObjectStreamClass.java:150)<br>    at java.io.ObjectStreamClass.checkDeserialize(ObjectStreamClass.java:768)<br>    at java.io.ObjectInputStream.readOrdinaryObject(ObjectInputStream.java:1770)<br>    at java.io.ObjectInputStream.readObject0(ObjectInputStream.java:1348)<br>    at java.io.ObjectInputStream.readObject(ObjectInputStream.java:370)<br>    at Serializable.SerializableInterfaceTest.main(SerializableInterfaceTest.java:32)</p>
+<p>会发现在程序写入序列化的时候，没有任何错误的提示，但在读入数据的时候，却提示错误，我们看写入的文件内容有什么变化</p>
+<p>��srSerializable.AppleE-�f����xpsrSerializable.Orange���0h�xp</p>
+<p>会发现确实只序列化了Apple和Orange子类，但重新构建的时候，是找不到Fruit基类的，也就是上面，没有相应的构造函数。 原因是什么？ 我们继续探究，如果Fruit基类继承了该接口，但子类Apple没有继承该接口呢？重新编译、运行，发现能够正常运行，那是不是如果父类继承了该接口，子类就可以自动的序列化呢？从Java继承的角度来将，是这样理解的，父类继承了该接口，子类当然可以，但Java的Serializable接口是使用了Java的Reflection机制实现的，因此我们继续探究一下，当前的Apple类过于简单，我们再稍微加一点内容，将Apple修改如下：</p>
+<p>package Serializable;</p>
+<p>import java.io.Serializable;</p>
+<p>public class Apple extends Fruit{</p>
+<pre><code>public int productYear;
+
+public Apple(String name,float price){
+    super(name, price);
+    productYear = 2013;
+}
+
+@Override
+public void show(){
+    System.out.println(&quot;A apple named:&quot;+name+&quot; price:&quot;+price +&quot; product:&quot;+productYear);
+}
+</code></pre><p>}</p>
+<p>在这里增加了一个int的productYear属性，执行结果为：</p>
+<p>A apple named:apple price:1.1 product:2013<br>A orange named:orange price:2.2</p>
+<p>所以可以看出来，如果父类继承了Serializable接口的话，子类也可以自动继承该接口，并实现序列化。 那如果父类没有继承该接口，我们写子类，想要实现Serializable接口，怎么去做呢？<a href="http://docs.oracle.com/javase/7/docs/api/" target="_blank" rel="noopener">http://docs.oracle.com/javase/7/docs/api/</a> API Reference中有这样一段：</p>
+<p>During deserialization, the fields of non-serializable classes will be initialized using the public or protected no-arg constructor of the class. A no-arg constructor must be accessible to the subclass that is serializable. The fields of serializable subclasses will be restored from the stream.</p>
+<p> 如果说，子类要实现序列化，那么要求父类实现序列化，或者父类拥有无参构造函数。 父类实现序列化的方法已经验证过了，那么验证一下父类拥有无参构造函数的情况，修改Furit代码为：</p>
+<p>package Serializable;</p>
+<p>public class Fruit{<br>    public String name;<br>    public float price;</p>
+<pre><code>public Fruit(String name,float price){
+    this.name = name;
+    this.price = price;
+}
+
+public Fruit(){
+    this.name = &quot;Default&quot;;
+    this.price = 0.1f;
+}
+public void show(){};
+</code></pre><p>}</p>
+<p>同时，为Apple子类和Orange子类添加无参构造函数，运行结果为下：</p>
+<p>A apple named:Default price:0.1<br>A orange named:Default price:0.1</p>
+<p>在反序列化的时候，如果父类没有实现序列化，那么JVM调用了父类的无参构造函数，为子类中的父类对象进行了实例化。</p>
+<h4 id="3、修改默认的序列化机制："><a href="#3、修改默认的序列化机制：" class="headerlink" title="3、修改默认的序列化机制："></a>3、修改默认的序列化机制：</h4><p>1）有数据不希望被序列化？ 使用默认的序列化策略，类中所有的数据域都会被序列化。但在实际使用的时候，很多的情况下我们是不希望数据被序列化的，这时候怎么办？在Java中有一个很简单的机制可以实现该目的，使用transient关键字。e.g. 我们将上面程序中的基类Fruitjava进行修改，改动如下： 改动之前</p>
+<p>public String name;</p>
+<p>改动之后</p>
+<p>public transient String name;</p>
+<p>其实改动很少，只是将 name 加上了 transient关键字，再次运行程序，结果如下：</p>
+<p>A apple named:null price:1.1<br>A orange named:null price:2.2</p>
+<p>达到目的，所有的名称都没有从文件中的反序列化中得到。默认值为null 2）自定义序列化的对象 如果希望完全在Serializable接口基础上实现自定义序列化，需要自己实现witeObject接口和readObject接口，同时，在调用writeObject接口的时候，要先调defaultWriteObject()来使得自定义的序列化仍然使用Java Serializable默认的机制，当然，在读取的时候，要先调用 defaultReadObject()，也是一样的道理。 e.g 我们可以对Fruit基类做如下的修改：</p>
+<pre><code>private void writeObject(ObjectOutputStream out) throws IOException{
+    out.defaultWriteObject();
+    out.writeObject(name);
+    out.writeFloat(price);
+}
+
+private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException{
+    in.defaultReadObject();
+    this.name = (String)in.readObject();
+    this.price = in.readFloat();
+}
+</code></pre><h4 id="4、一个对象被多个对象共享的时候："><a href="#4、一个对象被多个对象共享的时候：" class="headerlink" title="4、一个对象被多个对象共享的时候："></a>4、一个对象被多个对象共享的时候：</h4><p>比如将代码按下列修改 1)添加类Owner</p>
+<p>package Serializable;<br>import java.io.Serializable;<br>public class Owner implements Serializable{<br>    public String name;<br>    public Owner(String name){<br>        this.name = name;<br>    }<br>}</p>
+<p>2)修改Fruit基类，增加设置Owner属性</p>
+<p>package Serializable;</p>
+<p>import java.io.Serializable;</p>
+<p>public class Fruit implements Serializable{<br>    public String name;<br>    public float price;<br>    public Owner owner;</p>
+<pre><code>public Fruit(String name,float price){
+    this.name = name;
+    this.price = price;
+}
+
+public void setOwner(Owner owner){
+    this.owner = owner;
+}
+
+public Fruit(){
+    this.name = &quot;Default&quot;;
+    this.price = 0.1f;
+}
+public void show(){};
+</code></pre><p>}</p>
+<p>3)修改测试程序，为每个Fruit设置Owner</p>
+<pre><code>ObjectOutputStream op = new ObjectOutputStream(new FileOutputStream(new File(&quot;testSerializable&quot;)));
+Apple apple = new Apple(&quot;apple&quot;, 1.1f);
+Orange orange = new Orange(&quot;orange&quot;,2.2f);
+Owner owner = new Owner(&quot;Happy&quot;);
+apple.setOwner(owner);
+orange.setOwner(owner);
+op.writeObject(apple);
+op.writeObject(orange);
+op.close();
+</code></pre><p>程序运行结果不变，那我们观察生成的文件</p>
+<p>��srSerializable.AppleD�[��^xrSerializable.Fruit”=�l<br>                                                          KFpriceLnametLjava/lang/String;LownertLSerializable/Owner;xp?���tapplesrSerializable.Ownerl[B0�Lnameq~xptHappysrSerializable.Orange�[ɪ�pd�xq~@<br>                                                      ��torangeq~</p>
+<p>可以发现，在内容中，Owner只是提到一次，也就是因为两个Fruit的指向了同一个Owner，因此在序列化保存中，只是将该对象保存了一次。 在Java核心技术中是这样解释这一部分内容的： 每个对象用是用一个序列号(serial number)保存的，在写入过程其算法为：</p>
+<p>1、对遇到的每一个对象引用都关联了一个序列号</p>
+<p>2、对每一个对象，当第一次遇到的时候，都保存其对象数据到流中。</p>
+<p>3、如果某个对象在之前被保存过，那么只写出“与之前保存过的序列号为x的对象相同”</p>
+<p>在读取的过程中，其算法为：</p>
+<p>1、对于流程的对象，在第一次遇到其序列号的时候，构建它，并使用流中的数据来初始化它，然后记录这个顺序号和新对象之间的关联。</p>
+<p>2、当遇到“与之前保存过的序列号为x的对象相同”标记时候，获取与这个顺序号想关联的对象引用。</p>
+<p>Tips：因为序列化用序列号代替了内存地址，所有允许将对象集合从一台机器传送到另外一台机器。</p>
+<h4 id="5、版本管理："><a href="#5、版本管理：" class="headerlink" title="5、版本管理："></a>5、版本管理：</h4><h4 id="6、clone-serializable"><a href="#6、clone-serializable" class="headerlink" title="6、clone+serializable"></a>6、clone+serializable</h4><p>书签Java 二：Externable 1、使用： 2、与Serializable区别 三：Android序列化Parcelable 四：开源序列化接口：</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/07/06/linux-system-call/" rel="next" title="系统调用">
+                <i class="fa fa-chevron-left"></i> 系统调用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/07/10/java-jni-method/" rel="prev" title="Java 本地方法 1、初步认识">
+                Java 本地方法 1、初步认识 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#综述"><span class="nav-number">1.</span> <span class="nav-text">综述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念："><span class="nav-number">1.1.</span> <span class="nav-text">概念：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一：Serializable接口"><span class="nav-number">1.2.</span> <span class="nav-text">一：Serializable接口</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1、使用："><span class="nav-number">1.2.1.</span> <span class="nav-text">1、使用：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、注意事项："><span class="nav-number">1.3.</span> <span class="nav-text">2、注意事项：</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3、修改默认的序列化机制："><span class="nav-number">1.3.1.</span> <span class="nav-text">3、修改默认的序列化机制：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4、一个对象被多个对象共享的时候："><span class="nav-number">1.3.2.</span> <span class="nav-text">4、一个对象被多个对象共享的时候：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5、版本管理："><span class="nav-number">1.3.3.</span> <span class="nav-text">5、版本管理：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6、clone-serializable"><span class="nav-number">1.3.4.</span> <span class="nav-text">6、clone+serializable</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

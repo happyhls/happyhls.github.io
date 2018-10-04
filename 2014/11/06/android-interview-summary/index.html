@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="已经进入11月份，公司也都跑了一遍，把之前整理的资料也慢慢的整理出来。这一篇是Android可能出的面试的题目的总结，以后慢慢补充。 1、 Android dvm的进程和Linux的进程, 应用程序的进程是否为同一个概念 DVM指Dalvik的虚拟机。每一个Android应用程序都在它自己的进程中运行，都拥有一个独立的Dalvik虚拟机实例。而每一个DVM都是在Linux 中的一个进程，所以说可以">
+<meta name="keywords" content="Android,面试">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android面试题目总结">
+<meta property="og:url" content="http://yoursite.com/2014/11/06/android-interview-summary/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="已经进入11月份，公司也都跑了一遍，把之前整理的资料也慢慢的整理出来。这一篇是Android可能出的面试的题目的总结，以后慢慢补充。 1、 Android dvm的进程和Linux的进程, 应用程序的进程是否为同一个概念 DVM指Dalvik的虚拟机。每一个Android应用程序都在它自己的进程中运行，都拥有一个独立的Dalvik虚拟机实例。而每一个DVM都是在Linux 中的一个进程，所以说可以">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/1.jpg">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/2.jpg">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/3.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.519Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android面试题目总结">
+<meta name="twitter:description" content="已经进入11月份，公司也都跑了一遍，把之前整理的资料也慢慢的整理出来。这一篇是Android可能出的面试的题目的总结，以后慢慢补充。 1、 Android dvm的进程和Linux的进程, 应用程序的进程是否为同一个概念 DVM指Dalvik的虚拟机。每一个Android应用程序都在它自己的进程中运行，都拥有一个独立的Dalvik虚拟机实例。而每一个DVM都是在Linux 中的一个进程，所以说可以">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/1.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/06/android-interview-summary/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Android面试题目总结 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/06/android-interview-summary/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android面试题目总结
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-06 22:25:51" itemprop="dateCreated datePublished" datetime="2014-11-06T22:25:51+08:00">2014-11-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/面试/" itemprop="url" rel="index"><span itemprop="name">面试</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>已经进入11月份，公司也都跑了一遍，把之前整理的资料也慢慢的整理出来。这一篇是Android可能出的面试的题目的总结，以后慢慢补充。</p>
+<p>1、 Android dvm的进程和Linux的进程, 应用程序的进程是否为同一个概念</p>
+<p>DVM指Dalvik的虚拟机。每一个Android应用程序都在它自己的进程中运行，都拥有一个独立的Dalvik虚拟机实例。而每一个DVM都是在Linux 中的一个进程，所以说可以认为是同一个概念。</p>
+<p>2、 android中的动画有哪几类，它们的特点和区别是什么？</p>
+<p>两种，一种是Tween动画、还有一种是Frame动画。Tween动画，这种实现方式可以使视图组件移动、放大、缩小以及产生透明度的变化；另一种Frame动画，传统的动画方法，通过顺序的播放排列好的图片来实现，类似电影。</p>
+<p>3、handler机制的原理</p>
+<p>（作用：在新启动的线程中发送消息，在主线程中获取、处理消息。）</p>
+<p>andriod提供了 Handler 和 Looper 来满足线程间的通信。Handler 先进先出原则。Looper类用来管理特定线程内对象之间的消息交换(Message Exchange)</p>
+<ol>
+<li>Looper: 一个线程可以产生一个Looper对象，由它来管理此线程里的Message Queue(消息队列)。</li>
+<li>Handler: 你可以构造Handler对象来与Looper沟通，以便push新消息到Message Queue里；或者接收Looper从Message Queue取出)所送来的消息。</li>
+<li>Message Queue(消息队列):用来存放线程放入的消息。</li>
+<li>线程：UI thread 通常就是main thread，而Android启动程序时会替它建立一个Message Queue。</li>
+</ol>
+<p>4、说说mvc模式的原理，它在android中的运用 MVC(Model_view_contraller)” 模型_视图_控制器”。 MVC应用程序总是由这三个部分组成。Event(事件)导致Controller改变Model或View，或者同时改变两者。只要 Controller改变了Models的数据或者属性，所有依赖的View都会自动更新。类似的，只要Controller改变了View，View会从潜在的Model中获取数据来刷新自己。 5、View的刷新: 在需要刷新的地方,使用handle.sendmessage发送信息,然后在handle的getmessage里面执行invaliate或者postinvaliate. 6、GC内存泄露出现情况:</p>
+<ol>
+<li>数据库的cursor没有关闭<ol>
+<li>如果说cursor可以立刻关闭，那么可以使用try{} finally{cursor.close()}来关闭cursor。</li>
+<li>如果cursor在其他的地方还要继续使用的话，那么则最好在Activity或者Fragment的生命周期的onDestroy()方法中记得关闭</li>
+</ol>
+</li>
+<li>构造adapter时,没有使用缓存contentview，衍生listview的优化问题<ol>
+<li>减少创建view的对象,在getView方法中充分复用contentview</li>
+<li>为了减少内部类的开销，将ViewHolder设置为静态内部类。</li>
+</ol>
+</li>
+<li>Bitmap对象不使用时采用recycle()释放内存<ol>
+<li>这个是内存泄漏很容易导致OOM的问题。</li>
+</ol>
+</li>
+<li>activity中的对象的生命周期大于activity<ol>
+<li>比如一个Activity中保存有一个静态对象，该对象指向一个内部类，那么就会有额外的开销。（静态对象会尝试维护原先的引用，但此时内部类必须保持一个对外部类的引用，因此会额外保存一份外部类的指针，因此外部类不会被GC掉）<ol>
+<li>方法是将该内部类声明为静态类。</li>
+</ol>
+</li>
+<li>在Activity生命周期之外，不要用户指向Acitivty内部的对象。</li>
+</ol>
+</li>
+</ol>
+<p>7、Intent的设计的优势或者设计初衷</p>
+<ul>
+<li>Android使用了统一的封装来实现了一致的编程模型。</li>
+<li>实现系统各个部分的一个松耦合，比如可以指定启动具有某种特征的程序而不需要硬编码</li>
+</ul>
+<p>8、Android为什么要设计4大组件，他们之间的联系，不设计行不行（主要是为了实现MVC模式，然而java中最难的模式也是这个，很少有产品能将这个模式做得很好</p>
+<ul>
+<li>Activity</li>
+<li>Service</li>
+<li>Broadcast</li>
+<li>ContentProvider</li>
+</ul>
+<p>9、Service的生命周期 <a href="/images/wordpress/2014/11/1.jpg"><img src="/images/wordpress/2014/11/1.jpg" alt="1"></a>  </p>
+<ol>
+<li>Service常用生命周期回调方法如下：<ol>
+<li>onCreate() 该方法在服务被创建时调用，该方法只会被调用一次，无论调用多少次startService()或bindService()方法，服务也只被创建一次。 onDestroy()该方法在服务被终止时调用。startService和bindService对应的onStartCommand()和onBind() onUnbind()会多次被调。</li>
+</ol>
+</li>
+<li>Context.startService()启动Service有关的生命周期方法<ol>
+<li>onStartCommand() 只有采用Context.startService()方法启动服务时才会回调该方法。该方法在服务开始运行时被调用。</li>
+<li>多次调用startService()方法尽管不会多次创建服务，但onStartCommand() 方法会被多次调用。</li>
+</ol>
+</li>
+<li>Context.bindService()启动Service有关的生命周期方法<ol>
+<li>onBind()只有采用Context.bindService()方法启动服务时才会回调该方法。该方法在调用者与服务绑定时被调用，当调用者与服务已经绑定，多次调用Context.bindService()方法并不会导致该方法被多次调用。</li>
+<li>onUnbind()只有采用Context.bindService()方法启动服务时才会回调该方法。该方法在调用者与服务解除绑定时被调用。</li>
+</ol>
+</li>
+</ol>
+<p>服务的分类：</p>
+<ul>
+<li>本地服务(Local)：直接依附于主线程，可以使用bindService()中的Binder进行通信，也可以通过启动服务的时候将任务通过Intent提交给Service，完成时通过广播进行结果反馈。</li>
+<li>远程服务(Remote)：在AndroidManifest.xml中配置对应的Service为android:remote=”true”，此时需要通过广播或者AIDL进行通信。其生命周期与主线程独立</li>
+</ul>
+<p>优先级：</p>
+<ul>
+<li>前台服务：会同时在状态栏加以提示，优先级高，但服务终止的时候状态栏也会消失。</li>
+<li>后台服务：默认状态，优先级低于前台服务，GC时相比更容易被干掉。</li>
+</ul>
+<p>几个注意事项：</p>
+<ul>
+<li>bindService()+unbindService()应该成对出现</li>
+<li>startService()+stopService()应该成对出现</li>
+<li>屏幕旋转时，Activity是重新创建的，因此Service也是同样，重新创建之后，与之前的Service连接就会断开。</li>
+</ul>
+<p>bindService方法：</p>
+<ul>
+<li>在Service中实现Binder内部类，当Service创建之后初始化该Binder内部类，并保存实例，然后覆写onBind(Intent inent)方法，在其中返回该Binder实例。</li>
+<li>在Activity中创建ServiceConnection()内部类或者匿名类，覆写其中的onServiceConnected(ComponentName name, IBinder service)方法和onServiceDisconnected(ComponmentName name)方法，然后再onServiceConnected方法中获取Service对应的Binder类的实例。</li>
+</ul>
+<p>参考：<a href="http://www.cnblogs.com/newcj/archive/2011/05/30/2061370.html" target="_blank" rel="noopener">http://www.cnblogs.com/newcj/archive/2011/05/30/2061370.html</a> 注意： Service默认是工作在主线程的，所以默认情况下，如果在Service中做的时间过长，同样也会导致ANR的问题，因此有3中解决方法：</p>
+<ul>
+<li>在Service开启线程</li>
+<li>使用IntentService(会开辟一个工作线程的FIFO工作队列，工作完成之后自动结果，覆写onHandleIntent(Intent intent)就可以)</li>
+<li>设置android:remote=”true”，使用广播通信</li>
+<li>AIDL</li>
+</ul>
+<p>Service的onStartCommand()会返回一个数值，表示当Service被Kill掉的时候不同的反应。</p>
+<ol>
+<li>START_NOT_STICKY<ul>
+<li>如果系统在onStartCommand()方法返回之后kill掉该服务，那么除非有其他的Pending Intent需要传递，那么不会重新创建该Service。</li>
+</ul>
+</li>
+<li>START_STICKY<ul>
+<li>如果系统在onStartCommand()方法返回之后kill掉该服务，那么系统会重新创建该服务，并且重新调用onStartCommand()，并且不会重新派发最近的intent。如果此时没有需要派发的Intent，那么就会传入一个null的intent。这种情况适用于媒体播放等情况，不执行命令，但是在后台等待任务。</li>
+</ul>
+</li>
+<li>START_REDELIVER_INTENT<ul>
+<li>如果系统在onStartCommand()方法返回之后kill掉该服务，那么系统会重新创建该服务，并且重新调用onStartCommand()，并且重新派发最近的intent。用于需要立刻恢复继续处理的情况，比如说下载服务。</li>
+</ul>
+</li>
+</ol>
+<p>如何实现Service的不死之身？</p>
+<ul>
+<li>onDestory中重启服务</li>
+<li>两个服务互相关心</li>
+<li>AlarmManger定时广播检查</li>
+<li>监听各种事件，比如锁屏开屏，网络变化。</li>
+</ul>
+<p>10、注册广播有几种方式，这些方式有何优缺点？请谈谈Android引入广播机制的用意。  Android广播机制（两种注册方法） 在android下，要想接受广播信息，那么这个广播接收器就得我们自己来实现了，我们可以继承BroadcastReceiver，就可以有一个广播接受器了。有个接受器还不够，我们还得重写BroadcastReceiver里面的onReceiver方法，当来广播的时候我们要干什么，这就要我们自己来实现，不过我们可以搞一个信息防火墙。具体的代码：</p>
+<p>public class SmsBroadCastReceiver extends BroadcastReceiver {<br>  @Override<br>  public void onReceive(Context context, Intent intent) {<br>    Bundle bundle = intent.getExtras();<br>    Object[] object = (Object[]) bundle.get(“pdus”);<br>    SmsMessage sms[] = new SmsMessage[object.length];<br>    for (int i = 0; i &lt; object.length; i++) {<br>      sms[0] = SmsMessage.createFromPdu((byte[]) object);<br>      Toast.makeText(context,<br>          “来自” + sms.getDisplayOriginatingAddress() + “的消息是：” + sms.getDisplayMessageBody(),<br>          Toast.LENGTH_SHORT).show();<br>    }<br>    // 终止广播，在这里我们可以稍微处理，根据用户输入的号码可以实现短信防火墙。<br>    abortBroadcast();<br>  }<br>}</p>
+<p>当实现了广播接收器，还要设置广播接收器接收广播信息的类型，这里是信息：android.provider.Telephony.SMS_RECEIVED</p>
+<p>我们就可以把广播接收器注册到系统里面，可以让系统知道我们有个广播接收器。这里有两种，一种是代码动态注册：</p>
+<p><code>//生成广播处理</code></p>
+<p><code>smsBroadCastReceiver = newSmsBroadCastReceiver();</code></p>
+<p><code>//实例化过滤器并设置要过滤的广播</code></p>
+<p><code>IntentFilter intentFilter = newIntentFilter(&quot;android.provider.Telephony.SMS_RECEIVED&quot;);</code></p>
+<p><code>//注册广播</code></p>
+<p><code>BroadCastReceiverActivity.this.registerReceiver(smsBroadCastReceiver,intentFilter);</code></p>
+<p>一种是在AndroidManifest.xml中配置广播</p>
+<pre><code>&lt;receiver android:name=&quot;.SmsBroadCastReceiver&quot; &gt;
+    &lt;intent-filterandroid:priority&gt;
+        &lt;actionandroid:name android.provider.Telephony.SMS_RECEIVED=&quot;&quot; /&gt;
+        &lt;intent-filter&gt;
+        &lt;/intent-filter&gt;
+    &lt;/intent-filterandroid:priority&gt;
+&lt;/receiver&gt;
+</code></pre><p>两种注册类型的区别是： 1)第一种不是常驻型广播，也就是说广播跟随程序的生命周期。 2)第二种是常驻型，也就是说当应用程序关闭后，如果有信息广播来，程序也会被系统调用自动运行。 11、请解释下在单线程模型中Message、Handler、MessageQueue、Looper之间的关系。Handler简介： 一个Handler允许你发送和处理Message和Runable对象，这些对象和一个线程的MessageQueue相关联。每一个线程实例和一个单独的线程以及该线程的MessageQueue相关联。当你创建一个新的Handler时，它就和创建它的线程绑定在一起了。这里，线程我们也可以理解为线程的MessageQueue。从这一点上来看，Handler把Message和Runable对象传递给MessageQueue，而且在这些对象离开MessageQueue时，Handler负责执行他们。 Handler有两个主要的用途：（1）确定在将来的某个时间点执行一个或者一些Message和Runnable对象。（2）在其他线程（不是Handler绑定线程）中排入一些要执行的动作。 Scheduling Message，即（1），可以通过以下方法完成： post(Runnable):Runnable在handler绑定的线程上执行，也就是说不创建新线程。 postAtTime(Runnable,long): postDelayed(Runnable,long): sendEmptyMessage(int): sendMessage(Message): sendMessageAtTime(Message,long): sendMessageDelayed(Message,long): post这个动作让你把Runnable对象排入MessageQueue,MessageQueue受到这些消息的时候执行他们，当然以一定的排序。sendMessage这个动作允许你把Message对象排成队列，这些Message对象包含一些信息，Handler的hanlerMessage(Message)会处理这些Message.当然，handlerMessage(Message)必须由Handler的子类来重写。这是编程人员需要作的事。 当posting或者sending到一个Hanler时，你可以有三种行为：当MessageQueue准备好就处理，定义一个延迟时间，定义一个精确的时间去处理。后两者允许你实现timeout,tick,和基于时间的行为。 当你的应用创建一个新的进程时，主线程（也就是UI线程）自带一个MessageQueue，这个MessageQueue管理顶层的应用对象（像activities,broadcast receivers等）和主线程创建的窗体。你可以创建自己的线程，并通过一个Handler和主线程进行通信。这和之前一样，通过post和sendmessage来完成，差别在于在哪一个线程中执行这么方法。在恰当的时候，给定的Runnable和Message将在Handler的MessageQueue中被Scheduled。 Message简介： Message类就是定义了一个信息，这个信息中包含一个描述符和任意的数据对象，这个信息被用来传递给Handler.Message对象提供额外的两个int域和一个Object域，这可以让你在大多数情况下不用作分配的动作。 尽管Message的构造函数是public的，但是获取Message实例的最好方法是调用Message.obtain(),或者Handler.obtainMessage()方法，这些方法会从回收对象池中获取一个。 MessageQueue简介： 这是一个包含message列表的底层类。Looper负责分发这些message。Messages并不是直接加到一个MessageQueue中，而是通过MessageQueue.IdleHandler关联到Looper。 你可以通过Looper.myQueue()从当前线程中获取MessageQueue。 Looper简介： Looper类被用来执行一个线程中的message循环。默认情况，没有一个消息循环关联到线程。在线程中调用prepare()创建一个Looper，然后用loop()来处理messages，直到循环终止。 大多数和message loop的交互是通过Handler。 下面是一个典型的带有Looper的线程实现。</p>
+<p>class LooperThread extends Thread {<br>  public Handler mHandler;</p>
+<p>  public void run() {<br>    Looper.prepare();<br>    mHandler = new Handler() {<br>      public voidhandleMessage(Message msg) {<br>        // process incomingmessages here<br>      }<br>    };<br>    Looper.loop();<br>  }<br>}</p>
+<p>12、AIDL的全称是什么？如何工作？能处理哪些类型的数据？AIDL的英文全称是Android Interface Define Language</p>
+<p>当A进程要去调用B进程中的service时，并实现通信，我们通常都是通过AIDL来操作的 A工程： 首先我们在net.blogjava.mobile.aidlservice包中创建一个RemoteService.aidl文件，在里面我们自定义一个接口，含有方法get。ADT插件会在gen目录下自动生成一个RemoteService.java文件，该类中含有一个名为RemoteService.stub的内部类，该内部类中含有aidl文件接口的get方法。 说明一：aidl文件的位置不固定，可以任意 然后定义自己的MyService类，在MyService类中自定义一个内部类去继承RemoteService.stub这个内部类，实现get方法。在onBind方法中返回这个内部类的对象，系统会自动将这个对象封装成IBinder对象，传递给他的调用者。 其次需要在AndroidManifest.xml文件中配置MyService类，代码如下：</p>
+<p><code>&lt;!-- 注册服务 --&gt;</code></p>
+<p><code>&lt;service android:name=&quot;.MyService&quot;&gt;</code></p>
+<p><code>&lt;intent-filter&gt;</code></p>
+<p><code>&lt;!-- 指定调用AIDL服务的ID --&gt;</code></p>
+<p><code>&lt;actionandroid:name=&quot;net.blogjava.mobile.aidlservice.RemoteService&quot; /&gt;</code></p>
+<p><code>&lt;/intent-filter&gt;</code></p>
+<p><code>&lt;/service&gt;</code></p>
+<p>为什么要指定调用AIDL服务的ID,就是要告诉外界MyService这个类能够被别的进程访问，只要别的进程知道这个ID，正是有了这个ID,B工程才能找到A工程实现通信。 说明：AIDL并不需要权限 B工程： 首先我们要将A工程中生成的RemoteService.java文件拷贝到B工程中，在bindService方法中绑定aidl服务 绑定AIDL服务就是将RemoteService的ID作为intent的action参数。 说明：如果我们单独将RemoteService.aidl文件放在一个包里，那个在我们将gen目录下的该包拷贝到B工程中。如果我们将RemoteService.aidl文件和我们的其他类存放在一起，那么我们在B工程中就要建立相应的包，以保证RmoteService.java文件的报名正确，我们不能修改RemoteService.java文件 bindService(newInten(“net.blogjava.mobile.aidlservice.RemoteService”),serviceConnection, Context.BIND_AUTO_CREATE); ServiceConnection的onServiceConnected(ComponentName name, IBinderservice)方法中的service参数就是A工程中MyService类中继承了RemoteService.stub类的内部类的对象。   13、 横竖屏切换时候activity的生命周期?</p>
+<ul>
+<li>不设置Activity的android:configChanges时，切屏会重新调用各个生命周期，切横屏时会执行一次，切竖屏时会执行两次</li>
+<li>设置Activity的android:configChanges=”orientation”时，切屏还是会重新调用各个生命周期，切横、竖屏时只会执行一次</li>
+<li>设置Activity的android:configChanges=”orientation|keyboardHidden”时，切屏不会重新调用各个生命周期，只会执行onConfigurationChanged方法</li>
+</ul>
+<p>14、如何将SQLite数据库(dictionary.db文件)与apk文件一起发布? 解答：可以将dictionary.db文件复制到Eclipse Android工程中的res aw目录中。所有在res aw目录中的文件不会被压缩，这样可以直接提取该目录中的文件。可以将dictionary.db文件复制到res aw目录中 15、 如何将打开res aw目录中的数据库文件? 解答：在Android中不能直接打开res aw目录中的数据库文件，而需要在程序第一次启动时将该文件复制到手机内存或SD卡的某个目录中，然后再打开该数据库文件。复制的基本方法是使用getResources().openRawResource方法获得res aw目录中资源的 InputStream对象，然后将该InputStream对象中的数据写入其他的目录中相应文件中。在Android SDK中可以使用SQLiteDatabase.openOrCreateDatabase方法来打开任意目录中的SQLite数据库文件。 16、Android引入广播机制的用意?</p>
+<ul>
+<li>从MVC的角度考虑(应用程序内) 、其实回答这个问题的时候还可以这样问，android为什么要有那4大组件，现在的移动开发模型基本上也是照搬的web那一套MVC架构，只不过是改了点嫁妆而已。android的四大组件本质上就是为了实现移动或者说嵌入式设备上的MVC架构，它们之间有时候是一种相互依存的关系，有时候又是一种补充关系，引入广播机制可以方便几大组件的信息和数据交互。</li>
+<li>程序间互通消息(例如在自己的应用程序内监听系统来电)</li>
+<li>效率上(参考UDP的广播协议在局域网的方便性)</li>
+<li>设计模式上(反转控制的一种应用，类似监听者模式)</li>
+</ul>
+<p>17、XML包括哪些解释技术，区别是什么？</p>
+<ul>
+<li>DOM将文档解析成一颗文档树，可在节点上进行遍历、增加、修改和删除。一次性读入内存，对内存消耗大。</li>
+<li>SAX至上而下解析文档，以事件进行驱动。不会一次性读入内存，对内存消耗小，不能任意读取节点，并且不能对节点进行增加、修改和删除。</li>
+</ul>
+<p>18、switch语句能否作用在byte上，能否作用在long上，能否作用在String上? switch能作用在byte、char、short和int上，JDK1.7后可以作用在String上。 19、”==”和equals方法究竟有什么区别？ ==比较地址。==是运算符，equals是方法，方法可以通过重写改变其行为，如String的equals就是比较字符串内容。 20、java中有几种类型的流？JDK为每种类型的流提供了一些抽象类以供继承，请说出他们分别是哪些类？ java中有三种流，分别是字节流（InputStream、OutputStream）、字符流（Reader、Writer）、对象流（ObjectInputStream、ObjectOutputStream）。 21、字节流与字符流的区别？ 字节流用于读取或写出二进制数据，比如图片、影像等数据。 字符流用于读取或写出字符数据，比如传输字符串。 所有的数据都可以通过字节流来进行处理，不过如果是字符数据，用字节流还需要进行转换后传输，如果使用字符流可以方便数据的转换。 22、当一个线程进入一个对象的一个synchronized方法后，其它线程是否可进入此对象的其它方法? 如果其他方法没有加synchronized的话是可以进入的。 23、.描述4 种 activity 的启动模式</p>
+<ul>
+<li>standard ：系统的默认模式，一次跳转即会生成一个新的实例。假设有一个activity命名为MainActivity，执行语句：<ul>
+<li>startActivity(new Intent(MainActivity.this, MainActivity.class))后，MainActivity将跳转到另外一个MainActivity，也就是现在的Task栈里面有MainActivity的两个实例。按返回键后你会发现仍然是在MainActivity（第一个）里面。</li>
+</ul>
+</li>
+<li>singleTop<ul>
+<li>singleTop 跟standard 模式比较类似。如果已经有一个实例位于Activity栈的顶部时，就不产生新的实例，而只是调用Activity中的newInstance()方法。如果不位于栈顶，会产生一个新的实例。例：当MainActivity为 singleTop 模式时，执行跳转后栈里面依旧只有一个实例，如果现在按返回键程序将直接退出。</li>
+</ul>
+</li>
+<li>singleTask<ul>
+<li>singleTask模式和后面的singleInstance模式都是只创建一个实例的。在这种模式下，无论跳转的对象是不是位于栈顶的activity，程序都不会生成一个新的实例（当然前提是栈里面已经有这个实例）。这种模式相当有用，在以后的多activity开发中，经常会因为跳转的关系导致同个页面生成多个实例，这个在用户体验上始终有点不好，而如果你将对应的activity声明为 singleTask 模式，这种问题将不复存在。如果该activity启动过，系统会找到对应的task，将task栈中位于activity之上的清除，然后调出对应的activity</li>
+</ul>
+</li>
+<li>singleInstance<ul>
+<li>设置为 singleInstance 模式的 activity 将独占一个task（感觉task可以理解为进程），独占一个task的activity与其说是activity，倒不如说是一个应用，这个应用与其他activity是独立的，它有自己的上下文activity。</li>
+</ul>
+</li>
+</ul>
+<p>24、如何一次性退出所有打开的Activity 编写一个Activity作为入口，当需要关闭程序时，可以利用Activity的SingleTop模式跳转该Activity，它上面的所有Activity都会被销毁掉。然后再将该Activity关闭。 或者再跳转时，设置intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);这样也能将上面的Activity销毁掉。 25、Activity和Service之间如何通信</p>
+<ul>
+<li>启动时Intent传递</li>
+<li>通过Binder在Activity中获取Service的实例，然后可以在Activity中直接调用Service的方法</li>
+<li>通过广播，在Service中发布广播，然后在Activity中接收</li>
+<li>通过Binder的transact方法。public final boolean transact (int code, Parcel data, Parcel reply, int flags)</li>
+<li>Messager</li>
+<li>AIDL</li>
+</ul>
+<p>26、Android不同进程之间数据交换方式</p>
+<p>Intent，ContentProvider，Broadcast，AIDL</p>
+<p>Android同一进程中，Service和Activity通信方式</p>
+<p>Binder，Intent，ContentProvider，Broadcast，AIDL，(通过Binder传递Handler对象)Handler</p>
+<p>27、Intent对象可以携带的携带数据 通过查询Intent/Bundle的API文档，我们可以获知，Intent/Bundle支持传递基本类型的数据和基本类型的数组数据，以及String/CharSequence类型的数据和String/CharSequence类型的数组数据。而对于其它类型的数据貌似无能为力，其实不然，我们可以在Intent/Bundle的API中看到Intent/Bundle还可以传递Parcelable（包裹化，邮包）和Serializable（序列化）类型的数据，以及它们的数组/列表数据。</p>
+<p>28、ContentValues可以存放的数据类型</p>
+<p>Key：String</p>
+<p>Value：Byte，Integer，Float，Short，byte[]，String，Double，Long，Boolean等常用数据类型。</p>
+<p>28、算法让程序更省电</p>
+<ul>
+<li>利用推送服务替换轮询</li>
+<li>通过AlarmManager的定时任务替代轮询操作<ul>
+<li>还可以采用比如一些指数退避的算法来减少更新频率，尤其是后台的时候，用户不去点击界面的时候，不需要那么高的刷刷新频率。</li>
+</ul>
+</li>
+<li>先获取当前的连接状态，在发送Http请求的时候，是否有网络可以用，如果无网络可用，则不要去获取新的数据，因为必然是在浪费电量。</li>
+<li>检查电量，根据电量的多少采取不同的策略。</li>
+<li>wakeclock和其他的硬件资源不要占用时间过多，用完之后及时释放<ul>
+<li>传感器<ul>
+<li>加速度传感器，亮度传感器等等</li>
+</ul>
+</li>
+<li>其他的<ul>
+<li>蓝牙，WiFi，GPS等等</li>
+</ul>
+</li>
+<li>可以将上面的资源的获取和释放，与生命周期结合起来。</li>
+</ul>
+</li>
+</ul>
+<p>29、能快速重新联网</p>
+<ul>
+<li>心跳检测</li>
+<li>监听网络状态</li>
+</ul>
+<p>30、Queue接口</p>
+<p><em>Throws exception</em></p>
+<p><em>Returns special value</em></p>
+<p><strong>Insert</strong></p>
+<p><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Queue.html#add(E" target="_blank" rel="noopener"><code>add(e)</code></a>)</p>
+<p><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Queue.html#offer(E" target="_blank" rel="noopener"><code>offer(e)</code></a>)</p>
+<p><strong>Remove</strong></p>
+<p><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Queue.html#remove(" target="_blank" rel="noopener"><code>remove()</code></a>)</p>
+<p><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Queue.html#poll(" target="_blank" rel="noopener"><code>poll()</code></a>)</p>
+<p><strong>Examine</strong></p>
+<p><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Queue.html#element(" target="_blank" rel="noopener"><code>element()</code></a>)</p>
+<p><a href="http://docs.oracle.com/javase/7/docs/api/java/util/Queue.html#peek(" target="_blank" rel="noopener"><code>peek()</code></a>)</p>
+<p>31、Android中常见的设计模式</p>
+<ul>
+<li>组合模式<ul>
+<li>View和ViewGroup的使用(几乎所有的widget和布局类)</li>
+</ul>
+</li>
+<li>观察者模式<ul>
+<li>通知和广播</li>
+<li>DataSetObserver,ContentObserver</li>
+</ul>
+</li>
+<li>单例模式<ul>
+<li>获取系统中的各种Service，比如INPUT_METHOD_SERVICE，WIFI的Service</li>
+</ul>
+</li>
+<li>模板方法模式<ul>
+<li>View中定好模板，子类比如Button或者自定义的View要依据其模板来。</li>
+</ul>
+</li>
+<li>备忘录模式<ul>
+<li>就是保存状态，然后做会其他的事情，然后再回来继续</li>
+</ul>
+</li>
+<li>享元模式<ul>
+<li>比如String之间共享，还有SQL的编译，具体的没看过</li>
+</ul>
+</li>
+<li>命令模式<ul>
+<li>Runnable的run()方法</li>
+</ul>
+</li>
+<li>工厂方法<ul>
+<li>太多了，比如BitmapFactory，Connection相关的</li>
+</ul>
+</li>
+<li>适配器模式<ul>
+<li>ListView，GridView，ViewPager等里面的Adapter。</li>
+</ul>
+</li>
+<li>原型模式<ul>
+<li>clone方法</li>
+</ul>
+</li>
+<li>策略模式<ul>
+<li>比如Collections中的sort()方法</li>
+<li>比如Annimation中的Interpolator不同实现，不同的Interpolator带来不同的策略。</li>
+</ul>
+</li>
+<li>生成器模式(建造者模式)<ul>
+<li>DialogBuilder()</li>
+</ul>
+</li>
+<li>责任链/响应链<ul>
+<li>触摸、按键各种事件的传递</li>
+</ul>
+</li>
+<li>装饰者模式<ul>
+<li>各种InputStream.OutputStream</li>
+</ul>
+</li>
+</ul>
+<p>31、Adapter中getView的写法</p>
+<p><strong>ListView item缓存机制</strong>：为了使得性能更优，ListView会缓存行item(某行对应的View)。ListView通过adapter的getView函数获得每行的item。滑动过程中， a. 如果某行item已经滑出屏幕，若该item不在缓存内，则put进缓存，否则更新缓存； b. 获取滑入屏幕的行item之前会先判断缓存中是否有可用的item，如果有，做为convertView参数传递给adapter的getView。 更具体可见源代码<a href="http://www.grepcode.com/file/repository.grepcode.com/java/ext/com.google.android/android/4.0.1_r1/android/widget/AbsListView.java#AbsListView.obtainView%28int%2Cboolean%5B%5D%29" title="ListView obtainView源码，缓存的核心" target="_blank" rel="noopener">ListView.obtainView</a>。</p>
+<p>来源： &lt;<a href="http://www.trinea.cn/android/android-listview-display-error-image-when-scroll/" target="_blank" rel="noopener">http://www.trinea.cn/android/android-listview-display-error-image-when-scroll/</a>&gt;</p>
+<p>虽然两种设置不同，结果也不同，但是convertview的机制没有变。 其实到此为止我们可以总结出convertview的机制了，就是在初始显示的时候，每次显示一个item都调用一次getview方法但是每次调用的时候covertview为空（因为还没有旧的view），当显示完了之后。如果屏幕移动了之后，<strong>并且导致有些Item（也可以说是view）跑到屏幕外面，此时如果还有新的item需要产生，则这些item显示时调用的getview方法中的convertview参数就不是null，而是那些移出屏幕的view（旧view），我们所要做的就是将需要显示的item填充到这些回收的view（旧view）中去，最后注意convertview为null的不仅仅是初始显示的那些item，还有一些是已经开始移入屏幕但是还没有view被回收的那些item。</strong> 最终我们用亲手写的代码实现了<strong>Recycler(反复循环器).</strong> <strong>第二个问题其实应该在第一个问题中嵌套来讲，但是为了思路清晰我分开了：</strong> view的setTag和getTag方法其实很简单，在实际编写代码的时候一个view不仅仅是为了显示一些字符串、图片，有时我们还需要他们携带一些其他的数据以便我们对该view的识别或者其他操作。于是android 的设计者们就创造了setTag(Object)方法来存放一些数据和view绑定，我们可以理解为这个是view 的标签也可以理解为view 作为一个容器存放了一些数据。而这些数据我们也可以通过getTag() 方法来取出来。 <strong>到这里setTag和getTag大家应该已经明白了。再回到上面的话题，我们通过convertview的setTag方法和getTag方法来将我们要显示的数据来绑定在convertview上。如果convertview 是第一次展示我们就创建新的Holder对象与之绑定，并在最后通过return convertview 返回，去显示；如果convertview 是回收来的那么我们就不必创建新的holder对象，只需要把原来的绑定的holder取出加上新的数据就行了。</strong></p>
+<p>来源： &lt;<a href="http://blog.csdn.net/pkxiuluo01/article/details/7380974" target="_blank" rel="noopener">http://blog.csdn.net/pkxiuluo01/article/details/7380974</a>&gt;</p>
+<p>class LooperThread extends Thread {<br>  @Override<br>  public View getView(int position, View convertView, ViewGroup parent) {<br>    ViewHolder holder;<br>    if (convertView == null) {<br>      convertView = inflater.inflate(R.layout.list_item, null);<br>      holder = new ViewHolder();<br>      ……<br>      convertView.setTag(holder);<br>    } else {<br>      holder = (ViewHolder)convertView.getTag();<br>    }<br>  }</p>
+<p>  private static class ViewHolder {</p>
+<pre><code>ImageView appIcon;
+TextView appName;
+TextView appInfo;
+</code></pre><p>  }<br>}</p>
+<p>32、生命周期</p>
+<ul>
+<li>Activity的生命周期</li>
+<li><p><a href="/images/wordpress/2014/11/2.jpg"><img src="/images/wordpress/2014/11/2.jpg" alt="2"></a></p>
+</li>
+<li><p>Fragent的生命周期</p>
+</li>
+<li><a href="/images/wordpress/2014/11/3.png"><img src="/images/wordpress/2014/11/3.png" alt="3"></a></li>
+</ul>
+<p>33、屏幕尺寸</p>
+<p><strong>px</strong> Pixels - corresponds to actual pixels on the screen. 对应屏幕上的每一个像素点 <strong>in</strong> Inches - based on the physical size of the screen. 1 Inch = 2.54 centimeters 英尺 <strong>mm</strong> Millimeters - based on the physical size of the screen. 毫米 <strong>pt</strong> Points - 1/72 of an inch based on the physical size of the screen. 点？ <strong>dp</strong> Density-independent Pixels - an abstract unit that is based on the physical density of the screen. These units are relative to a 160 dpi screen, so one dp is one pixel on a 160 dpi screen. The ratio of dp-to-pixel will change with the screen density, but not necessarily in direct proportion. Note: The compiler accepts both “dip” and “dp”, though “dp” is more consistent with “sp”. 分辨率独立单位，单位是在160dpi上定义的，160dpi上，1dp=pixel <strong>sp</strong> Scale-independent Pixels - this is like the dp unit, but it is also scaled by the user’s font size preference. It is commend you use this unit when specifying font sizes, so they will be adjusted for both the screen density and user’s preference. 缩放独立的单位，一般用在文字大小上</p>
+<p>来源： &lt;<a href="http://stackoverflow.com/questions/2025282/difference-between-px-dp-dip-and-sp-in-android" target="_blank" rel="noopener">http://stackoverflow.com/questions/2025282/difference-between-px-dp-dip-and-sp-in-android</a>&gt;</p>
+<p>34、Android事件处理机制：</p>
+<ul>
+<li>基于监听的事件处理：比如设置onClickListener</li>
+<li>基于回调的事件处理：主要是重写Android组件的特定的回调方法，或者重写Activity的回调方法。<ul>
+<li>onBackPressed(),onKeyDown(int keycode, KeyEvent event), onKeyLongPress,onKeyUp()</li>
+<li>基于分工的事件模型分工更加明确，事件源、事件监听由两个类分开实现，具有更好的维护性。</li>
+<li>Android的事件处理机制保证监听的事件监听器会被优先触发。</li>
+</ul>
+</li>
+</ul>
+<p>35、Activity的启动、关闭</p>
+<ul>
+<li>启动<ul>
+<li>startActivity(Intent intent);</li>
+<li>startActivityForResult(Intent intent, int requestCode)</li>
+<li>要注意上面的intent可以是显示的intent，也可以是隐式的，但如果是隐式的，那么指向的activity必须设置category为<category android:name="android.intent.category.DEFAULT"></category></li>
+</ul>
+</li>
+<li>关闭<ul>
+<li>finish()关闭自己</li>
+<li>finish(int requestCode)，关闭以startActivityForResult启动的Activity。</li>
+<li>System.exit(0)</li>
+</ul>
+</li>
+</ul>
+<p>36、Intent-Filter中action和category的区别。</p>
+<p>回答：改变以前从app角度来看问题的思路，整个问题从intent的设计角度来谈。当Intent在创建的时候，创建者并不会知道到底系统中哪个程序来处理这个Intent。但是Intent的创建者会知道他们想要做什么（比如从设备中获取一个通讯录），并且需要访问其他的程序来获取所需要的。</p>
+<p>为了在实现这个，Intent会有一些信息来实现这个，其中就包含了actions和categories。</p>
+<p>actions是定义了一个Intent的通用的方法，比如查看contact，比如从Gallery中获取一张照片。</p>
+<p>category则是提供了额外的信息来识别到底调用哪个程序。比如当浏览器中点击一个I拦截，Intent会包含一个BROWSABLE的category来识别他。</p>
+<p>所以当系统去识别一个Intent的时候，会查找所有注册的Activy，Service，BroadcastReceiver包含上面全部信息的那些。如果Intent要识别PICK的action，那么如果Activity的Intent-fileter中不包含PICK的action的就会被从候选名单中剔除。con</p>
+<p>通过这种办法，由action，category，type，以及可能的scheme组合在一起，来找到具体的执行操作的组件。</p>
+<p>37、Android 程序 ，不能混淆的地方</p>
+<ul>
+<li>Android系统组件，系统组件有固定的方法被系统调用。</li>
+<li>被Android Resource 文件引用到的。名字已经固定，也不能混淆，比如自定义的View 。</li>
+<li>Android Parcelable ，需要使用android 序列化的。</li>
+<li>其他Anroid 官方建议 不混淆的，如</li>
+<li>android.app.backup.BackupAgentHelper</li>
+<li>android.preference.Preference</li>
+<li>com.android.vending.licensing.ILicensingService</li>
+<li>Java序列化方法，系统序列化需要固定的方法。</li>
+<li>枚举 ，系统需要处理枚举的固定方法。</li>
+<li>本地方法，不能修改本地方法名</li>
+<li>annotations 注释</li>
+<li>数据库驱动</li>
+<li>有些resource 文件</li>
+<li>用到反射的地方</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/面试/" rel="tag"># 面试</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/03/06/java-queue-priorityqueue/" rel="next" title="Queue,PriorityQueue学习">
+                <i class="fa fa-chevron-left"></i> Queue,PriorityQueue学习
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/13/android-volley-usage-1-sending-request/" rel="prev" title="Volley Lesson 1 -Sending a Simple Request（译）">
+                Volley Lesson 1 -Sending a Simple Request（译） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

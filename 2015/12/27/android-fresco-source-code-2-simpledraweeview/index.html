@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？ 引言在《Fresco源代码分析之1：Fresco的初始化 》文章中，仔细分析了Fresco.init(Context)方法中所做的工作。总结下来有一下几点：  初始化了 ImagePipelineFactory ， 包括默认的ImagePipelineConfig（其中初始化了各种线程池、是否解码、旋转之类的">
+<meta name="keywords" content="Android,Fresco">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？">
+<meta property="og:url" content="http://yoursite.com/2015/12/27/android-fresco-source-code-2-simpledraweeview/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？ 引言在《Fresco源代码分析之1：Fresco的初始化 》文章中，仔细分析了Fresco.init(Context)方法中所做的工作。总结下来有一下几点：  初始化了 ImagePipelineFactory ， 包括默认的ImagePipelineConfig（其中初始化了各种线程池、是否解码、旋转之类的">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T15:07:12.463Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？">
+<meta name="twitter:description" content="Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？ 引言在《Fresco源代码分析之1：Fresco的初始化 》文章中，仔细分析了Fresco.init(Context)方法中所做的工作。总结下来有一下几点：  初始化了 ImagePipelineFactory ， 包括默认的ImagePipelineConfig（其中初始化了各种线程池、是否解码、旋转之类的">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2015/12/27/android-fresco-source-code-2-simpledraweeview/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？ | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2015/12/27/android-fresco-source-code-2-simpledraweeview/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2015-12-27 23:59:56" itemprop="dateCreated datePublished" datetime="2015-12-27T23:59:56+08:00">2015-12-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 23:07:12" itemprop="dateModified" datetime="2018-10-03T23:07:12+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/Fresco/" itemprop="url" rel="index"><span itemprop="name">Fresco</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Fresco源代码分析之二：SimpleDraweeView如何拉取图片并绘制在屏幕上？</p>
+<h1 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h1><p>在<a href="http://blog.happyhls.me/2015/12/24/fresco%E6%BA%90%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90%E4%B9%8B1%EF%BC%9Afresco%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96/" target="_blank" rel="noopener">《Fresco源代码分析之1：Fresco的初始化 》</a>文章中，仔细分析了Fresco.init(Context)方法中所做的工作。总结下来有一下几点：</p>
+<ol>
+<li>初始化了 <em>ImagePipelineFactory</em> ， 包括默认的ImagePipelineConfig（其中初始化了各种线程池、是否解码、旋转之类的设置、各种Cache的默认配置等等）。</li>
+<li>初始化了默认的 <em>SimpleDraweeView</em> ，包括对应的ImagePipeline。</li>
+</ol>
+<p>那么问题来了，当我们通过SimpleDraweeView的</p>
+<pre><code>setImageUri(Uri, Object)
+</code></pre><p>方法调用的时候，Fresco到底做了哪些工作呢？图片是经过了哪些工作绘制在界面上的呢？这篇文章就来说说这些事情。</p>
+<h1 id="调用方法"><a href="#调用方法" class="headerlink" title="调用方法"></a>调用方法</h1><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"> \* Displays an image given by the uri.</span><br><span class="line"> \*</span><br><span class="line"> \* @param uri uri of the image</span><br><span class="line"> \* @param callerContext caller context</span><br><span class="line"> */</span><br><span class="line">public void setImageURI(Uri uri, @Nullable Object callerContext) &#123;</span><br><span class="line">  DraweeController controller = mSimpleDraweeControllerBuilder</span><br><span class="line">      .setCallerContext(callerContext)</span><br><span class="line">      .setUri(uri)</span><br><span class="line">      .setOldController(getController())</span><br><span class="line">      .build();</span><br><span class="line">  setController(controller);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在想象中，图片库要将图片显示出来，至少要经过查询缓存、网络获取、图片的解码、写入缓存、图片的后处理、显示图片这几个过程。但查看Fresco的代码，发现仅仅这几行，两句话就完事了，那么这两句话后面，到底有哪些故事发生呢？</p>
+<h1 id="源代码分析"><a href="#源代码分析" class="headerlink" title="源代码分析"></a>源代码分析</h1><p>从上述代码出发，分析图片加载的全过程。</p>
+<h2 id="获取DraweeController"><a href="#获取DraweeController" class="headerlink" title="获取DraweeController"></a>获取DraweeController</h2><p>代码的第一行，典型的是一个获取DraweeController的方法，具体的工作是怎么样的呢？</p>
+<pre><code>DraweeController controller = mSimpleDraweeControllerBuilder
+    .setCallerContext(callerContext)
+    .setUri(uri)
+    .setOldController(getController())
+    .build();
+</code></pre><p>其中mSimpleDraweeControllerBuilder是一个SimpleDraweeControllerBuilder的接口，该方法以此调用了四个方法，分别设置了 <strong>调用者的上下文</strong>、 <strong>Uri</strong>、 <strong>旧的Controller</strong>。从接口上看不出来Fresco具体做了什么工组的，因此还是要看看具体的实现。 在Fresco的初始化代码中，是这样初始化的</p>
+<pre><code>// 初始化Drawee
+private static void initializeDrawee(Context context) {
+  sDraweeControllerBuilderSupplier = new PipelineDraweeControllerBuilderSupplier(context);
+  SimpleDraweeView.initialize(sDraweeControllerBuilderSupplier);
+}
+</code></pre><p>因此可以看出来，SimpleDraweeView所对应的Controller实际上是源自PipelineDraweeControllerBuilder，进一步查看，可以发现继承关系如下：</p>
+<pre><code>SimpleDraweeControllerBuilder
+|
+|
+AbstractDraweeControllerBuilder
+|
+|
+PipelineDraweeControllerBuilder
+</code></pre><p>既然在SimpleDraweeView.setUri()方法中只调用了setCallerContext\setUri\setOldController，那么我们就从这四个方法入手</p>
+<h3 id="setCallerContext-Object-callerContext"><a href="#setCallerContext-Object-callerContext" class="headerlink" title="setCallerContext(Object callerContext)"></a>setCallerContext(Object callerContext)</h3><p>这个方法源自 <strong>AbstractDraweeControllerBuilder</strong></p>
+<pre><code>/** Sets the caller context. */
+@Override
+public BUILDER setCallerContext(Object callerContext) {
+  mCallerContext = callerContext;
+  return getThis();
+}
+</code></pre><p>和字面意思一样，该方法就是简单的设置了上下文，而且需要注意的是，上下文的类型为<strong>Object</strong>。</p>
+<h3 id="setUri-Uri-uri"><a href="#setUri-Uri-uri" class="headerlink" title="setUri(Uri uri)"></a>setUri(Uri uri)</h3><p>该方法首先调用 <strong>PipelineDraweeControllerBuilder</strong> 的对应的方法</p>
+<pre><code>@Override
+public PipelineDraweeControllerBuilder setUri(Uri uri) {
+  return super.setImageRequest(ImageRequest.fromUri(uri));
+}
+</code></pre><p>其实本质上还是调用父类的这个方法，但需要注意的是，在这里面使用ImageRequest.fromUri(Uri)又将方法包装了一下，将Uri包装为ImageRequest的类型。ImageRequest的类的注释如下：</p>
+<pre><code>Immutable object encapsulating everything pipeline has to know about requested image to proceed.
+</code></pre><p>可以直接看出，在Fresco中，ImageRequest为一个不可变类，其中包含了一个请求所需要的全部信息。 而调用至 <strong>AbstractDraweeControllerBuilder</strong> 中对应的方法也很简单，就是设置了一下对应的成员变量</p>
+<pre><code>/** Sets the image request. */
+public BUILDER setImageRequest(REQUEST imageRequest) {
+  mImageRequest = imageRequest;
+  return getThis();
+}
+</code></pre><h3 id="setOldController-DraweeController"><a href="#setOldController-DraweeController" class="headerlink" title="setOldController(DraweeController)"></a>setOldController(DraweeController)</h3><p>此处也是调用的 <strong>AbstractDraweeControllerBuilder</strong>中的方法，具体代码如下：</p>
+<pre><code>/** Sets the old controller to be reused if possible. */
+@Override
+public BUILDER setOldController(@Nullable DraweeController oldController) {
+  mOldController = oldController;
+  return getThis();
+}
+</code></pre><p>工作也很简单，就是同样是设置了成员变量，那么这样看来，所有的工作应该都是放在了build()方法里面，现在去看看。</p>
+<h3 id="build"><a href="#build" class="headerlink" title="build()"></a>build()</h3><p>build方法也是直接调用的 <strong>AbstractDraweeControllerBuilder</strong>中的方法，</p>
+<pre><code>/** Builds the specified controller. */
+@Override
+public AbstractDraweeController build() {
+  validate();
+
+  // if only a low-res request is specified, treat it as a final request.
+  if (mImageRequest == null &amp;&amp; mMultiImageRequests == null &amp;&amp; mLowResImageRequest != null) {
+    mImageRequest = mLowResImageRequest;
+    mLowResImageRequest = null;
+  }
+
+  return buildController();
+}
+</code></pre><p>这里面有一个判断 <em>仅仅在ImageRequest以及MultiImageRequest都为空，且LowResImagaeRequest(低质量请求)存在的时候，才将这个低质量的请求作为最终的请求来处理。</em> 那 <strong>buildController()</strong> 方法做了什么呢？代码如下：</p>
+<pre><code>/** Builds a regular controller. */
+protected AbstractDraweeController buildController() {
+  AbstractDraweeController controller = obtainController();
+  controller.setRetainImageOnFailure(getRetainImageOnFailure());
+  maybeBuildAndSetRetryManager(controller);
+  maybeAttachListeners(controller);
+  return controller;
+}
+</code></pre><p>可以看出来，分了4个步骤：</p>
+<ol>
+<li>获取对应的Controller</li>
+<li>配置Controller是否显示失败重新获取的图片</li>
+<li>设置重试管理器（RetryManager）</li>
+<li>设置Attach事件监听者</li>
+</ol>
+<p>要想搞明白了，还是一件一件事情依次看看做了什么。 <strong>AbstractDraweeController controller = obtainController();</strong> AbstractDraweeControllerBuilder中并没有obtainController()的默认实现，并要求子类实现，在PipelineDraweeControllerBuilder中，其实现如下：</p>
+<pre><code>  /**
+   * 该方法会尝试复用以前的Controller,
+   * 复用的办法是:
+   * 1\首先判断Controller的类型,如果是PipelineDraweeController,则初始化即可
+   * 2\如果不是如果是PipelineDraweeController的类型,则新建一个.
+   * @return
+   */
+
+@Override
+protected PipelineDraweeController obtainController() {
+  DraweeController oldController = getOldController();
+  PipelineDraweeController controller;
+  if (oldController instanceof PipelineDraweeController) {
+    controller = (PipelineDraweeController) oldController;
+    controller.initialize(
+        obtainDataSourceSupplier(),
+        generateUniqueControllerId(),
+        getCallerContext());
+  } else {
+    controller = mPipelineDraweeControllerFactory.newController(
+        obtainDataSourceSupplier(),
+        generateUniqueControllerId(),
+        getCallerContext());
+  }
+  return controller;
+}
+</code></pre><p>其实代码也很简单，就是检查之前通过setOldController设置的Controller是否为自身的类型，如果是，则通过设置重新使用，如果不是，则通过对应的工厂方法重新建立一个。 当然，我们不能看到这边就可以了，既然Controller可以复用，我们就看看重用Controller的初始化代码中都做了什么工作？</p>
+<pre><code>/**
+ * 通过新配置的Id和调用者上下文,重新初始化AbstractDraweeController
+ * 这种设计允许在不需要重新实例化controller的时候复用之前的Controller.
+ *
+ * Initializes this controller with the new id and caller context.
+ * This allows for reusing of the existing controller instead of instantiating a new one.
+ * This method should be called when the controller is in detached state.
+ * @param id unique id for this controller
+ * @param callerContext tag and context for this controller
+ */
+protected void initialize(String id, Object callerContext) {
+  init(id, callerContext);
+}
+
+private void init(String id, Object callerContext) {
+  // 记录事件:开始初始化Controller
+  mEventTracker.recordEvent(Event.ON_INIT_CONTROLLER);
+  // 如果之前有DeferredReleaser,则释放
+  // cancel deferred release
+  if (mDeferredReleaser != null) {
+    mDeferredReleaser.cancelDeferredRelease(this);
+  }
+  // 重新初始化各种状态
+  // reinitialize mutable state (fetch state)
+  mIsAttached = false;
+  releaseFetch();
+  mRetainImageOnFailure = false;
+  // 重新初始化RetryManager
+  // reinitialize optional components
+  if (mRetryManager != null) {
+    mRetryManager.init();
+  }
+  // 重新初始化GestureDetector
+  if (mGestureDetector != null) {
+    mGestureDetector.init();
+    mGestureDetector.setClickListener(this);
+  }
+  // 清空ControllerListener
+  if (mControllerListener instanceof InternalForwardingListener) {
+    ((InternalForwardingListener) mControllerListener).clearListeners();
+  } else {
+    mControllerListener = null;
+  }
+  // 清空Drawee视图
+  // clear hierarchy and controller overlay
+  if (mSettableDraweeHierarchy != null) {
+    mSettableDraweeHierarchy.reset();
+    mSettableDraweeHierarchy.setControllerOverlay(null);
+    mSettableDraweeHierarchy = null;
+  }
+  mControllerOverlay = null;
+  // reinitialize constant state
+  if (FLog.isLoggable(FLog.VERBOSE)) {
+    FLog.v(TAG, &quot;controller %x %s -&gt; %s: initialize&quot;, System.identityHashCode(this), mId, id);
+  }
+  mId = id;
+  mCallerContext = callerContext;
+}
+</code></pre><p>上面的代码就是Controller初始化或者说重新初始化过程，所调用的代码，具体都有哪些工作呢？依次来看：</p>
+<ol>
+<li>记录事件：初始化Controller</li>
+<li>如果之前调用了DeferredReleaser，则取消。</li>
+<li>设置变量 mISAttached = false; 释放之前的网络获取。</li>
+<li>重新配置RetryManager.</li>
+<li>重新设置触摸事件检测</li>
+<li>配置MControllerListener，若为内置转发Listener，则保留，反之清空。</li>
+<li>清空对应的Drawee视图。</li>
+<li>设置Id和上下文。</li>
+</ol>
+<h3 id="setController-DraweeController"><a href="#setController-DraweeController" class="headerlink" title="setController(DraweeController)"></a>setController(DraweeController)</h3><p>setController(DraweeController)的代码如下：</p>
+<pre><code>/** Sets the controller. */
+public void setController(@Nullable DraweeController draweeController) {
+  mDraweeHolder.setController(draweeController);
+  super.setImageDrawable(mDraweeHolder.getTopLevelDrawable());
+}
+</code></pre><p>这一块代码也很简单，两句话：</p>
+<ol>
+<li>为mDraweeHoler设置了Controller</li>
+<li>调用了ImageView的setImageDrawable(Drawable)方法，设置了一张图片。</li>
+</ol>
+<p>其实第2步代码的作用非常容易理解：就是在网络数据拉取成功之前，先设置一张默认的图片，这样在交互的时候，界面更加友好。 那么这样看来，网络请求发出等工作都是在第1步代码当中了。</p>
+<pre><code>/**
+ * 配置新的Controller
+ * Sets a new controller.
+ */
+public void setController(@Nullable DraweeController draweeController) {
+  // 首先判断该DraweeHolder是否已经与某个Controller绑定.（按照Controller方法的调用行为,此处更应该表述的是,该图像已经需要Controller加载过）
+  boolean wasAttached = mIsControllerAttached;
+  // 如果之前绑定过,则首先解除绑定.
+  if (wasAttached) {
+    detachController();
+  }
+
+  // Clear the old controller, 重置之前的Controller
+  if (mController != null) {
+    mEventTracker.recordEvent(Event.ON_CLEAR_OLD_CONTROLLER);
+    mController.setHierarchy(null);
+  }
+  // 将新的Controller赋值给成员变量.
+  mController = draweeController;
+  // 记录事件,配置视图
+  if (mController != null) {
+    mEventTracker.recordEvent(Event.ON_SET_CONTROLLER);
+    mController.setHierarchy(mHierarchy);
+  } else {
+    mEventTracker.recordEvent(Event.ON_CLEAR_CONTROLLER);
+  }
+
+  // 如果之前的Controller曾经绑定,则进一步调用attachController
+  if (wasAttached) {
+    attachController();
+  }
+}
+</code></pre><p><strong>setController</strong> 方法着实也非常简单，可以看出其实主要就是几个工作：</p>
+<ol>
+<li>首先检查该DraweeHolder是否之前绑定过Controller，如果有，则调用detachController()方法释放之前的Controller。</li>
+<li>清空之前的Controller，并将新的controller对象赋给mController。</li>
+<li>记录事件，为新的controller配置视图。</li>
+<li>如果该DraweeHolder之前绑定过Controller，则调用attachController()方法直接拉起下一步进程。</li>
+</ol>
+<p>需要注意的是，我们在代码分析中可以发现，其实我们在setController的时候，Fresco并不一定会直接发出网络请求，那么Fresco是什么时候进行的呢？分为两种情况：</p>
+<ol>
+<li>如果DraweeHoler之前有通过Controller加载过图片，则直接通过新的controller重新加载。</li>
+<li>如果没有，则等待时机执行。那什么时候呢？接着分析一下。</li>
+</ol>
+<h4 id="图片的加载"><a href="#图片的加载" class="headerlink" title="图片的加载"></a>图片的加载</h4><p>其实很简单，Controller中有个方法叫onAttach()，这个名字是不是很熟悉？没错，和View的onAttach()方法签名一样，同样的，则个方法也是监听DraweeHolder的onAttach()回调函数，来看看。 <strong>ViewHolder</strong></p>
+<pre><code>/**
+ * Gets the controller ready to display the image.
+ *
+ * &lt;p&gt;The containing view must call this method from both {@link View#onFinishTemporaryDetach()}
+ * and {@link View#onAttachedToWindow()}.
+ */
+public void onAttach() {
+  mEventTracker.recordEvent(Event.ON_HOLDER_ATTACH);
+  mIsHolderAttached = true;
+  attachOrDetachController();
+}
+</code></pre><p>代码很简单，就是记录事件，然后设置变量，然后调用下面一个方法，接着看。</p>
+<pre><code>private void attachOrDetachController() {
+  if (mIsHolderAttached &amp;&amp; mIsVisible &amp;&amp; mIsActivityStarted) {
+    attachController();
+  } else {
+    detachController();
+  }
+}
+</code></pre><p>这个也不用多说，就是检查DraweeHolder是否已经已经在屏幕上了，是否是显示的，Activity是否已经启动，如果是，则直接attachController()。 <strong>AbastarctDraweeController</strong> 接下来就看看Controller的onAttach()方法了</p>
+<pre><code>@Override
+public void onAttach() {
+  if (FLog.isLoggable(FLog.VERBOSE)) {
+    FLog.v(
+        TAG,
+        &quot;controller %x %s: onAttach: %s&quot;,
+        System.identityHashCode(this),
+        mId,
+        mIsRequestSubmitted ? &quot;request already submitted&quot; : &quot;request needs submit&quot;);
+  }
+  // 记录事件
+  mEventTracker.recordEvent(Event.ON_ATTACH_CONTROLLER);
+  // 检查mSettingableDraweeHierarchy是否为null
+  Preconditions.checkNotNull(mSettableDraweeHierarchy);
+  // 释放DeferredReleaser
+  mDeferredReleaser.cancelDeferredRelease(this);
+  // 设置mISAttached
+  mIsAttached = true;
+  // 如果任务没有提交,则提交
+  if (!mIsRequestSubmitted) {
+    submitRequest();
+  }
+}
+</code></pre><p>代码也很简单，无需多说，任务就是在这里被提交的。</p>
+<pre><code>// 提交请求
+protected void submitRequest() {
+  // 记录事件
+  mEventTracker.recordEvent(Event.ON_DATASOURCE_SUBMIT);
+  // 向Controller Listener 提交对应事件
+  getControllerListener().onSubmit(mId, mCallerContext);
+  // 设置进度,设置不显示进度
+  mSettableDraweeHierarchy.setProgress(0, true);
+  // 设置相关变量
+  mIsRequestSubmitted = true;
+  mHasFetchFailed = false;
+  mDataSource = getDataSource();
+  if (FLog.isLoggable(FLog.VERBOSE)) {
+    FLog.v(
+        TAG,
+        &quot;controller %x %s: submitRequest: dataSource: %x&quot;,
+        System.identityHashCode(this),
+        mId,
+        System.identityHashCode(mDataSource));
+  }
+  final String id = mId;
+  final boolean wasImmediate = mDataSource.hasResult();
+  // 添加DataSubscriber
+  final DataSubscriber&lt;T&gt; dataSubscriber =
+      new BaseDataSubscriber&lt;T&gt;() {
+        @Override
+        public void onNewResultImpl(DataSource&lt;T&gt; dataSource) {
+          // isFinished must be obtained before image, otherwise we might set intermediate result
+          // as final image.
+          boolean isFinished = dataSource.isFinished();
+          float progress = dataSource.getProgress();
+          T image = dataSource.getResult();
+          if (image != null) {
+            onNewResultInternal(id, dataSource, image, progress, isFinished, wasImmediate);
+          } else if (isFinished) {
+            onFailureInternal(id, dataSource, new NullPointerException(), /* isFinished */ true);
+          }
+        }
+        @Override
+        public void onFailureImpl(DataSource&lt;T&gt; dataSource) {
+          onFailureInternal(id, dataSource, dataSource.getFailureCause(), /* isFinished */ true);
+        }
+        @Override
+        public void onProgressUpdate(DataSource&lt;T&gt; dataSource) {
+          boolean isFinished = dataSource.isFinished();
+          float progress = dataSource.getProgress();
+          onProgressUpdateInternal(id, dataSource, progress, isFinished);
+        }
+      };
+  mDataSource.subscribe(dataSubscriber, mUiThreadImmediateExecutor);
+}
+</code></pre><p>提交请求的代码我也加了注释，但这个地方涉及到整个数据流的分析，后面接着讲，暂时就看到这里。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Fresco/" rel="tag"># Fresco</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2015/12/24/android-fresco-source-code-1-initialization/" rel="next" title="Fresco源代码分析：1、Fresco的初始化">
+                <i class="fa fa-chevron-left"></i> Fresco源代码分析：1、Fresco的初始化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#引言"><span class="nav-number">1.</span> <span class="nav-text">引言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#调用方法"><span class="nav-number">2.</span> <span class="nav-text">调用方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源代码分析"><span class="nav-number">3.</span> <span class="nav-text">源代码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#获取DraweeController"><span class="nav-number">3.1.</span> <span class="nav-text">获取DraweeController</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#setCallerContext-Object-callerContext"><span class="nav-number">3.1.1.</span> <span class="nav-text">setCallerContext(Object callerContext)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setUri-Uri-uri"><span class="nav-number">3.1.2.</span> <span class="nav-text">setUri(Uri uri)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setOldController-DraweeController"><span class="nav-number">3.1.3.</span> <span class="nav-text">setOldController(DraweeController)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#build"><span class="nav-number">3.1.4.</span> <span class="nav-text">build()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#setController-DraweeController"><span class="nav-number">3.1.5.</span> <span class="nav-text">setController(DraweeController)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#图片的加载"><span class="nav-number">3.1.5.1.</span> <span class="nav-text">图片的加载</span></a></li></ol></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

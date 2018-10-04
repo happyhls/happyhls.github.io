@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在Volley当中，我们很清晰的能够看到，建立请求，都会放在Reqeust当中，当结果的反馈是通过ResponseDelivery调用对应的Response反馈。Picasso和Volley相比，更加专注在图形，但应该也是遵循类似的逻辑。那我们今天就来分析一下，在不同的执行阶段，一个请求封装成的RequestCreator、Request、Target、Action。 RequestCreator">
+<meta name="keywords" content="Android,Picasso,RequestCreator">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Picasso源代码分析：2、ReqeustCreator">
+<meta property="og:url" content="http://yoursite.com/2014/11/25/picasso-source-code-2-requestcreator/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="在Volley当中，我们很清晰的能够看到，建立请求，都会放在Reqeust当中，当结果的反馈是通过ResponseDelivery调用对应的Response反馈。Picasso和Volley相比，更加专注在图形，但应该也是遵循类似的逻辑。那我们今天就来分析一下，在不同的执行阶段，一个请求封装成的RequestCreator、Request、Target、Action。 RequestCreator">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T14:50:34.108Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Picasso源代码分析：2、ReqeustCreator">
+<meta name="twitter:description" content="在Volley当中，我们很清晰的能够看到，建立请求，都会放在Reqeust当中，当结果的反馈是通过ResponseDelivery调用对应的Response反馈。Picasso和Volley相比，更加专注在图形，但应该也是遵循类似的逻辑。那我们今天就来分析一下，在不同的执行阶段，一个请求封装成的RequestCreator、Request、Target、Action。 RequestCreator">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/25/picasso-source-code-2-requestcreator/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Picasso源代码分析：2、ReqeustCreator | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/25/picasso-source-code-2-requestcreator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Picasso源代码分析：2、ReqeustCreator
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-25 16:10:25" itemprop="dateCreated datePublished" datetime="2014-11-25T16:10:25+08:00">2014-11-25</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 22:50:34" itemprop="dateModified" datetime="2018-10-03T22:50:34+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/Picasso/" itemprop="url" rel="index"><span itemprop="name">Picasso</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在Volley当中，我们很清晰的能够看到，建立请求，都会放在Reqeust当中，当结果的反馈是通过ResponseDelivery调用对应的Response反馈。Picasso和Volley相比，更加专注在图形，但应该也是遵循类似的逻辑。那我们今天就来分析一下，在不同的执行阶段，一个请求封装成的RequestCreator、Request、Target、Action。</p>
+<h1 id="RequestCreator"><a href="#RequestCreator" class="headerlink" title="RequestCreator"></a>RequestCreator</h1><p>RequestCreator用来做什么？用来构建一个图片下载的Request，那它是如何组织的呢？ 静态变量</p>
+<p>private static int nextId = 0;</p>
+<p>有一个静态的用来获取ReqeustId()的方法，代码如下：</p>
+<p>  private static int getRequestId() {<br>    if (isMain()) {<br>      return nextId++;<br>    }</p>
+<pre><code>final CountDownLatch latch = new CountDownLatch(1);
+final AtomicInteger id = new AtomicInteger();
+Picasso.HANDLER.post(new Runnable() {
+  @Override public void run() {
+    id.set(getRequestId());
+    latch.countDown();
+  }
+});
+try {
+  latch.await();
+} catch (InterruptedException e) {
+  sneakyRethrow(e);
+}
+return id.get();
+</code></pre><p>  }</p>
+<ul>
+<li>此处是设置该Reqeust的Id，有两种情况：<ul>
+<li>如果是在主线程上调用：则直接将返回nextId，并自增–&gt;貌似不是线程安全的</li>
+<li>如果是在其他的线程上调用，那么通过handler发送给主线程，在主线程中同样从这里取一个nextId,然后自增，然后再设置给AtomicInteger。使用了CountDownLatch来在其他线程中等待主线程设置Id。</li>
+</ul>
+</li>
+<li>有个问题：这个线程是不是线程安全的？<ul>
+<li>我认为这个方法并不是线程安全的，其所做的工作只是保证所有的nextId的分配都在主线程上进行，但并没有保证不会同时有两个线程去请求获取ReqeustId()。</li>
+<li>不对，这个应该是线程安全的，因为这个方法在返回nextId之前，保证调用是来自主线程。换句话说，只有在主线程调用getRequestId()的时候，才会去生成并返回reqeustId，既然都在一个线程上进行的，那肯定是线程安全的。</li>
+</ul>
+</li>
+</ul>
+<p><strong>类成员变量：</strong></p>
+<p>  private final Picasso picasso;</p>
+<p>  //注意，其实在Reqeust.Builder是保存了所有的与图片显示相关的信息，包括图片的URL或者ResourceId，宽度，长度，是否旋转裁剪等等。<br>  private final Request.Builder data;</p>
+<p>  private boolean skipMemoryCache;<br>  private boolean noFade;<br>  private boolean deferred;<br>  private boolean setPlaceholder = true;<br>  private int placeholderResId;<br>  private int errorResId;<br>  private Drawable placeholderDrawable;<br>  private Drawable errorDrawable;<br>  private Object tag;</p>
+<p>成员变量中，则是保存了一Picasso对象的引用，还有一个Reqeust.Builder来保存图片的相关的信息等等，具体用的时候就会明白。 <strong>构造函数：</strong></p>
+<p>  RequestCreator(Picasso picasso, Uri uri, int resourceId) {<br>    if (picasso.shutdown) {<br>      throw new IllegalStateException(<br>          “Picasso instance already shut down. Cannot submit new requests.”);<br>    }<br>    this.picasso = picasso;<br>    this.data = new Request.Builder(uri, resourceId);<br>  }</p>
+<p>注意，构造函数的访问限定符是package。 在ReqeustCreator当中有大量的getter\setter函数，我们这里先不去分析，分析几个关键的点： <strong> public Bitmap get() throws IOException;</strong></p>
+<p>/**<br> * Synchronously fulfill this request. Must not be called from the main thread.<br> * 同步填充request，必须从主线程以外的线程上调用。<br> * </p><p><br> * <em>Note</em>: The result of this operation is not cached in memory because the underlying<br> * {@link Cache} implementation is not guaranteed to be thread-safe.<br> * 该操作的结果并不会在内存中cache，因为底层的{@link Cache}实现并不保证是线程安全的。<br> */<br>public Bitmap get() throws IOException {<br>  long started = System.nanoTime();<br>  checkNotMain();</p>
+<p>  if (deferred) {<br>    throw new IllegalStateException(“Fit cannot be used with get.”);<br>  }<br>  if (!data.hasImage()) {<br>    return null;<br>  }</p>
+<p>  //创建Request<br>  Request finalData = createRequest(started);<br>  //根据Reqeust，创建CacheKey<br>  String key = createKey(finalData, new StringBuilder());<br>  //获取对应的Action<br>  Action action = new GetAction(picasso, finalData, skipMemoryCache, key, tag);<br>  //首先创建一个BitmapHunter，并调用其中的hunt()方法。<br>  return forRequest(picasso, picasso.dispatcher, picasso.cache, picasso.stats, action).hunt();<br>}</p>
+<p>该方法的作用：同步填充一个请求，必须在主线程上调用，且不会写入Cache。其具体的方法是：</p>
+<ol>
+<li>首先检查是否工作在主线程，然后检查是否已经设置请求的地址Uri或者Resource Id</li>
+<li>然后创建一个Reqeust</li>
+<li>根据创建的Reqeust创建CacheKy</li>
+<li>再创建一个具体的Action</li>
+<li>调用forReqeust()方法构造一个BitmapHunter，并调用其中的hunt()方法。</li>
+</ol>
+<p>整体上理解起来很简单，创建Request，创建具体的Action，然后生成BitmapHunter，然后调用BitmapHunter.hunt()方法。但我们这个时候还没有看到具体都做了哪些工作，继续去看看forRequest都做了哪些事情。</p>
+<p>static BitmapHunter forRequest(Picasso picasso, Dispatcher dispatcher, Cache cache, Stats stats,<br>    Action action) {<br>  Request request = action.getRequest();<br>  List<requesthandler> requestHandlers = picasso.getRequestHandlers();</requesthandler></p>
+<p>  // Index-based loop to avoid allocating an iterator.<br>  //noinspection ForLoopReplaceableByForEach<br>  for (int i = 0, count = requestHandlers.size(); i &lt; count; i++) {<br>    RequestHandler requestHandler = requestHandlers.get(i);<br>    if (requestHandler.canHandleRequest(request)) {<br>      return new BitmapHunter(picasso, dispatcher, cache, stats, action, requestHandler);<br>    }<br>  }<br>  //此处是没有找到可以处理该请求的reqeustHandler<br>  return new BitmapHunter(picasso, dispatcher, cache, stats, action, ERRORING_HANDLER);<br>}</p>
+<p>其实，forReqeust就做了一件事情，就是根据Request的类型，找到一个能处理这个Reqeust请求的BitmapHunter，然后生成BitmapHunter并返回。 BitmapHunter.hunt()方法，顾名思义了，这个方法就是用来执行具体的数据请求，并解码图片，然后返回的操作。这个我们先比较一下，BtimapHunter后面回过来继续分析。 还需要注意的是：正如注释当中所描述的，该方法是一个同步的填充请求的方法，而且工作在主线程上，稍不注意就会造成系统卡顿和ANR，所以我们应该尽量避免使用，而且在整个Picasso当中，我们也可以看到，Picasso保留了该接口，但并没有真正的使用它。 看完了上面同步的填充请求的方法，当然有对应的异步方法： <strong>public void fetch()</strong></p>
+<p>/**<br> * Asynchronously fulfills the request without a {@link ImageView} or {@link Target}. This is<br> * useful when you want to warm up the cache with an image.<br> * 跟上面的get()方法相对应的，这是一个异步的处理方法的请求。该方法是线程安全的，可以从任何方法进行调用。<br> * </p><p><br> * <em>Note:</em> It is safe to invoke this method from any thread.<br> */<br>public void fetch() {<br>  long started = System.nanoTime();</p>
+<p>  if (deferred) {<br>    throw new IllegalStateException(“Fit cannot be used with fetch.”);<br>  }<br>  if (data.hasImage()) {<br>    // Fetch requests have lower priority by default.<br>    if (!data.hasPriority()) {<br>      data.priority(Priority.LOW);<br>    }</p>
+<pre><code>Request request = createRequest(started);
+String key = createKey(request, new StringBuilder());
+
+Action action = new FetchAction(picasso, request, skipMemoryCache, key, tag);
+picasso.submit(action);
+</code></pre><p>  }<br>}</p>
+<p>异步的方法与同步的方法接近，都需要创建对应的Reqeust，cacheKey，Action，但异步方法和同步方法的区别在于：</p>
+<ul>
+<li>两者的Action不同，同步方法直接创建了一个GetAction，而异步的方法fetch()则是创建了一个FetchAction，这两个Action有什么区别？其实两者都是简单的继承了Action父类，但不同的在于，FetchAction中添加了一个变量target，该变量在此处的实际值是ReqeustCreator的tag变量。</li>
+<li><p>同步方法get()会直接访问请求，而异步方法则将action提交到picasso就结束了，我们之前有看过picasso.submit(Action action)函数，忘了？没事，再来看一下。</p>
+<p>void submit(Action action) {<br>  dispatcher.dispatchSubmit(action);<br>}</p>
+<p>到这里就明白了，原来异步方法创建了对应的action之后，就直接提交给Dispatcher了。</p>
+</li>
+</ul>
+<p>但这依然不是我们常用的方法，接下来我们继续来看看ReqeustCreator中的into()方法，根据我们的经验，这个应该是常用的了吧。 into()总共有5个方法签名，分别是：</p>
+<ul>
+<li><strong>into(Target target)</strong></li>
+<li><strong>into(RemoteViews remoteViews, int viewId, int notificationId,Notification notification)</strong></li>
+<li><strong>into(RemoteViews remoteViews, int viewId, int[] appWidgetIds)</strong></li>
+<li><strong>into(ImageView target)</strong></li>
+<li><strong>into(ImageView target, Callback callback)</strong></li>
+</ul>
+<p>其中我们最常用的是into(Target target)和into(ImageView target)。我们首先来看看这两个方法： <strong>into(Target target)源代码：</strong></p>
+<p>public void into(Target target) {<br>  long started = System.nanoTime();<br>  checkMain();</p>
+<p>  if (target == null) {<br>    throw new IllegalArgumentException(“Target must not be null.”);<br>  }<br>  if (deferred) {<br>    throw new IllegalStateException(“Fit cannot be used with a Target.”);<br>  }</p>
+<p>  //如果请求没有设置图片属性，即既没有设置uri，也没有设置resourceId的时候，会取消该request<br>  if (!data.hasImage()) {<br>    picasso.cancelRequest(target);<br>    target.onPrepareLoad(setPlaceholder ? getPlaceholderDrawable() : null);<br>    return;<br>  }</p>
+<p>  //创建一个请求<br>  Request request = createRequest(started);<br>  String requestKey = createKey(request);</p>
+<p>  //如果设置不要跳过MemoryCache，那么就从MemoryCache中取回数据<br>  if (!skipMemoryCache) {<br>    //尝试从cache中获取图片<br>    Bitmap bitmap = picasso.quickMemoryCacheCheck(requestKey);<br>    //如果cache hit，那么则取消相应的请求，并从Memory返回图片<br>    if (bitmap != null) {<br>      picasso.cancelRequest(target);<br>      target.onBitmapLoaded(bitmap, MEMORY);<br>      return;<br>    }<br>  }</p>
+<p>  //到此，图片没有cache hit，需要访问网络获取图片。<br>  //设置默认显示的图片<br>  target.onPrepareLoad(setPlaceholder ? getPlaceholderDrawable() : null);</p>
+<p>  //根据需要获取的图片的相关信息，创建一个Action<br>  Action action =<br>      new TargetAction(picasso, target, request, skipMemoryCache, errorResId, errorDrawable,<br>          requestKey, tag);<br>  //将action添加到队列并提交。<br>  picasso.enqueueAndSubmit(action);<br>}</p>
+<p>一看，是不是很熟悉，和刚刚的那个异步执行Reqeust的方法fetch()的思路基本上是一样的嘛：</p>
+<ol>
+<li>首先判断是否工作在主线程上 (这一点和fetch()方法不同，fetch()方法不限制必须要在主线程上执行)</li>
+<li>检查输入的合法性：包括target、deferred、data.hashImage()即是否Uri或者resourceId已经设置</li>
+<li>创建Request、CacheKey</li>
+<li>尝试从Cache中获取图片，如果Cache Hit，那么立刻返回结果。</li>
+<li>如果Cache失败或者不需要Cache，则显示默认图片，然后创建Action</li>
+<li>提交Action到dispatcher，同时将action放进Picasso中的targetToAction的Map中(需要注意，targetToAction是一个WeakReference，如果外部没有代码保持引用的话就会被GC回收掉)。</li>
+</ol>
+<p>这样看来，也没有什么难题，等等，Target到底是什么呢？我们知道这个应该和我们要设定的控件有关系，但到底是做什么的呢？我们还没有看明白。 <strong>Target接口：</strong></p>
+<p>public interface Target {<br>  void onBitmapLoaded(Bitmap bitmap, LoadedFrom from);<br>  void onBitmapFailed(Drawable errorDrawable);<br>  void onPrepareLoad(Drawable placeHolderDrawable);<br>}</p>
+<p>该接口是Picasso为了实现对于任意的图形控制接口都能实现加载，而设计的一个接口，为什么这么说？我们界面中需要设置一张图片，系统只为设置图片保留了接口，但无法直接访问对应的ImageView控件，或者对应的根本就不是ImageView控件，那我们怎么办？难道就没有办法去设置图片了吗？当然不是，因为系统保留的接口，所以我们只需要重新写一个类包含该控件，并实现Target接口，在onBitmapLoaded方法中实现设置图片的逻辑即可。 此外，作者的注释还提到， Objects implementing this class <strong>must</strong> have a working implementation of  {@link Object#equals(Object)} and {@link Object#hashCode()} for proper storage internally. Instances of this interface will also be compared to determine if view recycling is occurring. It is recommended that you add this interface directly on to a custom view type when using in an  adapter to ensure correct recycling behavior. 个人的理解是，首先，如果需要使用Target，那么我们一定要实现hashCode()和equals()方法。因为该接口也会用来判断该View是否正在被垃圾回收。在我们使用自定义View的时候，比如Adapter中使用的时候，最好封装一个Target对象，以获得更好的垃圾回收效果。 在ReqeustCreator类中的into(Target target)方法中，作者也在注释当中为我们列举了两个使用的范例：</p>
+<p>//实现一个View:<br>public class ProfileView extends FrameLayout implements Target {<br>  @Override public void onBitmapLoaded(Bitmap bitmap, LoadedFrom from) {<br>    setBackgroundDrawable(new BitmapDrawable(bitmap));<br>  }</p>
+<p>  @Override public void onBitmapFailed() {<br>    setBackgroundResource(R.drawable.profile_error);<br>  }</p>
+<p>  @Override public void onPrepareLoad(Drawable placeHolderDrawable) {<br>    frame.setBackgroundDrawable(placeHolderDrawable);<br>  }<br>}</p>
+<p>//在一个adapter当中实现一个holder<br>public class ViewHolder implements Target {<br>  public FrameLayout frame;<br>  public TextView name;</p>
+<p>  @Override public void onBitmapLoaded(Bitmap bitmap, LoadedFrom from) {<br>    frame.setBackgroundDrawable(new BitmapDrawable(bitmap));<br>  }</p>
+<p>  @Override public void onBitmapFailed() {<br>    frame.setBackgroundResource(R.drawable.profile_error);<br>  }</p>
+<p>  @Override public void onPrepareLoad(Drawable placeHolderDrawable) {<br>    frame.setBackgroundDrawable(placeHolderDrawable);<br>  }<br>}</p>
+<p>所以，我们可以记住一条了，在Adapter中使用Picasso的时候，最好将我们的ViewHolder实现Target，不过此外还要记住，作者也特别建议我们在实现Target的时候，覆写equals()和hashCode()方法。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Picasso/" rel="tag"># Picasso</a>
+          
+            <a href="/tags/RequestCreator/" rel="tag"># RequestCreator</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/25/picasso-source-code-2-picasso-entrance/" rel="next" title="Picasso源代码分析：2、Picasso.java">
+                <i class="fa fa-chevron-left"></i> Picasso源代码分析：2、Picasso.java
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/25/picasso-source-code-2-bitmap-hunter/" rel="prev" title="Picasso源代码分析：3、BitmapHunter">
+                Picasso源代码分析：3、BitmapHunter <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#RequestCreator"><span class="nav-number">1.</span> <span class="nav-text">RequestCreator</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

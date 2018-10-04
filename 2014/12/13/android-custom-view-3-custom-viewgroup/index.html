@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前面我们已经分析过两种自定义View的方法：  自定义View：1、定制自己的饼形图 自定义View：2、组合视图  今天我们来继续学习第三种自定义View的方法，继承ViewGroup，实现自己的Layout。什么意思呢？其实前两种自定义View的方法，我们都是编写的具体的每一个View，然后整合到我们现有的Layout(比如LinearLayout，RelativeLayout等等)当中，但很">
+<meta name="keywords" content="Android,View,ViewGroup">
+<meta property="og:type" content="article">
+<meta property="og:title" content="自定义View：3、编写自己的ViewGroup">
+<meta property="og:url" content="http://yoursite.com/2014/12/13/android-custom-view-3-custom-viewgroup/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="前面我们已经分析过两种自定义View的方法：  自定义View：1、定制自己的饼形图 自定义View：2、组合视图  今天我们来继续学习第三种自定义View的方法，继承ViewGroup，实现自己的Layout。什么意思呢？其实前两种自定义View的方法，我们都是编写的具体的每一个View，然后整合到我们现有的Layout(比如LinearLayout，RelativeLayout等等)当中，但很">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/12/device-2014-12-13-190320-576x1024.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.631Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="自定义View：3、编写自己的ViewGroup">
+<meta name="twitter:description" content="前面我们已经分析过两种自定义View的方法：  自定义View：1、定制自己的饼形图 自定义View：2、组合视图  今天我们来继续学习第三种自定义View的方法，继承ViewGroup，实现自己的Layout。什么意思呢？其实前两种自定义View的方法，我们都是编写的具体的每一个View，然后整合到我们现有的Layout(比如LinearLayout，RelativeLayout等等)当中，但很">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/12/device-2014-12-13-190320-576x1024.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/12/13/android-custom-view-3-custom-viewgroup/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>自定义View：3、编写自己的ViewGroup | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/12/13/android-custom-view-3-custom-viewgroup/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">自定义View：3、编写自己的ViewGroup
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-12-13 20:07:04" itemprop="dateCreated datePublished" datetime="2014-12-13T20:07:04+08:00">2014-12-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/View/" itemprop="url" rel="index"><span itemprop="name">View</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前面我们已经分析过两种自定义View的方法：</p>
+<ul>
+<li><a href="http://blog.happyhls.me/2014/12/08/%e8%87%aa%e5%ae%9a%e4%b9%89view%ef%bc%9a1%e3%80%81%e5%ae%9a%e5%88%b6%e8%87%aa%e5%b7%b1%e7%9a%84%e9%a5%bc%e5%bd%a2%e5%9b%be/" target="_blank" rel="noopener">自定义View：1、定制自己的饼形图</a></li>
+<li><a href="http://blog.happyhls.me/2014/12/09/%e8%87%aa%e5%ae%9a%e4%b9%89view%ef%bc%9a2%e3%80%81%e7%bb%84%e5%90%88%e8%a7%86%e5%9b%be/" target="_blank" rel="noopener">自定义View：2、组合视图</a></li>
+</ul>
+<p>今天我们来继续学习第三种自定义View的方法，继承ViewGroup，实现自己的Layout。什么意思呢？其实前两种自定义View的方法，我们都是编写的具体的每一个View，然后整合到我们现有的Layout(比如LinearLayout，RelativeLayout等等)当中，但很多情况下，自定义View并不能完全满足我们的需求，或者说，我们想要使用现成的控件，但我们希望我们的界面上，我们可以完全自己来控制如何摆放这些控件。那这个时候怎么做呢？ 我们先来看一下我们想要实现的效果是什么样子的？ <a href="/images/wordpress/2014/12/device-2014-12-13-190320.png"><img src="/images/wordpress/2014/12/device-2014-12-13-190320-576x1024.png" alt="device-2014-12-13-190320"></a> 简单分解一下上面我们要实现的需求：</p>
+<ul>
+<li>每一小块为自定义View(称之为磁贴)，大小共有3中规格，分别是：横向占据屏幕1/4（size=one），横向占据屏幕1/2（size=two），横向占据屏幕全部（size=four）。其高度始终为屏幕1/4。颜色与文字均可以通过XML直接指定。</li>
+<li>要求在XML定义各个View之后，要求能够从左上角开始能够自动占据铺满屏幕。</li>
+</ul>
+<p>好了，要求说完了，那么该怎么去实现呢？首先我们来分解任务，要实现上面的功能，其实我们总共需要两个步骤，第一步，参考<a href="http://blog.happyhls.me/2014/12/08/%e8%87%aa%e5%ae%9a%e4%b9%89view%ef%bc%9a1%e3%80%81%e5%ae%9a%e5%88%b6%e8%87%aa%e5%b7%b1%e7%9a%84%e9%a5%bc%e5%bd%a2%e5%9b%be/" target="_blank" rel="noopener">自定义View：1、定制自己的饼形图</a>，定制我们自己的磁贴。第二步，指定我们自定的ViewGroup，自动对添加的磁贴贴到合适的位置上。</p>
+<h2 id="一、定制磁贴"><a href="#一、定制磁贴" class="headerlink" title="一、定制磁贴"></a>一、定制磁贴</h2><h3 id="1、定制属性"><a href="#1、定制属性" class="headerlink" title="1、定制属性"></a>1、定制属性</h3><p>首先，我们需要在attrs.xml中为磁贴定义一些属性，在这边定义之后，我们就可以直接在Layout的XML中为磁贴指定颜色，文字，大小等内容。代码如下：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">declare-styleable</span> <span class="attr">name</span>=<span class="string">"Tile"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"background"</span> <span class="attr">format</span>=<span class="string">"color"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"title"</span> <span class="attr">format</span>=<span class="string">"string"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">attr</span> <span class="attr">name</span>=<span class="string">"size"</span> <span class="attr">format</span>=<span class="string">"enum"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">enum</span> <span class="attr">name</span>=<span class="string">"one"</span> <span class="attr">value</span>=<span class="string">"1"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">enum</span> <span class="attr">name</span>=<span class="string">"two"</span> <span class="attr">value</span>=<span class="string">"2"</span>/&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">enum</span> <span class="attr">name</span>=<span class="string">"four"</span> <span class="attr">value</span>=<span class="string">"4"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">attr</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">declare-styleable</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>如上所示，我们总共为磁贴定义了3个属性，其中包括背景颜色，文字内容，以及尺寸，one代表占据宽度的1/4，two代表占据宽度的1/2，而four则代表了占据宽度的全部。</p>
+<h3 id="2、定义View：Tile"><a href="#2、定义View：Tile" class="headerlink" title="2、定义View：Tile"></a>2、定义View：Tile</h3><p>接下来就是很重要的一步，定义View，即Tile，还记得我们之前的文章具体是怎么做的吗？没做，就是分3步走：</p>
+<ol>
+<li>构造函数从XML中获取参数，初始化。</li>
+<li>覆写onMeasure方法，指定View具体的大小。</li>
+<li>覆写onDraw方法，按照参数指定的颜色，文字及大小进行绘制。</li>
+</ol>
+<h4 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Tile</span><span class="params">(Context context, AttributeSet attrs, <span class="keyword">int</span> defStyleAttr)</span> </span>&#123;</span><br><span class="line">     <span class="keyword">super</span>(context, attrs, defStyleAttr);</span><br><span class="line"></span><br><span class="line">     TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.Tile, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">     mContent = <span class="keyword">new</span> TileContent();</span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">         mContent.mBackgroundColor = typedArray.getColor(R.styleable.Tile_background, Color.BLUE);</span><br><span class="line">         mContent.mTitle = typedArray.getString(R.styleable.Tile_title);</span><br><span class="line">         mContent.mSize = typedArray.getInt(R.styleable.Tile_size, <span class="number">1</span>);</span><br><span class="line">     &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">         typedArray.recycle();;</span><br><span class="line">     &#125;</span><br><span class="line"></span><br><span class="line">     init();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">     mPaint = <span class="keyword">new</span> Paint(Paint.ANTI\_ALIAS\_FLAG);</span><br><span class="line">     mRect = <span class="keyword">new</span> Rect();</span><br><span class="line">     mTextPaint = <span class="keyword">new</span> TextPaint(Paint.ANTI\_ALIAS\_FLAG);</span><br><span class="line">     mTextPaint.setTextSize(<span class="number">50.0f</span>);</span><br><span class="line">     mTextSize = <span class="keyword">new</span> Rect();</span><br><span class="line">     mTextPaint.getTextBounds(mContent.mTitle, <span class="number">0</span>, mContent.mTitle.length(), mTextSize);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>初始化代码比较简单了：</p>
+<ol>
+<li>从context.getTheme()/obtainStyeAttributes中获取包含属性的TypeArray。</li>
+<li>从中读取设置的参数</li>
+<li>初始化画笔，获取文字所占的边界大小。</li>
+</ol>
+<h4 id="onMeasure-init-widthMeasureSpec-int-heightMeasureSpec"><a href="#onMeasure-init-widthMeasureSpec-int-heightMeasureSpec" class="headerlink" title="onMeasure(init widthMeasureSpec, int heightMeasureSpec)"></a>onMeasure(init widthMeasureSpec, int heightMeasureSpec)</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> widthMode = MeasureSpec.getMode(widthMeasureSpec);</span><br><span class="line">    <span class="keyword">int</span> heightMode = MeasureSpec.getMode(heightMeasureSpec);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> widthSize = MeasureSpec.getSize(widthMeasureSpec);</span><br><span class="line">    <span class="keyword">int</span> heightSize = MeasureSpec.getSize(heightMeasureSpec);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> width = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> height = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//如果指定了尺寸，那么就使用指定的尺寸，否则使用我们容器尺寸的一半</span></span><br><span class="line">    <span class="keyword">if</span> (widthMode == MeasureSpec.EXACTLY) &#123;</span><br><span class="line">        width = widthSize;</span><br><span class="line">        height = width;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">switch</span> (mContent.mSize) &#123;</span><br><span class="line">            <span class="keyword">case</span> SIZE_ONE :</span><br><span class="line">                width = widthSize &gt;&gt; <span class="number">2</span>;</span><br><span class="line">                height = width;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> SIZE_TWO:</span><br><span class="line">                width = widthSize &gt;&gt; <span class="number">1</span>;</span><br><span class="line">                height = width &gt;&gt; <span class="number">1</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> SIZE_FOUR:</span><br><span class="line">                width = widthSize;</span><br><span class="line">                height = width &gt;&gt; <span class="number">2</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    mRect.set(<span class="number">0</span>, <span class="number">0</span>, width, height);</span><br><span class="line">    setMeasuredDimension(width, height);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这个界面设置当中，onMeasure方法是比较关键的一步，因为我们要在这个地方为每一个磁贴，根据他们配置的属性为其指定合适的尺寸，那么我们具体是怎么做的呢？</p>
+<ol>
+<li>获取widthMode，如果是MeasureSpec.EACTLY，即在XML中指定了具体的大小，那么我们就应该使用指定的大小。</li>
+<li>如果没有指定具体的大小，而是让View根据需求来自己指定的话，我们就按照原先的设计，如果尺寸为one，那么就将宽度设置为全部的宽度1/4，高度则与宽度想的呢个，如果尺寸为two，那么则宽度为全部宽度的一半，高度为对应宽度的1/2，如果为four，则宽度为全部的宽度，高度是宽度的1/4。</li>
+</ol>
+<h4 id="onDraw"><a href="#onDraw" class="headerlink" title="onDraw"></a>onDraw</h4><p>onDraw方法是我们经常用到的方法了，简单的讲就是根据我们的需求画图呗，看看代码就行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"> <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onDraw</span><span class="params">(Canvas canvas)</span> </span>&#123;</span><br><span class="line">     mPaint.setColor(mContent.mBackgroundColor);</span><br><span class="line">     canvas.drawRect(mRect, mPaint);</span><br><span class="line">     mTextPaint.setColor(Color.WHITE);</span><br><span class="line">     canvas.drawText(mContent.mTitle, getMeasuredWidth()/<span class="number">2</span> - mTextSize.width()/<span class="number">2</span>, getMeasuredHeight()/<span class="number">2</span> + mTextSize.height()/<span class="number">2</span>, mTextPaint);</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码中，我们首先画好北京颜色，然后设置文字的画笔颜色，为其在中间写好文字。 好了，至此，具体的Tile就准备完毕了，再来看怎么编写我们自定的ViewGroup</p>
+<h2 id="二、定制ViewGroup：TileLayout"><a href="#二、定制ViewGroup：TileLayout" class="headerlink" title="二、定制ViewGroup：TileLayout"></a>二、定制ViewGroup：TileLayout</h2><h3 id="1、覆写onMeasure方法"><a href="#1、覆写onMeasure方法" class="headerlink" title="1、覆写onMeasure方法"></a>1、覆写onMeasure方法</h3><p>自定义View的onMeasure方法我们有写过，但是自定义Layout的onMeasure方法怎么写呢？因为ViewGroup继承自View，因此思路和View基本上差别不大，我们这里先简单考虑，我们先将整个屏幕的全部空间都占据使用。那该怎么写呢？</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onMeasure</span><span class="params">(<span class="keyword">int</span> widthMeasureSpec, <span class="keyword">int</span> heightMeasureSpec)</span> </span>&#123;</span><br><span class="line">    measureChildren(widthMeasureSpec, heightMeasureSpec);</span><br><span class="line">    <span class="keyword">super</span>.onMeasure(widthMeasureSpec, heightMeasureSpec);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中做了两个工作：</p>
+<ul>
+<li>依次通知子View们进行测量</li>
+<li>调用父类的onMeasure方法。</li>
+</ul>
+<h3 id="2、onLayout布局"><a href="#2、onLayout布局" class="headerlink" title="2、onLayout布局"></a>2、onLayout布局</h3><p>该方法是ViewGroup的核心方法之一，简单的理解，在该方法中，我们需要设计将子元素放在合适的位置上。根据需求，我们对TileLayout的onLayout方法可以如下实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onLayout</span><span class="params">(<span class="keyword">boolean</span> changed, <span class="keyword">int</span> left, <span class="keyword">int</span> top, <span class="keyword">int</span> right, <span class="keyword">int</span> bottom)</span> </span>&#123;</span><br><span class="line">    Log.i(TAG, <span class="string">"onLayout:"</span> + <span class="string">" position:"</span> + left + <span class="string">","</span> + top + <span class="string">","</span> + right + <span class="string">","</span> + bottom);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> positionX = left;</span><br><span class="line">    <span class="keyword">int</span> positionY = top;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">int</span> childCount = getChildCount();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; childCount; i++) &#123;</span><br><span class="line">        View childView = getChildAt(i);</span><br><span class="line">        <span class="keyword">if</span>(! (childView <span class="keyword">instanceof</span> Tile) ) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"Catch Exception not Tile!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        Tile item = (Tile) childView;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> width = childView.getMeasuredWidth();</span><br><span class="line">        <span class="keyword">int</span> height = childView.getMeasuredHeight();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">int</span> itemPostitionX = left;</span><br><span class="line">        <span class="keyword">int</span> itemPositionY = top;</span><br><span class="line">        <span class="keyword">switch</span> (item.getSize()) &#123;</span><br><span class="line">            <span class="keyword">case</span> Tile.SIZE_ONE:</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span>( !isSpaceEmpty(Tile.SIZE_ONE) ) &#123;</span><br><span class="line">                    LayoutPositions params = mSizeOneSpaces.remove();</span><br><span class="line">                    itemPostitionX = params.x;</span><br><span class="line">                    itemPositionY = params.y;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (positionX + width &lt;= right) &#123;</span><br><span class="line">                        itemPostitionX = positionX;</span><br><span class="line">                        itemPositionY = positionY;</span><br><span class="line">                        positionX += width;</span><br><span class="line">                        <span class="keyword">if</span> (positionX &gt;= right) &#123;</span><br><span class="line">                            positionX = left;</span><br><span class="line">                            positionY = positionY + height;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        itemPostitionX = left;</span><br><span class="line">                        itemPostitionX = positionY + height;</span><br><span class="line">                        positionX = itemPostitionX + width;</span><br><span class="line">                        positionY = itemPositionY;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Tile.SIZE_TWO:</span><br><span class="line">                <span class="keyword">if</span> (positionX + width &lt;= right) &#123;</span><br><span class="line">                    itemPostitionX = positionX;</span><br><span class="line">                    itemPositionY = positionY;</span><br><span class="line">                    positionX += width;</span><br><span class="line">                    <span class="keyword">if</span> (positionX &gt;= right) &#123;</span><br><span class="line">                        positionX = left;</span><br><span class="line">                        positionY = positionY + height;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> start=positionX; start + (width &gt;&gt; <span class="number">1</span>) &lt;= right; start=start + (width &gt;&gt; <span class="number">1</span>)) &#123;</span><br><span class="line">                        mSizeOneSpaces.add(<span class="keyword">new</span> LayoutPositions(start, positionY));</span><br><span class="line">                    &#125;</span><br><span class="line">                    positionX = left;</span><br><span class="line">                    positionY = positionY + height;</span><br><span class="line">                    itemPostitionX = positionX;</span><br><span class="line">                    itemPositionY = positionY;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> Tile.SIZE_FOUR:</span><br><span class="line">                <span class="keyword">if</span> (positionX == left) &#123;</span><br><span class="line">                    itemPostitionX = positionX;</span><br><span class="line">                    itemPositionY = positionY;</span><br><span class="line">                    positionX += width;</span><br><span class="line">                    positionY += height;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> start=positionX; start + (width &gt;&gt; <span class="number">2</span>) &lt;= right; start=start + (width &gt;&gt; <span class="number">2</span>)) &#123;</span><br><span class="line">                        mSizeOneSpaces.add(<span class="keyword">new</span> LayoutPositions(start, positionY));</span><br><span class="line">                    &#125;</span><br><span class="line">                    positionX = left;</span><br><span class="line">                    positionY = positionY + height;</span><br><span class="line">                    itemPostitionX = positionX;</span><br><span class="line">                    itemPositionY = positionY;</span><br><span class="line">                    positionX = left;</span><br><span class="line">                    positionY = positionY + height;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Log.i(TAG, <span class="string">"Item:"</span> + item.getTitle() + <span class="string">" position:"</span> + itemPostitionX + <span class="string">","</span> + itemPositionY + <span class="string">","</span> + (itemPostitionX + width) + <span class="string">","</span> + (itemPositionY + height));</span><br><span class="line">        childView.layout(itemPostitionX, itemPositionY, itemPostitionX + width, itemPositionY + height);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其实思路也很简单，首先尝试摆放，如果能将子View摆在某处，那么则摆放这里，继续摆放下面的地方，如果不能，则说明此行空间不足，那么将剩下的空间根据大小分配给合适的数量的size=“one”的元素。依次摆放就可以。</p>
+<h2 id="三、使用"><a href="#三、使用" class="headerlink" title="三、使用"></a>三、使用</h2><p>按照我们设计的，将所有的属性设置都放在XML当中，Activity代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestTileLayout</span> <span class="keyword">extends</span> <span class="title">Activity</span></span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.tile);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>布局代码：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span><br><span class="line"><span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.TileLayout</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">xmlns:tile</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"match\_parent"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"match\_parent"</span></span></span><br><span class="line"><span class="tag">    &gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.Tile</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:tile</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:background</span>=<span class="string">"#0000FF"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:title</span>=<span class="string">"Title1"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:size</span>=<span class="string">"one"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.Tile</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:tile</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:background</span>=<span class="string">"#00FF00"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:title</span>=<span class="string">"Title2"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:size</span>=<span class="string">"two"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.Tile</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:tile</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:background</span>=<span class="string">"#FF0000"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:title</span>=<span class="string">"Title3"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:size</span>=<span class="string">"four"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.Tile</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:tile</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:background</span>=<span class="string">"#0000FF"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:title</span>=<span class="string">"Title4"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:size</span>=<span class="string">"one"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.Tile</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:tile</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:background</span>=<span class="string">"#00FF00"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:title</span>=<span class="string">"Title5"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:size</span>=<span class="string">"one"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.Tile</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:tile</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:background</span>=<span class="string">"#FF00FF"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:title</span>=<span class="string">"Title6"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:size</span>=<span class="string">"two"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.Tile</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:tile</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:background</span>=<span class="string">"#FF000F"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:title</span>=<span class="string">"Title7"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:size</span>=<span class="string">"four"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">me.happyhls.androiddemo.view.Tile</span></span></span><br><span class="line"><span class="tag">        <span class="attr">xmlns:tile</span>=<span class="string">"http://schemas.android.com/apk/res-auto"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_width</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">android:layout</span>\<span class="attr">_height</span>=<span class="string">"wrap\_content"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:background</span>=<span class="string">"#0000FF"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:title</span>=<span class="string">"Title8"</span></span></span><br><span class="line"><span class="tag">        <span class="attr">tile:size</span>=<span class="string">"one"</span></span></span><br><span class="line"><span class="tag">        /&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">me.happyhls.androiddemo.view.TileLayout</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
+<p>好了，上面就是简单的对自定义ViewGroup的使用。总结来说，我们只是大体了解了一下如何自定义View，如何自定义ViewGroup，但深入的我们依然没有设计到，因此后面会有至少两篇文章，我们来分析Android原生控件TextView和Android原生Layout:LinearLayout的源代码。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/View/" rel="tag"># View</a>
+          
+            <a href="/tags/ViewGroup/" rel="tag"># ViewGroup</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/12/09/android-custom-view-2-composition/" rel="next" title="自定义View：2、组合视图">
+                <i class="fa fa-chevron-left"></i> 自定义View：2、组合视图
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/12/16/android-eventbus-1-initialization-register/" rel="prev" title="EventBus源代码解析：1、初始化与订阅者注册">
+                EventBus源代码解析：1、初始化与订阅者注册 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、定制磁贴"><span class="nav-number">1.</span> <span class="nav-text">一、定制磁贴</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、定制属性"><span class="nav-number">1.1.</span> <span class="nav-text">1、定制属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、定义View：Tile"><span class="nav-number">1.2.</span> <span class="nav-text">2、定义View：Tile</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#初始化"><span class="nav-number">1.2.1.</span> <span class="nav-text">初始化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#onMeasure-init-widthMeasureSpec-int-heightMeasureSpec"><span class="nav-number">1.2.2.</span> <span class="nav-text">onMeasure(init widthMeasureSpec, int heightMeasureSpec)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#onDraw"><span class="nav-number">1.2.3.</span> <span class="nav-text">onDraw</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、定制ViewGroup：TileLayout"><span class="nav-number">2.</span> <span class="nav-text">二、定制ViewGroup：TileLayout</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、覆写onMeasure方法"><span class="nav-number">2.1.</span> <span class="nav-text">1、覆写onMeasure方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、onLayout布局"><span class="nav-number">2.2.</span> <span class="nav-text">2、onLayout布局</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、使用"><span class="nav-number">3.</span> <span class="nav-text">三、使用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

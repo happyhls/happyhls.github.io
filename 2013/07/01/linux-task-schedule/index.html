@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一、多任务概念多任务主要分为两类：非抢占式多任务(cooperative multitasking)和抢占式多任务(preemptive multitasking)。 概念：抢占(preemption)、进程的时间片(tineslice)、让步(yielding)、公平调度算法(CFS) 二、I/O消耗型和处理器消耗型进程I/O消耗型：这种任务应该经常处于可以运行的状态，并且每次都是运行短短的一段">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux任务调度算法">
+<meta property="og:url" content="http://yoursite.com/2013/07/01/linux-task-schedule/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="一、多任务概念多任务主要分为两类：非抢占式多任务(cooperative multitasking)和抢占式多任务(preemptive multitasking)。 概念：抢占(preemption)、进程的时间片(tineslice)、让步(yielding)、公平调度算法(CFS) 二、I/O消耗型和处理器消耗型进程I/O消耗型：这种任务应该经常处于可以运行的状态，并且每次都是运行短短的一段">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T14:32:22.225Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Linux任务调度算法">
+<meta name="twitter:description" content="一、多任务概念多任务主要分为两类：非抢占式多任务(cooperative multitasking)和抢占式多任务(preemptive multitasking)。 概念：抢占(preemption)、进程的时间片(tineslice)、让步(yielding)、公平调度算法(CFS) 二、I/O消耗型和处理器消耗型进程I/O消耗型：这种任务应该经常处于可以运行的状态，并且每次都是运行短短的一段">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/07/01/linux-task-schedule/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Linux任务调度算法 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/07/01/linux-task-schedule/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Linux任务调度算法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-07-01 17:17:06" itemprop="dateCreated datePublished" datetime="2013-07-01T17:17:06+08:00">2013-07-01</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 22:32:22" itemprop="dateModified" datetime="2018-10-03T22:32:22+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux内核设计与实现/" itemprop="url" rel="index"><span itemprop="name">Linux内核设计与实现</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux内核设计与实现/读书笔记/" itemprop="url" rel="index"><span itemprop="name">读书笔记</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="一、多任务概念"><a href="#一、多任务概念" class="headerlink" title="一、多任务概念"></a>一、多任务概念</h2><p>多任务主要分为两类：非抢占式多任务(cooperative multitasking)和抢占式多任务(preemptive multitasking)。 概念：抢占(preemption)、进程的时间片(tineslice)、让步(yielding)、公平调度算法(CFS)</p>
+<h2 id="二、I-O消耗型和处理器消耗型进程"><a href="#二、I-O消耗型和处理器消耗型进程" class="headerlink" title="二、I/O消耗型和处理器消耗型进程"></a>二、I/O消耗型和处理器消耗型进程</h2><p><strong>I/O消耗型：</strong>这种任务应该经常处于可以运行的状态，并且每次都是运行短短的一段时间，因为其等待更多的IO请求的时候，经常会堵塞。 <strong>处理器消耗型：</strong>这种任务通常在不停的运行，比如说科学计算或者Matlab之类的，从调度的角度来考虑，不应该让他们经常运行，应该是降低调度的频率，延长其运行时间。 有一些任务分类比较模糊，既是I/O消耗型，也是处理器消耗型，比如X Windows服务。 调度的策略是在这两个矛盾中寻找平衡：进程相应迅速(响应时间短)和最大系统的利用率(高吞吐量)。而Unix的调度更倾向于I/O调度，以便于更好的提供程序的响应速度。</p>
+<h2 id="三、进程的优先级"><a href="#三、进程的优先级" class="headerlink" title="三、进程的优先级"></a>三、进程的优先级</h2><p>调度算法中最基本的一类是基于优先级的调度。通常的(Linux不采用)是优先级高的先运行，低的后运行，相同的优先级的进程按照轮转的方式进行调度，或者是优先级高的程序，其使用的时间片也比较长。调度程序总是选择时间片 没有用尽且优先级最高的进程来运行。 Linux有两种不同的优先级范围： <strong>1)nice值</strong>:其范围为-20～19,默认值为0;nice值越大，代表优先级越低(可以理解，越nice，对其他的程序越友好，更容易让路，优先级越低)。在不同的Unix系统中，nice值的含义代表有所不同，在Mac OS X中，nice值代表了分配给进程的时间片的绝对值;Linux中，nice值代表了时间片的比例。使用ps -el看到的进程列表中的NI，就代表了时间片。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">happyhls@happy-desktop:~$ ps -el</span><br><span class="line">F S   UID   PID  PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD</span><br><span class="line">4 S     0     1     0  0  80   0 -  6117 poll_s ?        00:00:00 init</span><br><span class="line">1 S     0     2     0  0  80   0 -     0 kthrea ?        00:00:00 kthreadd</span><br><span class="line">1 S     0     3     2  0  80   0 -     0 run_ks ?        00:00:00 ksoftirqd/0</span><br><span class="line">1 S     0     6     2  0 -40   - -     0 cpu_st ?        00:00:00 migration/0</span><br></pre></td></tr></table></figure>
+<p><strong> 2)实时优先级</strong>：实时优先级的范围是0～99,与nice相反，实时优先级的数值，数值越大，代表了其进程优先级也就越高。还有一点， 任何实时进程的优先级都要高于普通的进程。实时优先级和nice互不相干。调用 ps -eo state,uid,pid,ppid,rtprio,time,comm  </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">happyhls@happy-desktop:~$ ps -eo state,uid,pid,ppid,rtprio,time,comm</span><br><span class="line">S   UID   PID  PPID RTPRIO     TIME COMMAND</span><br><span class="line">S     0     1     0      - 00:00:00 init</span><br><span class="line">S     0     2     0      - 00:00:00 kthreadd</span><br><span class="line">S     0     3     2      - 00:00:00 ksoftirqd/0</span><br><span class="line">S     0     6     2     99 00:00:00 migration/0</span><br><span class="line">S     0     7     2     99 00:00:00 watchdog/0</span><br><span class="line">S     0     8     2     99 00:00:00 migration/1</span><br></pre></td></tr></table></figure>
+<p>其中的RTPRIO就代表了实时优先级。如果为-，则代表不是实时优先级。</p>
+<h2 id="四、时间片"><a href="#四、时间片" class="headerlink" title="四、时间片"></a>四、时间片</h2><p>时间片，表明进程在被抢占之前所能够持续运行的时间。调度策略需要规定一个默认的时间片，其中有一个相对的问题：如果时间片过长，会带来系统对交互响应的滞后，如果时间片过短，会带来更多的进程切换所带来的处理器耗时;同时I/O消耗型和处理器消耗型也有不同的需求，I/O消耗型，希望频繁的调度，但每次只要运行很短的时间，而处理器消耗型则希望每一个调度之后，都能够运行的时间越长越好，比如可以更好的提高高速缓存的命中。 一般的系统中，为了保证交互的流畅，一般都把时间片设置的比较小，而在Linux中，CFS调度是分配的比例给时间片，而非具体的时间。同时时间片还会受到nice值大小的影响。优先级更高的程序会有高的权重，而优先级比较低的程序，其时间片的权重也会比较低。 在大多数系统当中，一个进程是否可以进入运行状态，是其时间片和优先级决定的。而在Linux的CFS当中，抢占的时机取决于新的可运行程序使用了多少的处理器使用比，如果消耗的使用比当前的进程要小，新的进程立刻投入运行，否则则会推迟其运行。</p>
+<h2 id="五、调度策略的初步认识CFS"><a href="#五、调度策略的初步认识CFS" class="headerlink" title="五、调度策略的初步认识CFS"></a>五、调度策略的初步认识CFS</h2><p>在书的P38页，大体说明一下，有两个任务，一个是文本编辑器，另外一个任务是视频播放，可以明白的是，文本编辑器的任务是I/O消耗型的任务，而视频播放显然是处理器消耗型的任务。假设说这两个任务的优先级相同，nice值相同，那CFS是怎么调度的？ 其任务调度如下所示： 首先，两者优先级和nice均相同，因此系统会给这两个分配相同的CPU时间，都是50%，但是每次文本编辑器被唤醒之后，只运行很少的时间，就会放弃CPU，而视频播放则会在其被调度的时候，全力工作。因此运行一段时间后，CFS会发现，给文本处理器的时间是50%，但实际上其使用的时间要远远小于50%,为了保证公平，当文本编辑器被唤醒的时候，CFS会立刻抢占视频编码的进程，让文本处理器运行。简单的理解，给你的这次用不完，下次让你提前用。</p>
+<h2 id="六、Linux调度算法"><a href="#六、Linux调度算法" class="headerlink" title="六、Linux调度算法"></a>六、Linux调度算法</h2><h3 id="1、调度器类"><a href="#1、调度器类" class="headerlink" title="1、调度器类"></a>1、调度器类</h3><p>Linux调度器以模块化的方式提供，模块化结构称为调度器类(scheduler classes)，允许多种不同的可动态添加的调度算法并存，调度属于自己的范畴的进程。每一个调度器都有一个优先级，基础调度器(位于kernel/sched.c)会按照优先级遍历调度类，然后进行调度。CFS为针对普通进程的调度类，Linux称为SCHED_NORMAL，CFS算法实现在kernel/sched_fair.c</p>
+<h3 id="2、Unix传统进程调度的问题"><a href="#2、Unix传统进程调度的问题" class="headerlink" title="2、Unix传统进程调度的问题"></a>2、Unix传统进程调度的问题</h3><p>1)如果要将nice值对应到时间片上去，需要将nice单位值对应到处理器的绝对时间：这就会带来问题，比如是nice=0对应的时间为100ms，而nice=+20的时候，对应的是5ms，那么当两个任务的分别优先级为0和20的时候，两个任务的优先级分配是合理的;但如果此时两个任务都是nice=+20,这时候就会带来问题，这时候满足我们的初衷，就是两个任务都能够获得50%的任务时间，但这个时候的问题是，由于其nice值为+20;因此其5ms就会被调度一次，此时调度非常频繁，开销变大，而其nice很大，本身可能就是后台任务，这个时候这样频繁调度是不合理的。 2)相对nice值的问题。如果两个nice值分别为0和1,那么他们的时间片为100ms和95ms，几乎一样，但如果两个nice值为18和19,那么他们分别获得10ms和5ms的nice值，相差两倍的时间。(因此，一般nice都是使用相对值) 解决的办法就是：将nice值呈几何增加而不是算数增加 3)绝对的时间片是依赖于系统定时器的，而由于平台的不同，其系统定时器可能是10ms，也有可能是5ms，而且相邻的时间片的差值应该是系统定时器的整数倍。 解决的办法是：将nice值到时间片的映射与定时器节拍分离开来。</p>
+<h3 id="3、公平调度（CFS）"><a href="#3、公平调度（CFS）" class="headerlink" title="3、公平调度（CFS）"></a>3、公平调度（CFS）</h3><p>CFS的出发点为：进程调度的效果应该就像系统具备一个理想中的完美的多任务处理器。 但由于系统调度时的任务抢占必然会有代价，因此CFS首先考虑任务调度系统性能不会受损。CFS的做法是允许每一个进程运行一段时间、循环轮转选择运行最小的进程作为一个运行的进程，而不是再采用分配给每个进程时间片的做法，CFS在所有的可运行进程总数的基础上计算出一个进程应该运行多久，而不是依靠nice的值来计算时间片。nice值在CFS中被作为进程获得的处理器运行比的权重：越高的nice(优先级越低)获得更低的处理器使用权重。相反，更低的nice值的进程获得更高的处理器使用权重。 CFS为了完美多任务中无线小调度周期的近似值设立了一个目标。称作“目标延时”，越小的调度周期有越好的交互性，同时也更加接近完美的多任务。但也要承担更高的切换代价和更差的系统总吞吐能力。（e.g如果目标延迟值为20ms，有两个任务，那么每个任务在抢占之前会运行10ms，如果有10个任务，那么每个任务在抢占之前会运行2ms） 此时又需要考虑一个问题，如果任务接近无线多个，那么每个任务的使用时间将无限接近于0,因此CFS引入了每个进程获得的时间片底线，也称作是最小粒度。默认情况下为1ms。 同时可以看到，nice值对于时间片是几何加权，而不是算数加权。任何nice值对应的是处理器的使用比，而不是绝对值。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/07/01/ubuntu-adb-failed/" rel="next" title="Ubuntu 64位 android adb 无法使用的解决办法">
+                <i class="fa fa-chevron-left"></i> Ubuntu 64位 android adb 无法使用的解决办法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/07/06/linux-system-call/" rel="prev" title="系统调用">
+                系统调用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、多任务概念"><span class="nav-number">1.</span> <span class="nav-text">一、多任务概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、I-O消耗型和处理器消耗型进程"><span class="nav-number">2.</span> <span class="nav-text">二、I/O消耗型和处理器消耗型进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、进程的优先级"><span class="nav-number">3.</span> <span class="nav-text">三、进程的优先级</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四、时间片"><span class="nav-number">4.</span> <span class="nav-text">四、时间片</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五、调度策略的初步认识CFS"><span class="nav-number">5.</span> <span class="nav-text">五、调度策略的初步认识CFS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六、Linux调度算法"><span class="nav-number">6.</span> <span class="nav-text">六、Linux调度算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1、调度器类"><span class="nav-number">6.1.</span> <span class="nav-text">1、调度器类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、Unix传统进程调度的问题"><span class="nav-number">6.2.</span> <span class="nav-text">2、Unix传统进程调度的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、公平调度（CFS）"><span class="nav-number">6.3.</span> <span class="nav-text">3、公平调度（CFS）</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

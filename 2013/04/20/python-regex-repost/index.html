@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="感谢原作者，这是写的超级好的一篇Python的正则表达式，转载过来，以备查找。 原文链接 http://www.cnblogs.com/huxi/archive/2010/07/04/1771073.html  本文介绍了Python对于正则表达式的支持，包括正则表达式基础以及Python正则表达式标准库的完整介绍及使用示例。本文的内容不包括如何编写高效的正则表达式、如何优化正则表达式，这些主题请">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python正则表达式指南(转载)">
+<meta property="og:url" content="http://yoursite.com/2013/04/20/python-regex-repost/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="感谢原作者，这是写的超级好的一篇Python的正则表达式，转载过来，以备查找。 原文链接 http://www.cnblogs.com/huxi/archive/2010/07/04/1771073.html  本文介绍了Python对于正则表达式的支持，包括正则表达式基础以及Python正则表达式标准库的完整介绍及使用示例。本文的内容不包括如何编写高效的正则表达式、如何优化正则表达式，这些主题请">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://images.cnblogs.com/cnblogs_com/huxi/WindowsLiveWriter/Python_10A67/re_simple_38246a58-83be-4adf-9f30-6d735e9b9b47.png">
+<meta property="og:image" content="http://images.cnblogs.com/cnblogs_com/huxi/Windows-Live-Writer/Python_10A67/pyre_ebb9ce1c-e5e8-4219-a8ae-7ee620d5f9f1.png">
+<meta property="og:updated_time" content="2018-10-03T15:10:01.860Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python正则表达式指南(转载)">
+<meta name="twitter:description" content="感谢原作者，这是写的超级好的一篇Python的正则表达式，转载过来，以备查找。 原文链接 http://www.cnblogs.com/huxi/archive/2010/07/04/1771073.html  本文介绍了Python对于正则表达式的支持，包括正则表达式基础以及Python正则表达式标准库的完整介绍及使用示例。本文的内容不包括如何编写高效的正则表达式、如何优化正则表达式，这些主题请">
+<meta name="twitter:image" content="http://images.cnblogs.com/cnblogs_com/huxi/WindowsLiveWriter/Python_10A67/re_simple_38246a58-83be-4adf-9f30-6d735e9b9b47.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/04/20/python-regex-repost/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Python正则表达式指南(转载) | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/04/20/python-regex-repost/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Python正则表达式指南(转载)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-04-20 21:14:33" itemprop="dateCreated datePublished" datetime="2013-04-20T21:14:33+08:00">2013-04-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 23:10:01" itemprop="dateModified" datetime="2018-10-03T23:10:01+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Python编程/" itemprop="url" rel="index"><span itemprop="name">Python编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>感谢原作者，这是写的超级好的一篇Python的正则表达式，转载过来，以备查找。 原文链接 <a href="http://www.cnblogs.com/huxi/archive/2010/07/04/1771073.html" target="_blank" rel="noopener">http://www.cnblogs.com/huxi/archive/2010/07/04/1771073.html</a></p>
+<blockquote>
+<p>本文介绍了Python对于正则表达式的支持，包括正则表达式基础以及Python正则表达式标准库的完整介绍及使用示例。本文的内容不包括如何编写高效的正则表达式、如何优化正则表达式，这些主题请查看其他教程。 注意：本文基于Python2.4完成；如果看到不明白的词汇请记得百度谷歌或维基，whatever。 尊重作者的劳动，转载请注明作者及原文地址</p>
+</blockquote>
+<h2 id="1-正则表达式基础"><a href="#1-正则表达式基础" class="headerlink" title="1. 正则表达式基础"></a>1. 正则表达式基础</h2><h3 id="1-1-简单介绍"><a href="#1-1-简单介绍" class="headerlink" title="1.1. 简单介绍"></a>1.1. 简单介绍</h3><p>正则表达式并不是Python的一部分。正则表达式是用于处理字符串的强大工具，拥有自己独特的语法以及一个独立的处理引擎，效率上可能不如str自带的方法，但功能十分强大。得益于这一点，在提供了正则表达式的语言里，正则表达式的语法都是一样的，区别只在于不同的编程语言实现支持的语法数量不同；但不用担心，不被支持的语法通常是不常用的部分。如果已经在其他语言里使用过正则表达式，只需要简单看一看就可以上手了。 下图展示了使用正则表达式进行匹配的流程： <img src="http://images.cnblogs.com/cnblogs_com/huxi/WindowsLiveWriter/Python_10A67/re_simple_38246a58-83be-4adf-9f30-6d735e9b9b47.png" alt="re_simple" title="re_simple"> 正则表达式的大致匹配过程是：依次拿出表达式和文本中的字符比较，如果每一个字符都能匹配，则匹配成功；一旦有匹配不成功的字符则匹配失败。如果表达式中有量词或边界，这个过程会稍微有一些不同，但也是很好理解的，看下图中的示例以及自己多使用几次就能明白。 下图列出了Python支持的正则表达式元字符和语法： <img src="http://images.cnblogs.com/cnblogs_com/huxi/Windows-Live-Writer/Python_10A67/pyre_ebb9ce1c-e5e8-4219-a8ae-7ee620d5f9f1.png" alt="pyre" title="pyre"></p>
+<h3 id="1-2-数量词的贪婪模式与非贪婪模式"><a href="#1-2-数量词的贪婪模式与非贪婪模式" class="headerlink" title="1.2. 数量词的贪婪模式与非贪婪模式"></a>1.2. 数量词的贪婪模式与非贪婪模式</h3><p>正则表达式通常用于在文本中查找匹配的字符串。Python里数量词默认是贪婪的（在少数语言里也可能是默认非贪婪），总是尝试匹配尽可能多的字符；非贪婪的则相反，总是尝试匹配尽可能少的字符。例如：正则表达式”ab<em>“如果用于查找”abbbc”，将找到”abbb”。而如果使用非贪婪的数量词”ab</em>?”，将找到”a”。</p>
+<h3 id="1-3-反斜杠的困扰"><a href="#1-3-反斜杠的困扰" class="headerlink" title="1.3. 反斜杠的困扰"></a>1.3. 反斜杠的困扰</h3><p>与大多数编程语言相同，正则表达式里使用”\“作为转义字符，这就可能造成反斜杠困扰。假如你需要匹配文本中的字符”\“，那么使用编程语言表示的正则表达式里将需要4个反斜杠”\\\“：前两个和后两个分别用于在编程语言里转义成反斜杠，转换成两个反斜杠后再在正则表达式里转义成一个反斜杠。Python里的原生字符串很好地解决了这个问题，这个例子中的正则表达式可以使用r”\\”表示。同样，匹配一个数字的”\\d”可以写成r”\d”。有了原生字符串，你再也不用担心是不是漏写了反斜杠，写出来的表达式也更直观。</p>
+<h3 id="1-4-匹配模式"><a href="#1-4-匹配模式" class="headerlink" title="1.4. 匹配模式"></a>1.4. 匹配模式</h3><p>正则表达式提供了一些可用的匹配模式，比如忽略大小写、多行匹配等，这部分内容将在Pattern类的工厂方法re.compile(pattern[, flags])中一起介绍。</p>
+<h2 id="2-re模块"><a href="#2-re模块" class="headerlink" title="2. re模块"></a>2. re模块</h2><h3 id="2-1-开始使用re"><a href="#2-1-开始使用re" class="headerlink" title="2.1. 开始使用re"></a>2.1. 开始使用re</h3><p>Python通过re模块提供对正则表达式的支持。使用re的一般步骤是先将正则表达式的字符串形式编译为Pattern实例，然后使用Pattern实例处理文本并获得匹配结果（一个Match实例），最后使用Match实例获得信息，进行其他的操作。</p>
+<p># encoding: UTF-8<br>import re</p>
+<p># 将正则表达式编译成Pattern对象<br>pattern = re.compile(r’hello’)</p>
+<p># 使用Pattern匹配文本，获得匹配结果，无法匹配时将返回None<br>match = pattern.match(‘hello world!’)</p>
+<p>if match:</p>
+<pre><code># 使用Match获得分组信息
+print match.group()
+</code></pre><p>### 输出 ###<br># hello</p>
+<p><strong>re.compile(strPattern[, flag]):</strong> 这个方法是Pattern类的工厂方法，用于将字符串形式的正则表达式编译为Pattern对象。 第二个参数flag是匹配模式，取值可以使用按位或运算符’|’表示同时生效，比如re.I | re.M。另外，你也可以在regex字符串中指定模式，比如re.compile(‘pattern’, re.I | re.M)与re.compile(‘(?im)pattern’)是等价的。 可选值有：</p>
+<ul>
+<li>re.<strong>I</strong>(re.IGNORECASE): 忽略大小写（括号内是完整写法，下同）</li>
+<li><strong>M</strong>(MULTILINE): 多行模式，改变’^’和’$’的行为（参见上图）</li>
+<li><strong>S</strong>(DOTALL): 点任意匹配模式，改变’.’的行为</li>
+<li><strong>L</strong>(LOCALE): 使预定字符类 \w \W \b \B \s \S 取决于当前区域设定</li>
+<li><strong>U</strong>(UNICODE): 使预定字符类 \w \W \b \B \s \S \d \D 取决于unicode定义的字符属性</li>
+<li><strong>X</strong>(VERBOSE): 详细模式。这个模式下正则表达式可以是多行，忽略空白字符，并可以加入注释。以下两个正则表达式是等价的：</li>
+</ul>
+<p><a href="http://www.cnblogs.com/huxi/archive/2010/07/04/1771073.html#" target="_blank" rel="noopener"></a></p>
+<p>a = re.compile(r”””\d +  # the integral part<br>                   \.    # the decimal point<br>                   \d <em>  # some fractional digits”””, re.X)<br>b = re.compile(r”\d+\.\d</em>“)</p>
+<p>re提供了众多模块方法用于完成正则表达式的功能。这些方法可以使用Pattern实例的相应方法替代，唯一的好处是少写一行re.compile()代码，但同时也无法复用编译后的Pattern对象。这些方法将在Pattern类的实例方法部分一起介绍。如上面这个例子可以简写为：</p>
+<p>m = re.match(r’hello’, ‘hello world!’)<br>print m.group()</p>
+<p>re模块还提供了一个方法escape(string)，用于将string中的正则表达式元字符如*/+/?等之前加上转义符再返回，在需要大量匹配元字符时有那么一点用。</p>
+<h3 id="2-2-Match"><a href="#2-2-Match" class="headerlink" title="2.2. Match"></a>2.2. Match</h3><p>Match对象是一次匹配的结果，包含了很多关于此次匹配的信息，可以使用Match提供的可读属性或方法来获取这些信息。 属性：</p>
+<ol>
+<li><strong>string</strong>: 匹配时使用的文本。</li>
+<li><strong>re</strong>: 匹配时使用的Pattern对象。</li>
+<li><strong>pos</strong>: 文本中正则表达式开始搜索的索引。值与Pattern.match()和Pattern.seach()方法的同名参数相同。</li>
+<li><strong>endpos</strong>: 文本中正则表达式结束搜索的索引。值与Pattern.match()和Pattern.seach()方法的同名参数相同。</li>
+<li><strong>lastindex</strong>: 最后一个被捕获的分组在文本中的索引。如果没有被捕获的分组，将为None。</li>
+<li><strong>lastgroup</strong>: 最后一个被捕获的分组的别名。如果这个分组没有别名或者没有被捕获的分组，将为None。</li>
+</ol>
+<p>方法：</p>
+<ol>
+<li><strong>group([group1, …]): </strong> 获得一个或多个分组截获的字符串；指定多个参数时将以元组形式返回。group1可以使用编号也可以使用别名；编号0代表整个匹配的子串；不填写参数时，返回group(0)；没有截获字符串的组返回None；截获了多次的组返回最后一次截获的子串。</li>
+<li><strong>groups([default]):</strong> 以元组形式返回全部分组截获的字符串。相当于调用group(1,2,…last)。default表示没有截获字符串的组以这个值替代，默认为None。</li>
+<li><strong>groupdict([default]):</strong> 返回以有别名的组的别名为键、以该组截获的子串为值的字典，没有别名的组不包含在内。default含义同上。</li>
+<li><strong>start([group]):</strong> 返回指定的组截获的子串在string中的起始索引（子串第一个字符的索引）。group默认值为0。</li>
+<li><strong>end([group]):</strong> 返回指定的组截获的子串在string中的结束索引（子串最后一个字符的索引+1）。group默认值为0。</li>
+<li><strong>span([group]):</strong> 返回(start(group), end(group))。</li>
+<li><strong>expand(template):</strong> 将匹配到的分组代入template中然后返回。template中可以使用\id或\g<id>、\g<name>引用分组，但不能使用编号0。\id与\g<id>是等价的；但\10将被认为是第10个分组，如果你想表达\1之后是字符’0’，只能使用\g<1>0。</1></id></name></id></li>
+</ol>
+<p>import re<br>m = re.match(r’(\w+) (\w+)(?P<sign>.*)’, ‘hello world!’)</sign></p>
+<p>print “m.string:”, m.string<br>print “m.re:”, m.re<br>print “m.pos:”, m.pos<br>print “m.endpos:”, m.endpos<br>print “m.lastindex:”, m.lastindex<br>print “m.lastgroup:”, m.lastgroup</p>
+<p>print “m.group(1,2):”, m.group(1, 2)<br>print “m.groups():”, m.groups()<br>print “m.groupdict():”, m.groupdict()<br>print “m.start(2):”, m.start(2)<br>print “m.end(2):”, m.end(2)<br>print “m.span(2):”, m.span(2)<br>print r”m.expand(r’\2 \1\3’):”, m.expand(r’\2 \1\3’)</p>
+<p>### output ###<br># m.string: hello world!<br># m.re: &lt;_sre.SRE_Pattern object at 0x016E1A38&gt;<br># m.pos: 0<br># m.endpos: 12<br># m.lastindex: 3<br># m.lastgroup: sign<br># m.group(1,2): (‘hello’, ‘world’)<br># m.groups(): (‘hello’, ‘world’, ‘!’)<br># m.groupdict(): {‘sign’: ‘!’}<br># m.start(2): 6<br># m.end(2): 11<br># m.span(2): (6, 11)<br># m.expand(r’\2 \1\3’): world hello!</p>
+<h3 id="2-3-Pattern"><a href="#2-3-Pattern" class="headerlink" title="2.3. Pattern"></a>2.3. Pattern</h3><p>Pattern对象是一个编译好的正则表达式，通过Pattern提供的一系列方法可以对文本进行匹配查找。 Pattern不能直接实例化，必须使用re.compile()进行构造。 Pattern提供了几个可读属性用于获取表达式的相关信息：</p>
+<ol>
+<li>pattern: 编译时用的表达式字符串。</li>
+<li>flags: 编译时用的匹配模式。数字形式。</li>
+<li>groups: 表达式中分组的数量。</li>
+<li>groupindex: 以表达式中有别名的组的别名为键、以该组对应的编号为值的字典，没有别名的组不包含在内。</li>
+</ol>
+<p>import re<br>p = re.compile(r’(\w+) (\w+)(?P<sign>.*)’, re.DOTALL)</sign></p>
+<p>print “p.pattern:”, p.pattern<br>print “p.flags:”, p.flags<br>print “p.groups:”, p.groups<br>print “p.groupindex:”, p.groupindex</p>
+<p>### output ###<br># p.pattern: (\w+) (\w+)(?P<sign>.*)<br># p.flags: 16<br># p.groups: 3<br># p.groupindex: {‘sign’: 3}</sign></p>
+<p>实例方法[ | re模块方法]：</p>
+<ol>
+<li><strong>match(string[, pos[, endpos]]) | re.match(pattern, string[, flags]):</strong> 这个方法将从string的pos下标处起尝试匹配pattern；如果pattern结束时仍可匹配，则返回一个Match对象；如果匹配过程中pattern无法匹配，或者匹配未结束就已到达endpos，则返回None。 pos和endpos的默认值分别为0和len(string)；re.match()无法指定这两个参数，参数flags用于编译pattern时指定匹配模式。 注意：这个方法并不是完全匹配。当pattern结束时若string还有剩余字符，仍然视为成功。想要完全匹配，可以在表达式末尾加上边界匹配符’$’。 示例参见2.1小节。</li>
+<li><p><strong>search(string[, pos[, endpos]]) | re.search(pattern, string[, flags]):</strong> 这个方法用于查找字符串中可以匹配成功的子串。从string的pos下标处起尝试匹配pattern，如果pattern结束时仍可匹配，则返回一个Match对象；若无法匹配，则将pos加1后重新尝试匹配；直到pos=endpos时仍无法匹配则返回None。 pos和endpos的默认值分别为0和len(string))；re.search()无法指定这两个参数，参数flags用于编译pattern时指定匹配模式。</p>
+<p># encoding: UTF-8<br>import re</p>
+<p># 将正则表达式编译成Pattern对象<br>pattern = re.compile(r’world’)</p>
+<p># 使用search()查找匹配的子串，不存在能匹配的子串时将返回None<br># 这个例子中使用match()无法成功匹配<br>match = pattern.search(‘hello world!’)</p>
+<p>if match:</p>
+<pre><code># 使用Match获得分组信息
+print match.group()
+</code></pre><p>### 输出 ###<br># world</p>
+</li>
+</ol>
+<ol start="3">
+<li><p><strong>split(string[, maxsplit]) | re.split(pattern, string[, maxsplit]):</strong> 按照能够匹配的子串将string分割后返回列表。maxsplit用于指定最大分割次数，不指定将全部分割。</p>
+<p>import re</p>
+<p>p = re.compile(r’\d+’)<br>print p.split(‘one1two2three3four4’)</p>
+<p>### output ###<br># [‘one’, ‘two’, ‘three’, ‘four’, ‘’]</p>
+</li>
+</ol>
+<ol start="4">
+<li><p><strong>findall(string[, pos[, endpos]]) | re.findall(pattern, string[, flags]):</strong> 搜索string，以列表形式返回全部能匹配的子串。</p>
+<p>import re</p>
+<p>p = re.compile(r’\d+’)<br>print p.findall(‘one1two2three3four4’)</p>
+<p>### output ###<br># [‘1’, ‘2’, ‘3’, ‘4’]</p>
+</li>
+<li><p><strong>finditer(string[, pos[, endpos]]) | re.finditer(pattern, string[, flags]):</strong> 搜索string，返回一个顺序访问每一个匹配结果（Match对象）的迭代器。</p>
+<p>import re</p>
+<p>p = re.compile(r’\d+’)<br>for m in p.finditer(‘one1two2three3four4’):</p>
+<pre><code>print m.group(),
+</code></pre><p>### output ###<br># 1 2 3 4</p>
+</li>
+</ol>
+<ol start="6">
+<li><p><strong>sub(repl, string[, count]) | re.sub(pattern, repl, string[, count]):</strong> 使用repl替换string中每一个匹配的子串后返回替换后的字符串。 当repl是一个字符串时，可以使用\id或\g<id>、\g<name>引用分组，但不能使用编号0。 当repl是一个方法时，这个方法应当只接受一个参数（Match对象），并返回一个字符串用于替换（返回的字符串中不能再引用分组）。 count用于指定最多替换次数，不指定时全部替换。</name></id></p>
+<p>import re</p>
+<p>p = re.compile(r’(\w+) (\w+)’)<br>s = ‘i say, hello world!’</p>
+<p>print p.sub(r’\2 \1’, s)</p>
+<p>def func(m):</p>
+<pre><code>return m.group(1).title() + &apos; &apos; + m.group(2).title()
+</code></pre><p>print p.sub(func, s)</p>
+<p>### output ###<br># say i, world hello!<br># I Say, Hello World!</p>
+</li>
+</ol>
+<ol start="7">
+<li><p><strong>subn(repl, string[, count]) |re.sub(pattern, repl, string[, count]):</strong> 返回 (sub(repl, string[, count]), 替换次数)。</p>
+<p>import re</p>
+<p>p = re.compile(r’(\w+) (\w+)’)<br>s = ‘i say, hello world!’</p>
+<p>print p.subn(r’\2 \1’, s)</p>
+<p>def func(m):</p>
+<pre><code>return m.group(1).title() + &apos; &apos; + m.group(2).title()
+</code></pre><p>print p.subn(func, s)</p>
+<p>### output ###<br># (‘say i, world hello!’, 2)<br># (‘I Say, Hello World!’, 2)</p>
+</li>
+</ol>
+<p><strong>以上就是Python对于正则表达式的支持。熟练掌握正则表达式是每一个程序员必须具备的技能，这年头没有不与字符串打交道的程序了。笔者也处于初级阶段，与君共勉，^_^</strong> <strong>另外，图中的特殊构造部分没有举出例子，用到这些的正则表达式是具有一定难度的。有兴趣可以思考一下，如何匹配不是以abc开头的单词，^_^</strong> <strong>全文结束</strong></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/04/05/java-io-file-randomaccessfile/" rel="next" title="Java IO 之三:File、RandomAccessFile、重定向输入输出">
+                <i class="fa fa-chevron-left"></i> Java IO 之三:File、RandomAccessFile、重定向输入输出
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/04/23/django-template-useage/" rel="prev" title="Django 笔记：一、工程部署;模板(template)的使用">
+                Django 笔记：一、工程部署;模板(template)的使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-正则表达式基础"><span class="nav-number">1.</span> <span class="nav-text">1. 正则表达式基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-简单介绍"><span class="nav-number">1.1.</span> <span class="nav-text">1.1. 简单介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-数量词的贪婪模式与非贪婪模式"><span class="nav-number">1.2.</span> <span class="nav-text">1.2. 数量词的贪婪模式与非贪婪模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-反斜杠的困扰"><span class="nav-number">1.3.</span> <span class="nav-text">1.3. 反斜杠的困扰</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-匹配模式"><span class="nav-number">1.4.</span> <span class="nav-text">1.4. 匹配模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-re模块"><span class="nav-number">2.</span> <span class="nav-text">2. re模块</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-开始使用re"><span class="nav-number">2.1.</span> <span class="nav-text">2.1. 开始使用re</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Match"><span class="nav-number">2.2.</span> <span class="nav-text">2.2. Match</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Pattern"><span class="nav-number">2.3.</span> <span class="nav-text">2.3. Pattern</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

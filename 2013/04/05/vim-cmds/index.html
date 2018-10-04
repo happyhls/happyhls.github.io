@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="转自http://www.cnblogs.com/softwaretesting/archive/2011/07/12/2104435.html 命令历史以:和/开头的命令都有历史纪录，可以首先键入:或/然后按上下箭头来选择某个历史命令。 启动vim在命令行窗口中输入以下命令即可 vim 直接启动vim vim filename 打开vim并创建名为filename的文件 文件命令打开单个文件 v">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Vim命令合集（转载）">
+<meta property="og:url" content="http://yoursite.com/2013/04/05/vim-cmds/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="转自http://www.cnblogs.com/softwaretesting/archive/2011/07/12/2104435.html 命令历史以:和/开头的命令都有历史纪录，可以首先键入:或/然后按上下箭头来选择某个历史命令。 启动vim在命令行窗口中输入以下命令即可 vim 直接启动vim vim filename 打开vim并创建名为filename的文件 文件命令打开单个文件 v">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T15:12:22.601Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Vim命令合集（转载）">
+<meta name="twitter:description" content="转自http://www.cnblogs.com/softwaretesting/archive/2011/07/12/2104435.html 命令历史以:和/开头的命令都有历史纪录，可以首先键入:或/然后按上下箭头来选择某个历史命令。 启动vim在命令行窗口中输入以下命令即可 vim 直接启动vim vim filename 打开vim并创建名为filename的文件 文件命令打开单个文件 v">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/04/05/vim-cmds/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Vim命令合集（转载） | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/04/05/vim-cmds/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Vim命令合集（转载）
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-04-05 18:51:01" itemprop="dateCreated datePublished" datetime="2013-04-05T18:51:01+08:00">2013-04-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 23:12:22" itemprop="dateModified" datetime="2018-10-03T23:12:22+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>转自<a href="http://www.cnblogs.com/softwaretesting/archive/2011/07/12/2104435.html" target="_blank" rel="noopener">http://www.cnblogs.com/softwaretesting/archive/2011/07/12/2104435.html</a></p>
+<h1 id="命令历史"><a href="#命令历史" class="headerlink" title="命令历史"></a>命令历史</h1><p>以:和/开头的命令都有历史纪录，可以首先键入:或/然后按上下箭头来选择某个历史命令。</p>
+<h1 id="启动vim"><a href="#启动vim" class="headerlink" title="启动vim"></a>启动vim</h1><p>在命令行窗口中输入以下命令即可 vim 直接启动vim vim filename 打开vim并创建名为filename的文件</p>
+<h1 id="文件命令"><a href="#文件命令" class="headerlink" title="文件命令"></a>文件命令</h1><p>打开单个文件 vim file 同时打开多个文件 vim file1 file2 file3 … 在vim窗口中打开一个新文件 :open file 在新窗口中打开文件 :split file 切换到下一个文件 :bn 切换到上一个文件 :bp 查看当前打开的文件列表，当前正在编辑的文件会用[]括起来。 :args 打开远程文件，比如ftp或者share folder :e <a href="ftp://192.168.10.76/abc.txt" target="_blank" rel="noopener">ftp://192.168.10.76/abc.txt</a> :e \\qadrive\test\1.txt</p>
+<h1 id="vim的模式"><a href="#vim的模式" class="headerlink" title="vim的模式"></a>vim的模式</h1><p>正常模式（按Esc或Ctrl+[进入） 左下角显示文件名或为空 插入模式（按i键进入） 左下角显示–INSERT– 可视模式（不知道如何进入） 左下角显示–VISUAL–</p>
+<h1 id="导航命令"><a href="#导航命令" class="headerlink" title="导航命令"></a>导航命令</h1><p>% 括号匹配</p>
+<h1 id="插入命令"><a href="#插入命令" class="headerlink" title="插入命令"></a>插入命令</h1><p>i 在当前位置生前插入 I 在当前行首插入 a 在当前位置后插入 A 在当前行尾插入 o 在当前行之后插入一行 O 在当前行之前插入一行</p>
+<h1 id="查找命令"><a href="#查找命令" class="headerlink" title="查找命令"></a>查找命令</h1><p>/text　　查找text，按n健查找下一个，按N健查找前一个。 ?text　　查找text，反向查找，按n健查找下一个，按N健查找前一个。 vim中有一些特殊字符在查找时需要转义　　.<em>[]^%/?~$ :set ignorecase　　忽略大小写的查找 :set noignorecase　　不忽略大小写的查找 查找很长的词，如果一个词很长，键入麻烦，可以将光标移动到该词上，按</em>或#键即可以该单词进行搜索，相当于/搜索。而#命令相当于?搜索。 :set hlsearch　　高亮搜索结果，所有结果都高亮显示，而不是只显示一个匹配。 :set nohlsearch　　关闭高亮搜索显示 :nohlsearch　　关闭当前的高亮显示，如果再次搜索或者按下n或N键，则会再次高亮。 :set incsearch　　逐步搜索模式，对当前键入的字符进行搜索而不必等待键入完成。 :set wrapscan　　重新搜索，在搜索到文件头或尾时，返回继续搜索，默认开启。</p>
+<h1 id="替换命令"><a href="#替换命令" class="headerlink" title="替换命令"></a>替换命令</h1><p>ra 将当前字符替换为a，当期字符即光标所在字符。 s/old/new/ 用old替换new，替换当前行的第一个匹配 s/old/new/g 用old替换new，替换当前行的所有匹配 %s/old/new/ 用old替换new，替换所有行的第一个匹配 %s/old/new/g 用old替换new，替换整个文件的所有匹配 :10,20 s/^/    /g 在第10行知第20行每行前面加四个空格，用于缩进。 ddp 交换光标所在行和其下紧邻的一行。</p>
+<h1 id="移动命令"><a href="#移动命令" class="headerlink" title="移动命令"></a>移动命令</h1><p>h 左移一个字符 l 右移一个字符，这个命令很少用，一般用w代替。 k 上移一个字符 j 下移一个字符 以上四个命令可以配合数字使用，比如20j就是向下移动20行，5h就是向左移动5个字符，在Vim中，很多命令都可以配合数字使用，比如删除10个字符10x，在当前位置后插入3个！，3a！<esc>，这里的Esc是必须的，否则命令不生效。 w 向前移动一个单词（光标停在单词首部），如果已到行尾，则转至下一行行首。此命令快，可以代替l命令。 b 向后移动一个单词 2b 向后移动2个单词 e，同w，只不过是光标停在单词尾部 ge，同b，光标停在单词尾部。 ^ 移动到本行第一个非空白字符上。 0（数字0）移动到本行第一个字符上， <home> 移动到本行第一个字符。同0健。 $ 移动到行尾 3$ 移动到下面3行的行尾 gg 移动到文件头。 = [[ G（shift + g） 移动到文件尾。 = ]] f（find）命令也可以用于移动，fx将找到光标后第一个为x的字符，3fd将找到第三个为d的字符。 F 同f，反向查找。 跳到指定行，冒号+行号，回车，比如跳到240行就是 :240回车。另一个方法是行号+G，比如230G跳到230行。 Ctrl + e 向下滚动一行 Ctrl + y 向上滚动一行 Ctrl + d 向下滚动半屏 Ctrl + u 向上滚动半屏 Ctrl + f 向下滚动一屏 Ctrl + b 向上滚动一屏</home></esc></p>
+<h1 id="撤销和重做"><a href="#撤销和重做" class="headerlink" title="撤销和重做"></a>撤销和重做</h1><p>u 撤销（Undo） U 撤销对整行的操作 Ctrl + r 重做（Redo），即撤销的撤销。</p>
+<h1 id="删除命令"><a href="#删除命令" class="headerlink" title="删除命令"></a>删除命令</h1><p>x 删除当前字符 3x 删除当前光标开始向后三个字符 X 删除当前字符的前一个字符。X=dh dl 删除当前字符， dl=x dh 删除前一个字符 dd 删除当前行 dj 删除上一行 dk 删除下一行 10d 删除当前行开始的10行。 D 删除当前字符至行尾。D=d$ d$ 删除当前字符之后的所有字符（本行） kdgg 删除当前行之前所有行（不包括当前行） jdG（jd shift + g）   删除当前行之后所有行（不包括当前行） :1,10d 删除1-10行 :11,$d 删除11行及以后所有的行 :1,$d 删除所有行 J(shift + j)　　删除两行之间的空行，实际上是合并两行。</p>
+<h1 id="拷贝和粘贴"><a href="#拷贝和粘贴" class="headerlink" title="拷贝和粘贴"></a>拷贝和粘贴</h1><p>yy 拷贝当前行 nyy 拷贝当前后开始的n行，比如2yy拷贝当前行及其下一行。 p  在当前光标后粘贴,如果之前使用了yy命令来复制一行，那么就在当前行的下一行粘贴。 shift+p 在当前行前粘贴 :1,10 co 20 将1-10行插入到第20行之后。 :1,$ co $ 将整个文件复制一份并添加到文件尾部。 正常模式下按v（逐字）或V（逐行）进入可视模式，然后用jklh命令移动即可选择某些行或字符，再按y即可复制 ddp交换当前行和其下一行 xp交换当前字符和其后一个字符</p>
+<h1 id="剪切命令"><a href="#剪切命令" class="headerlink" title="剪切命令"></a>剪切命令</h1><p>正常模式下按v（逐字）或V（逐行）进入可视模式，然后用jklh命令移动即可选择某些行或字符，再按d即可剪切 ndd 剪切当前行之后的n行。利用p命令可以对剪切的内容进行粘贴 :1,10d 将1-10行剪切。利用p命令可将剪切后的内容进行粘贴。 :1, 10 m 20 将第1-10行移动到第20行之后。</p>
+<h1 id="退出命令"><a href="#退出命令" class="headerlink" title="退出命令"></a>退出命令</h1><p>:wq 保存并退出 ZZ 保存并退出 :q! 强制退出并忽略所有更改 :e! 放弃所有修改，并打开原来文件。</p>
+<h1 id="窗口命令"><a href="#窗口命令" class="headerlink" title="窗口命令"></a>窗口命令</h1><p>:split或new 打开一个新窗口，光标停在顶层的窗口上 :split file或:new file 用新窗口打开文件 split打开的窗口都是横向的，使用vsplit可以纵向打开窗口。 Ctrl+ww 移动到下一个窗口 Ctrl+wj 移动到下方的窗口 Ctrl+wk 移动到上方的窗口 关闭窗口 :close 最后一个窗口不能使用此命令，可以防止意外退出vim。 :q 如果是最后一个被关闭的窗口，那么将退出vim。 ZZ 保存并退出。 关闭所有窗口，只保留当前窗口 :only 录制宏 按q键加任意字母开始录制，再按q键结束录制（这意味着vim中的宏不可嵌套），使用的时候@加宏名，比如qa。。。q录制名为a的宏，@a使用这个宏。</p>
+<h1 id="执行shell命令"><a href="#执行shell命令" class="headerlink" title="执行shell命令"></a>执行shell命令</h1><p>:!command :!ls 列出当前目录下文件 :!perl -c script.pl 检查perl脚本语法，可以不用退出vim，非常方便。 :!perl script.pl 执行perl脚本，可以不用退出vim，非常方便。 :suspend或Ctrl - Z 挂起vim，回到shell，按fg可以返回vim。</p>
+<h1 id="注释命令"><a href="#注释命令" class="headerlink" title="注释命令"></a>注释命令</h1><p>perl程序中#开始的行为注释，所以要注释某些行，只需在行首加入# 3,5 s/^/#/g 注释第3-5行 3,5 s/^#//g 解除3-5行的注释 1,$ s/^/#/g 注释整个文档。 :%s/^/#/g 注释整个文档，此法更快。</p>
+<h1 id="帮助命令"><a href="#帮助命令" class="headerlink" title="帮助命令"></a>帮助命令</h1><p>:help or F1 显示整个帮助 :help xxx 显示xxx的帮助，比如 :help i, :help CTRL-[（即Ctrl+[的帮助）。 :help ‘number’ Vim选项的帮助用单引号括起 :help <esc> 特殊键的帮助用&lt;&gt;扩起 :help -t Vim启动参数的帮助用- ：help i_<esc> 插入模式下Esc的帮助，某个模式下的帮助用模式_主题的模式 帮助文件中位于||之间的内容是超链接，可以用Ctrl+]进入链接，Ctrl+o（Ctrl + t）返回</esc></esc></p>
+<h1 id="其他非编辑命令"><a href="#其他非编辑命令" class="headerlink" title="其他非编辑命令"></a>其他非编辑命令</h1><p>. 重复前一次命令 :set ruler?　　查看是否设置了ruler，在.vimrc中，使用set命令设制的选项都可以通过这个命令查看 :scriptnames　　查看vim脚本文件的位置，比如.vimrc文件，语法文件及plugin等。 :set list 显示非打印字符，如tab，空格，行尾等。如果tab无法显示，请确定用set lcs=tab:&gt;-命令设置了.vimrc文件，并确保你的文件中的确有tab，如果开启了expendtab，那么tab将被扩展为空格。 Vim教程 在Unix系统上 $ vimtutor 在Windows系统上 :help tutor :syntax 列出已经定义的语法项 :syntax clear 清除已定义的语法规则 :syntax case match 大小写敏感，int和Int将视为不同的语法元素 :syntax case ignore 大小写无关，int和Int将视为相同的语法元素，并使用同样的配色方案</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/04/04/java-io-reader-writer/" rel="next" title="Java IO 之二：传统IO (2)Reader,Writer">
+                <i class="fa fa-chevron-left"></i> Java IO 之二：传统IO (2)Reader,Writer
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/04/05/linux-global/" rel="prev" title="global命令详解(转载)">
+                global命令详解(转载) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#命令历史"><span class="nav-number">1.</span> <span class="nav-text">命令历史</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#启动vim"><span class="nav-number">2.</span> <span class="nav-text">启动vim</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件命令"><span class="nav-number">3.</span> <span class="nav-text">文件命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vim的模式"><span class="nav-number">4.</span> <span class="nav-text">vim的模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#导航命令"><span class="nav-number">5.</span> <span class="nav-text">导航命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#插入命令"><span class="nav-number">6.</span> <span class="nav-text">插入命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#查找命令"><span class="nav-number">7.</span> <span class="nav-text">查找命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#替换命令"><span class="nav-number">8.</span> <span class="nav-text">替换命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#移动命令"><span class="nav-number">9.</span> <span class="nav-text">移动命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#撤销和重做"><span class="nav-number">10.</span> <span class="nav-text">撤销和重做</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#删除命令"><span class="nav-number">11.</span> <span class="nav-text">删除命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#拷贝和粘贴"><span class="nav-number">12.</span> <span class="nav-text">拷贝和粘贴</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#剪切命令"><span class="nav-number">13.</span> <span class="nav-text">剪切命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#退出命令"><span class="nav-number">14.</span> <span class="nav-text">退出命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#窗口命令"><span class="nav-number">15.</span> <span class="nav-text">窗口命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#执行shell命令"><span class="nav-number">16.</span> <span class="nav-text">执行shell命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#注释命令"><span class="nav-number">17.</span> <span class="nav-text">注释命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#帮助命令"><span class="nav-number">18.</span> <span class="nav-text">帮助命令</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他非编辑命令"><span class="nav-number">19.</span> <span class="nav-text">其他非编辑命令</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在Android的开发当中，需要特别小心内存的时候，如果不去控制内存的使用，任意新建或者删除对象，虽然GC可以及时的会收到大量的内存空间，但由于很多情况下，我们的细节也不会处理的特别到位，因此就会出现内存泄漏，最典型的就是，你这部分堆中的内存永远都不会被使用到了，但仍然在栈中有对象指向它。 在Volley的实际中，也特别注意到了这一点。其实很容易想象到，大量的网络访问，接收到的数据结果一般都会保存">
+<meta name="keywords" content="Android,Java,Volley,Buffer,Cache">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Volley源代码分析 – 3: 缓存之ByteArrayPool">
+<meta property="og:url" content="http://yoursite.com/2014/11/20/android-volley-3-cache-bytearraypool/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="在Android的开发当中，需要特别小心内存的时候，如果不去控制内存的使用，任意新建或者删除对象，虽然GC可以及时的会收到大量的内存空间，但由于很多情况下，我们的细节也不会处理的特别到位，因此就会出现内存泄漏，最典型的就是，你这部分堆中的内存永远都不会被使用到了，但仍然在栈中有对象指向它。 在Volley的实际中，也特别注意到了这一点。其实很容易想象到，大量的网络访问，接收到的数据结果一般都会保存">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T15:14:17.415Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Volley源代码分析 – 3: 缓存之ByteArrayPool">
+<meta name="twitter:description" content="在Android的开发当中，需要特别小心内存的时候，如果不去控制内存的使用，任意新建或者删除对象，虽然GC可以及时的会收到大量的内存空间，但由于很多情况下，我们的细节也不会处理的特别到位，因此就会出现内存泄漏，最典型的就是，你这部分堆中的内存永远都不会被使用到了，但仍然在栈中有对象指向它。 在Volley的实际中，也特别注意到了这一点。其实很容易想象到，大量的网络访问，接收到的数据结果一般都会保存">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/20/android-volley-3-cache-bytearraypool/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Volley源代码分析 – 3: 缓存之ByteArrayPool | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/20/android-volley-3-cache-bytearraypool/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Volley源代码分析 – 3: 缓存之ByteArrayPool
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-20 16:01:44" itemprop="dateCreated datePublished" datetime="2014-11-20T16:01:44+08:00">2014-11-20</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 23:14:17" itemprop="dateModified" datetime="2018-10-03T23:14:17+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Volley/" itemprop="url" rel="index"><span itemprop="name">Volley</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在Android的开发当中，需要特别小心内存的时候，如果不去控制内存的使用，任意新建或者删除对象，虽然GC可以及时的会收到大量的内存空间，但由于很多情况下，我们的细节也不会处理的特别到位，因此就会出现内存泄漏，最典型的就是，你这部分堆中的内存永远都不会被使用到了，但仍然在栈中有对象指向它。 在Volley的实际中，也特别注意到了这一点。其实很容易想象到，大量的网络访问，接收到的数据结果一般都会保存在一个byte[]的数组当中，然后再调用其他的处理类进行数据分析。我们也知道，Volley的设计初衷是满足那些大量的频繁的网络访问，因此如果直接简单的通过new byte[length]来新建一个数组，必然会大量的频繁的向系统申请内存，如果这些内存处理得到，那么也会消耗大量的GC时间，更别说处理不当带来的内存泄漏，必然导致我们的APP的堆空间的使用量不断上升。此外还可能引入大量的新建对象的资源消耗，当然这个微乎其微。综上，为了解决这些问题，而且又能够保证Volley作为library的轻量，Volley的设计者设计了一个简单的byte[]的池，即ByteArrayPool类，先看源代码，然后再分析一下其原理和作用。</p>
+<p>package com.android.volley.toolbox;</p>
+<p>import java.util.ArrayList;<br>import java.util.Collections;<br>import java.util.Comparator;<br>import java.util.LinkedList;<br>import java.util.List;</p>
+<p>/**<br> * ByteArrayPool is a source and repository of <code>byte[]</code> objects. Its purpose is to<br> * supply those buffers to consumers who need to use them for a short period of time and then<br> * dispose of them. Simply creating and disposing such buffers in the conventional manner can<br> * considerable heap churn and garbage collection delays on Android, which lacks good management of<br> * short-lived heap objects. It may be advantageous to trade off some memory in the form of a<br> * permanently allocated pool of buffers in order to gain heap performance improvements; that is<br> * what this class does.<br> *<br> * ByteArrayPool是一个byte[]对象的源和仓库。其目的在于支持那些用户所需要的使用一段时间，然后丢弃的buffer。<br> * 在一般的情况下，直接创建，然后丢弃这样的buffer堆空间的大量消耗以及在Android设备的垃圾回收延时，这些都是缺少<br> * 一个良好的对于短生命周期的堆的管理。申请一块永久的空间来获取堆性能上的提升是有价值的，这也是这个类的作用。<br> *<br> * </p><p><br> * A good candidate user for this class is something like an I/O system that uses large temporary<br> * <code>byte[]</code> buffers to copy data around. In these use cases, often the consumer wants<br> * the buffer to be a certain minimum size to ensure good performance (e.g. when copying data chunks<br> * off of a stream), but doesn’t mind if the buffer is larger than the minimum. Taking this into<br> * account and also to maximize the odds of being able to reuse a recycled buffer, this class is<br> * free to return buffers larger than the requested size. The caller needs to be able to gracefully<br> * deal with getting buffers any size over the minimum.<br> * 一个比较好的使用环境是比如像I/O系统中大量的临时的byte[]缓冲的数据拷贝。在这些使用情况中，大多数情况下，用户想要<br> * 一个比较小的特定的空间来保证一个好的性能(比如从一个数据流中拷贝一个数据块)，但并不会关心这个buffer是否大于他们<br> * 所需要的最小的块。考虑到这些，也是尽可能的重用这个可回收的buffer，这个类返回大于请求大小的buffer。调用者需要优雅<br> * 的处理任何比最小的所需要的buffer大的空间。<br> * </p><p><br> * If there is not a suitably-sized buffer in its recycling pool when a buffer is requested, this<br> * class will allocate a new buffer and return it.<br> * 如果一个请求提交的时候，在回收池当中没有合适的大小的buffer，那么这个类就会申请一块新的空间并且返回。<br> * </p><p><br> * This class has no special ownership of buffers it creates; the caller is free to take a buffer<br> * it receives from this pool, use it permanently, and never return it to the pool; additionally,<br> * it is not harmful to return to this pool a buffer that was allocated elsewhere, provided there<br> * are no other lingering references to it.<br> * 该类对于其创建的buffer没有拥有者的概念；调用者可以自由的从pool中获取buffer，永久的使用这些buffer，不再归还。<br> * 除此之外，如果从其他的地方申请了buffer，归还到这个位置，也是没有任何坏处的。<br> * </p><p><br> * This class ensures that the total size of the buffers in its recycling pool never exceeds a<br> * certain byte limit. When a buffer is returned that would cause the pool to exceed the limit,<br> * least-recently-used buffers are disposed.<br> * 这个类保证了回收池中总共的buffer的大小用于不会超过其限制。当返回一个buffer会导致buffer池接近其极限的时候，<br> * least-recently-used的buffer就会被丢弃。<br> */<br>/**<br> * 我的理解：该buffer的作用就在于通过保存一些buffer来减少申请空间的次数，从而更加优化堆的使用。<br> * 其方法是，当需要buffer的时候，从这里面取，如果没有合适的，那么就申请，如果申请到了的话，那么就将这块buffer从<br> * 记录的List中删除。<br> * 当buffer不用的时候，就将buffer归还，方法是，首先根据buffer的长度将buffer放入到mBuffersBySize的合适的位置上，<br> * 然后判断新的buffer的大小是否超过了预设的大小限制，如果超过了的话，那么就从中删除那个占用空间最小的。<br> <em>
+ </em>/<br>public class ByteArrayPool {<br>    /** The buffer pool, arranged both by last use and by buffer size <em>/<br>    /\</em>* buffer池，通过LastUse和大小管理 */<br>    private List&lt;byte[]&gt; mBuffersByLastUse = new LinkedList&lt;byte[]&gt;();<br>    private List&lt;byte[]&gt; mBuffersBySize = new ArrayList&lt;byte[]&gt;(64);</p>
+<pre><code>/\*\* The total size of the buffers in the pool */
+/\*\* 池中所有的buffer大小的总和 */
+private int mCurrentSize = 0;
+
+/\*\*
+ \* The maximum aggregate size of the buffers in the pool. Old buffers are discarded to stay
+ \* under this limit.
+ \* 最大的buffers的大小的数量。当接近最大值的时候，就的buffer就会被丢弃。
+ */
+private final int mSizeLimit;
+
+/\*\* Compares buffers by size */
+/\*\* 通过buffer的大小进行比较  */
+protected static final Comparator&lt;byte\[\]&gt; BUF_COMPARATOR = new Comparator&lt;byte\[\]&gt;() {
+    @Override
+    public int compare(byte\[\] lhs, byte\[\] rhs) {
+        return lhs.length - rhs.length;
+    }
+};
+
+/\*\*
+ \* @param sizeLimit the maximum size of the pool, in bytes
+ */
+public ByteArrayPool(int sizeLimit) {
+    mSizeLimit = sizeLimit;
+}
+
+/\*\*
+ \* Returns a buffer from the pool if one is available in the requested size, or allocates a new
+ \* one if a pooled one is not available.
+ \* 从池总获取一个buffer，如果大小合适，则直接读取，如果不合适，则申请一块空间。
+ \*
+ \* @param len the minimum size, in bytes, of the requested buffer. The returned buffer may be
+ \*        larger.
+ \* @return a byte\[\] buffer is always returned.
+ */
+public synchronized byte\[\] getBuf(int len) {
+    for (int i = 0; i &lt; mBuffersBySize.size(); i++) {
+        byte\[\] buf = mBuffersBySize.get(i);
+        if (buf.length &gt;= len) {
+            //此块buffer大小满足长度要求
+
+            //当前buffer池可用大小减去buf的长度
+            mCurrentSize -= buf.length;
+            //该buffer刚刚被使用，所以从mBuffersBySize中删掉
+            mBuffersBySize.remove(i);
+            //该buffer刚刚被使用，所以从mBuufersByLastUse中删掉
+            mBuffersByLastUse.remove(buf);
+            //返回该buffer
+            return buf;
+        }
+    }
+    return new byte\[len\];
+}
+
+/\*\*
+ \* Returns a buffer to the pool, throwing away old buffers if the pool would exceed its allotted
+ \* size.
+ \* 将一块buffer归还给池，如果pool达到其分配的大小，则丢弃任何的旧的buffer。
+ \* @param buf the buffer to return to the pool.
+ */
+public synchronized void returnBuf(byte\[\] buf) {
+    if (buf == null || buf.length &gt; mSizeLimit) {
+        return;
+    }
+    //将该buffer放入到mBuufersByLastUse当中。
+    mBuffersByLastUse.add(buf);
+    //找到在mBuffersBySize中合适的位置。
+    int pos = Collections.binarySearch(mBuffersBySize, buf, BUF_COMPARATOR);
+    if (pos &lt; 0) {
+        pos = -pos - 1;
+    }
+    //将buffer添加到合适的位置上。
+    mBuffersBySize.add(pos, buf);
+    //将可用的buffer长度进行修改。
+    mCurrentSize += buf.length;
+    trim();
+}
+
+/\*\*
+ \* Removes buffers from the pool until it is under its size limit.
+ \* 如果当前系统中的可用buffer过多的话，则删除其中最小的buffer。
+ */
+private synchronized void trim() {
+    while (mCurrentSize &gt; mSizeLimit) {
+        byte\[\] buf = mBuffersByLastUse.remove(0);
+        mBuffersBySize.remove(buf);
+        mCurrentSize -= buf.length;
+    }
+}
+</code></pre><p>}</p>
+<p>其实整个ByteArrayPool的程序比较简单，我的理解就是</p>
+<ul>
+<li>该buffer的作用就在于通过保存一些buffer来减少申请空间的次数，从而更加优化堆的使用（可能在使用率不高的时候，会浪费一定的内存空间，但代价不高）。</li>
+<li>其方法是<ol>
+<li>当需要buffer的时候，从这里面取，如果没有合适的，那么就申请一个新的大小合适的buffer。</li>
+<li>如果申请到了的话，那么就将这块buffer从记录的List中删除。即意味着再次有其他程序获取buffer的时候，不会使用到这块buffer。</li>
+<li>当buffer使用完毕时候，就将buffer归还。方法是：<ol>
+<li>根据buffer的长度将buffer放入到mBuffersBySize的合适的位置上</li>
+<li>判断现在ByteArrayPool所占用的空间是否超过了预设的大小，如果超过了的话，那么就从中删除那个占用空间最小的。</li>
+</ol>
+</li>
+</ol>
+</li>
+</ul>
+<p>基于ByteArrayPool的PoolingByteArrayOutputStream</p>
+<p>/**<br> * A variation of {@link java.io.ByteArrayOutputStream} that uses a pool of byte[] buffers instead<br> * of always allocating them fresh, saving on heap churn.<br> <em>/<br>public class PoolingByteArrayOutputStream extends ByteArrayOutputStream {<br>    /\</em>*<br>     * If the {@link #PoolingByteArrayOutputStream(ByteArrayPool)} constructor is called, this is<br>     * the default size to which the underlying byte array is initialized.<br>     */<br>    private static final int DEFAULT_SIZE = 256;</p>
+<pre><code>private final ByteArrayPool mPool;
+
+/\*\*
+ \* Constructs a new PoolingByteArrayOutputStream with a default size. If more bytes are written
+ \* to this instance, the underlying byte array will expand.
+ */
+public PoolingByteArrayOutputStream(ByteArrayPool pool) {
+    this(pool, DEFAULT_SIZE);
+}
+
+/\*\*
+ \* Constructs a new {@code ByteArrayOutputStream} with a default size of {@code size} bytes. If
+ \* more than {@code size} bytes are written to this instance, the underlying byte array will
+ \* expand.
+ \*
+ \* @param size initial size for the underlying byte array. The value will be pinned to a default
+ \*        minimum size.
+ */
+public PoolingByteArrayOutputStream(ByteArrayPool pool, int size) {
+    mPool = pool;
+    buf = mPool.getBuf(Math.max(size, DEFAULT_SIZE));
+}
+
+@Override
+public void close() throws IOException {
+    mPool.returnBuf(buf);
+    buf = null;
+    super.close();
+}
+
+@Override
+public void finalize() {
+    mPool.returnBuf(buf);
+}
+
+/\*\*
+ \* Ensures there is enough space in the buffer for the given number of additional bytes.
+ */
+private void expand(int i) {
+    /\* Can the buffer handle @i more bytes, if not expand it */
+    if (count + i &lt;= buf.length) {
+        return;
+    }
+    byte\[\] newbuf = mPool.getBuf((count + i) * 2);
+    System.arraycopy(buf, 0, newbuf, 0, count);
+    mPool.returnBuf(buf);
+    buf = newbuf;
+}
+
+@Override
+public synchronized void write(byte\[\] buffer, int offset, int len) {
+    expand(len);
+    super.write(buffer, offset, len);
+}
+
+@Override
+public synchronized void write(int oneByte) {
+    expand(1);
+    super.write(oneByte);
+}
+</code></pre><p>}</p>
+<p>需要注意的几点：</p>
+<ul>
+<li>继承自ByteArrayOutputStream，所有的写入操作都是同步的</li>
+<li>在写入之前首先会检查是否需要扩展buffer的空间。</li>
+<li><p>覆写了finalize()方法，当垃圾回收的时候，会尝试归还所申请的空间，但注意，JVM并不保证这段代码一定会执行，而且在此实例的声明周期中，只会执行一次。所以我们尽量要调用close()方法显示的归还。</p>
+<ul>
+<li>当然，如果不归还也没太大的问题，空间还是会被垃圾回收的，但就违背了我们使用这个输出流的初衷了。</li>
+</ul>
+<p>性能？打算跑个测试看一下，应该还是不错，基本的测试思路是，开N个线程，在N个线程中申请随机大小的空间，如此重复，观察内存的占用情况。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/Volley/" rel="tag"># Volley</a>
+          
+            <a href="/tags/Buffer/" rel="tag"># Buffer</a>
+          
+            <a href="/tags/Cache/" rel="tag"># Cache</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/19/android-volley-2-task-execution/" rel="next" title="Volley源代码分析 – 2：任务的执行，CacheDispatcher、NetworkDispatcher、ResponseDelivery">
+                <i class="fa fa-chevron-left"></i> Volley源代码分析 – 2：任务的执行，CacheDispatcher、NetworkDispatcher、ResponseDelivery
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/21/android-volley-4-imagerequest-imageloader/" rel="prev" title="Volley源代码分析 – 4: Request实现之ImageRequest&ImageLoader">
+                Volley源代码分析 – 4: Request实现之ImageRequest&ImageLoader <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

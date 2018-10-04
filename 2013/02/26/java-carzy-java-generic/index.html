@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Java的泛型-Java的参数化类型 1、构造器： 当创建带有泛型声明打自定义类的时候，构造器名还是原来的类名，不要增加泛型声明，而再使用的时候，可以增加泛型声明来调用。比如说，Apple类，其构造器名仍然为Apple，而不是Apple,但在调用的时候，可以使用Apple的形式来调用。 2、从泛型类派生子类 创建了带泛型声明的接口、父类之后，可以继承接口或父类，但要注意的是，在使用的时候不能再包含">
+<meta property="og:type" content="article">
+<meta property="og:title" content="《疯狂Java讲义》-泛型(Generic)">
+<meta property="og:url" content="http://yoursite.com/2013/02/26/java-carzy-java-generic/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="Java的泛型-Java的参数化类型 1、构造器： 当创建带有泛型声明打自定义类的时候，构造器名还是原来的类名，不要增加泛型声明，而再使用的时候，可以增加泛型声明来调用。比如说，Apple类，其构造器名仍然为Apple，而不是Apple,但在调用的时候，可以使用Apple的形式来调用。 2、从泛型类派生子类 创建了带泛型声明的接口、父类之后，可以继承接口或父类，但要注意的是，在使用的时候不能再包含">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T14:59:49.380Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="《疯狂Java讲义》-泛型(Generic)">
+<meta name="twitter:description" content="Java的泛型-Java的参数化类型 1、构造器： 当创建带有泛型声明打自定义类的时候，构造器名还是原来的类名，不要增加泛型声明，而再使用的时候，可以增加泛型声明来调用。比如说，Apple类，其构造器名仍然为Apple，而不是Apple,但在调用的时候，可以使用Apple的形式来调用。 2、从泛型类派生子类 创建了带泛型声明的接口、父类之后，可以继承接口或父类，但要注意的是，在使用的时候不能再包含">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/02/26/java-carzy-java-generic/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>《疯狂Java讲义》-泛型(Generic) | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/02/26/java-carzy-java-generic/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">《疯狂Java讲义》-泛型(Generic)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-02-26 20:06:09" itemprop="dateCreated datePublished" datetime="2013-02-26T20:06:09+08:00">2013-02-26</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 22:59:49" itemprop="dateModified" datetime="2018-10-03T22:59:49+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Java的泛型-Java的参数化类型 1、构造器： 当创建带有泛型声明打自定义类的时候，构造器名还是原来的类名，不要增加泛型声明，而再使用的时候，可以增加泛型声明来调用。比如说，Apple类，其构造器名仍然为Apple，而不是Apple,但在调用的时候，可以使用Apple的形式来调用。 2、从泛型类派生子类 创建了带泛型声明的接口、父类之后，可以继承接口或父类，但要注意的是，在使用的时候不能再包含类型形参，比如下面的是错误的： public class A extends Apply<t>{} 此处正确的写法应该为 public class A extends Apple<string>或者 public class A extends Apple 需要注意的是，如果使用public class A extends Apple<string>则其中所有的T类型形参都会被替换成String，则在子类实现的时候就需要我们特别注意类型的转换。(原来T的位置已经全部更换为String了) 3、泛型的类型擦除 import java.util.ArrayList; import java.util.List; public class TestGeneric { public static void main(String[] args) { List listInt=new ArrayList(); List listString=new ArrayList(); System.out.println(listInt.getClass()==listString.getClass()); System.out.println(listInt.getClass().gettitle()); System.out.println(listString.getClass().gettitle()); } } 运行结果为： true java.util.ArrayList java.util.ArrayList 可以看出，其实在本质上，其都是ArrayList类，JVM运行时，并不存在泛型。 4、Foo是Bar的子类，那G<foo>是G<bar>的子类？ 这个问题是在泛型里面需要特别注意的问题，Foo[]是Bar的子类型，但G<foo>并不是G<bar>的子类型。 在Java中，使用泛型的时候，只要在编译的时候没有出现警告，那在运行的时候，就不会出现 ClassCastException! 有这样的代码</bar></foo></bar></foo></string></string></t></p>
+<p>List iList=new ArrayList();<br>List nList=iList;<br>nList.add(0.5);</p>
+<p>在编译的时候会出现如下错误！</p>
+<p>错误: 不兼容的类型<br>List nList=iList;<br>需要: List<br>找到:    List<br>1 个错误</p>
+<p>4-1.类型通配符 ？ 将问号作为通配符传入函数或者类，那么就可以表示，该元素类型可以匹配任何类型，如以下的代码：</p>
+<p>import java.util.ArrayList;<br>import java.util.List;<br>public class TestGeneric {<br>    public static void main(String[] args)<br>    {<br>        List iList=new ArrayList();<br>        iList.add(1);<br>        iList.add(2);<br>        iList.add(3);<br>        iList.add(4);<br>        test(iList);<br>    }<br>    public static void test(List&lt;?&gt; list)<br>    {<br>        for(int i = 0 ; i &lt; list.size() ; i++)<br>        {<br>            System.out.println(list.get(i));<br>        }<br>    }<br>}</p>
+<p>运行结果为</p>
+<p>1<br>2<br>3<br>4</p>
+<p>此处</p>
+<p>public static void test(List&lt;?&gt; list);</p>
+<p>该函数中list就使用了通配符？，用来代表任意类型，如果将此处的问号改为Number，虽然Number是Integer的父类，但仍然编译不成功。 我们需要注意的是，这种带通配符的List表示的是各种泛型List的父类，并不能将元素加入其中，比方说，下面的代码会出现错误。</p>
+<p>List&lt;?&gt; c = new ArrayList();<br>c.add(new Object());</p>
+<p>此处的问题也很明显，我们不知道List c中的元素的类型，因此我们无法向其中添加对象。同时分析源代码可以看到List中add方法的原型为 boolean add(E e); 因此我们可以注意到，添加的元素必须是E的类或者是其子类，此处使用通配符来替换，连类型都不清楚，当然无法添加。 4-2、设定类型通配符的上限 有如下代码：</p>
+<p>TestGeneric.java</p>
+<p>package testgeneric;<br>import java.util.ArrayList;<br>import java.util.List;<br>public class TestGeneric {<br>    public static void main(String[] args)<br>    {<br>        List circleList = new ArrayList();<br>        circleList.add(new Circle());<br>        MyCanvas mycanvas=new MyCanvas();<br>        mycanvas.drawAll(circleList);</p>
+<pre><code>    List shapeList = new ArrayList();
+    shapeList.add(new Circle());
+    shapeList.add(new Rectangle());
+    mycanvas.drawAll(shapeList);
+}
+</code></pre><p>}</p>
+<p>Shape.java</p>
+<p>package testgeneric;<br>public abstract class Shape {<br>    public abstract void draw(MyCanvas c);<br>}</p>
+<p>Circle.java</p>
+<p>package testgeneric;<br>import java.awt.Canvas;</p>
+<p>public class Circle extends Shape {<br>    @Override<br>    public void draw(MyCanvas c) {<br>        // TODO Auto-generated method stub<br>        System.out.println(“在画布” + c + “画一个圆”);<br>    }<br>}</p>
+<p>Rectangle.java</p>
+<p>package testgeneric;<br>import java.awt.Canvas;</p>
+<p>public class Rectangle extends Shape{<br>    @Override<br>    public void draw(MyCanvas c) {<br>        // TODO Auto-generated method stub<br>        System.out.println(“在画布”+c+”画一个矩形”);<br>    }</p>
+<p>}</p>
+<p>package testgeneric;<br>import java.util.List;</p>
+<p>public class MyCanvas {<br>    public void drawAll(List&lt;? extends Shape&gt; shape)<br>    {<br>        for(Shape s:shape)<br>        {<br>            s.draw(this);<br>        }<br>    }<br>}</p>
+<p>以上是完整的代码，注意到再MyCanvas类中，有如下一行 List&lt;? extends Shape&gt;，这一行就是一个受限的通配符，其意思就代表该未知类型是Shape类或者Shape的一个子类，即此处是上限(upper bound) 4-3 设置类型形参的上限 有如下代码：</p>
+<p>package testgeneric;</p>
+<p>public class Apple {<br>    T tmp;<br>    public static void main(String[] args)<br>    {<br>        Apple ai = new Apple();<br>        Apple ad = new Apple();</p>
+<pre><code>            下面这句将引起编译错误
+    Apple as = new Apple();
+}
+</code></pre><p>}</p>
+<p>如果需要多继承的话，可以这样写</p>
+<p>public class Apple</p>
+<p>此处需要注意的是，类必须放在第一位上。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/02/26/java-collection/" rel="next" title="Java--Collection,ArrayList,HashMap,HashSet">
+                <i class="fa fa-chevron-left"></i> Java--Collection,ArrayList,HashMap,HashSet
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/03/02/java-scanner-and-bufferedreader/" rel="prev" title="Java杂项">
+                Java杂项 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

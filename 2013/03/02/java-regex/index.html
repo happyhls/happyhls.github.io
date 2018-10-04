@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="正则表达式，常用的一些转义字符啥的，拿过来，记下来，用时备查 1、特殊字符^ 一行的开头$ 一行的结束() 表达式[] 表达式{} 表达式出现的频率 {1}出现1次，{1-3}出现1-3次* 任意次+ 一次或多次? 0次或1次. 除了换行符之外的任意字符\ 转义后面的字符| 多种匹配的或   2、预定义的字符 \d digital 数字\D NOT DIGITAL 非数字\s space 空白字符">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java正则表达式">
+<meta property="og:url" content="http://yoursite.com/2013/03/02/java-regex/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="正则表达式，常用的一些转义字符啥的，拿过来，记下来，用时备查 1、特殊字符^ 一行的开头$ 一行的结束() 表达式[] 表达式{} 表达式出现的频率 {1}出现1次，{1-3}出现1-3次* 任意次+ 一次或多次? 0次或1次. 除了换行符之外的任意字符\ 转义后面的字符| 多种匹配的或   2、预定义的字符 \d digital 数字\D NOT DIGITAL 非数字\s space 空白字符">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T15:02:32.188Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java正则表达式">
+<meta name="twitter:description" content="正则表达式，常用的一些转义字符啥的，拿过来，记下来，用时备查 1、特殊字符^ 一行的开头$ 一行的结束() 表达式[] 表达式{} 表达式出现的频率 {1}出现1次，{1-3}出现1-3次* 任意次+ 一次或多次? 0次或1次. 除了换行符之外的任意字符\ 转义后面的字符| 多种匹配的或   2、预定义的字符 \d digital 数字\D NOT DIGITAL 非数字\s space 空白字符">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2013/03/02/java-regex/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java正则表达式 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2013/03/02/java-regex/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java正则表达式
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-03-02 20:10:54" itemprop="dateCreated datePublished" datetime="2013-03-02T20:10:54+08:00">2013-03-02</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 23:02:32" itemprop="dateModified" datetime="2018-10-03T23:02:32+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java-编程思想/" itemprop="url" rel="index"><span itemprop="name">Java 编程思想</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java-编程思想/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>正则表达式，常用的一些转义字符啥的，拿过来，记下来，用时备查</p>
+<p>1、特殊字符<br>^ 一行的开头<br>$ 一行的结束<br>() 表达式<br>[] 表达式<br>{} 表达式出现的频率 {1}出现1次，{1-3}出现1-3次<br>* 任意次<br>+ 一次或多次<br>? 0次或1次<br>. 除了换行符之外的任意字符<br>\ 转义后面的字符<br>| 多种匹配的或</p>
+<p>  2、预定义的字符</p>
+<p>\d digital 数字<br>\D NOT DIGITAL 非数字<br>\s space 空白字符 包括 空格|制表符|回车符|换页符|换行符 等等<br>\S NOT SPACE 非空白字符<br>\w word单词字符 包括 0-9|A-Z|a-z|_<br>\W NOT WORD 非单词字符</p>
+<p>  3、方括号的用法</p>
+<p>(1)枚举 [abc]表示a、b、c中的任意一个字符<br>(2)表示范围（-） [a-z]表示从字符a-字符z<br>(3)表示求否（^） [^a-z]表示除了a-z之外的其他字符<br>(4)表示运算与（&amp;&amp;） [a-z&amp;&amp;[def]]表示d、e或者f<br>(5)表示运算并 [a-d[m-p]]表示a-dm-p</p>
+<p>  4、边界控制</p>
+<p>\b 单词边界<br>\B 非单词边界<br>\A 输入的开头<br>\G 前一个匹配的结尾<br>\Z 输入的结尾，仅仅用于最后的结束符<br>\z 输入的结尾</p>
+<p>  5、正则表达式工作模式：Greedy（贪婪模式）-&gt;默认、Reluctant（勉强模式）-?、Possessive（占有模式、仅Java，少用）-+ Greedy：尽可能多的匹配 Reluctant：尽可能烧得匹配 常用正则表达式：</p>
+<p>匹配中文字符的正则表达式： [/u4e00-/u9fa5]<br>匹配双字节字符(包括汉字在内)：[^/x00-/xff]<br>应用：计算字符串的长度（一个双字节字符长度计2，ASCII字符计1）<br>String.prototype.len=function(){return this.replace([^/x00-/xff]/g,”aa”).length;}<br>匹配空行的正则表达式：/n[/s| ]<em>/r<br>匹配HTML标记的正则表达式：/&lt;(.</em>)&gt;.<em>|&lt;(.</em>) //&gt;/<br>匹配首尾空格的正则表达式：(^/s<em>)|(/s</em>$)</p>
+<h3 id="Java的使用"><a href="#Java的使用" class="headerlink" title="Java的使用"></a>Java的使用</h3><p>import java.util.regex.Matcher;<br>import java.util.regex.Pattern;</p>
+<p>public class TestRegex {<br>    public static void main(String[] args)<br>    {<br>        String data=”This is your phone number: 123-456-789”;<br>        Pattern p=Pattern.compile(“\\d+-\\d+-\\d+”);<br>        Matcher m=p.matcher(data);<br>        if(m.matches())<br>            System.out.println(“matches():”+m.group());<br>        else<br>            System.out.println(“matches not found!”);<br>        if(m.lookingAt())<br>            System.out.println(“lookingAt():”+m.group());<br>        else<br>            System.out.println(“lookingAt not found”);<br>        if(m.find())<br>            System.out.println(“find():”+m.group());<br>        else<br>            System.out.println(“find() not found”);</p>
+<pre><code>    Pattern p_tmp=Pattern.compile(&quot;\\\s&quot;);
+    String\[\] str=p_tmp.split(data);
+    for(String tmp:str)
+    {
+        System.out.println(tmp);
+    }
+}
+</code></pre><p>}</p>
+<p>其运行结果为</p>
+<p>matches not found!<br>lookingAt not found<br>find():123-456-789<br>This<br>is<br>your<br>phone<br>number:<br>123-456-789</p>
+<p>在运行的时候，出现过 Invalid escape sequence (valid ones are \b \t \n \f \r \“ \‘ \\ )的错误，其错误原因为</p>
+<p>Pattern p=Pattern.compile(“\\d+-\\d+-\\d+”);</p>
+<p>之前写成了</p>
+<p>Pattern p=Pattern.compile(“\\d+-\\d+-\\d+”);</p>
+<p>而在Java中，\是保留字符，因此必须使用\\将其转义 在上述文中中在匹配之后调用过3种方法 matches()、lookingAt()、find()其主要的区别如下： matches()是对整个字符串进行匹配，只有整个字符串都匹配成功了，才会返回true lookingAt()是对前面的字符进行匹配，只有匹配的字符位于整个字符串的最前面，才会返回true find()则是只要在整个字符串中匹配到相应的字符，无论在什么位置，都返回true 如果查找到字符串，则调用 m.group()，可以返回子字符串，另外还有 m.start() m.end()返回开始及结束的位置 在Java中还有spilit函数用于将字符串分离，如上面中使用\s来使用空格分离单词 reset()函数，用来在寻找完成下一个字符串之后，继续用来在下一个字符串中寻找。</p>
+<h3 id="在Java的正则表达式中，分组也是很好用的一个功能，如下："><a href="#在Java的正则表达式中，分组也是很好用的一个功能，如下：" class="headerlink" title="在Java的正则表达式中，分组也是很好用的一个功能，如下："></a>在Java的正则表达式中，分组也是很好用的一个功能，如下：</h3><p>import java.util.regex.<em>;<br>import java.util.</em>;</p>
+<p>public class ThreatAnalyzer {<br>  static String threatData =<br>    “58.27.82.161@02/10/2005\n” +<br>    “204.45.234.40@02/11/2005\n” +<br>    “58.27.82.161@02/11/2005\n” +<br>    “58.27.82.161@02/12/2005\n” +<br>    “58.27.82.161@02/12/2005\n” +<br>    “[Next log section with different data format]“;<br>  public static void main(String[] args) {<br>    Scanner scanner = new Scanner(threatData);<br>    String pattern = “(\\d+[.]\\d+[.]\\d+[.]\\d+)@” +<br>      “(\\d{2}/\\d{2}/\\d{4})”;<br>    while(scanner.hasNext(pattern)) {<br>      scanner.next(pattern);<br>      MatchResult match = scanner.match();<br>      String ip = match.group(1);<br>      String date = match.group(2);<br>      System.out.format(“Threat on %s from %s\n”, date,ip);<br>    }<br>  }<br>}</p>
+<p>其中正则表达式如下：</p>
+<p>String pattern = “(\\d+[.]\\d+[.]\\d+[.]\\d+)@” +<br>      “(\\d{2}/\\d{2}/\\d{4})”;</p>
+<p>在每次输入中获取需要的IP地址和日期，同时使用()将正则表达式分组，那么最终的结果中，IP地址保存在group(1)中，而date则保存在group(2)中。同时将字符“@”滤除。需要好好学习。其运行的结果如下：</p>
+<p>Threat on 02/10/2005 from 58.27.82.161<br>Threat on 02/11/2005 from 204.45.234.40<br>Threat on 02/11/2005 from 58.27.82.161<br>Threat on 02/12/2005 from 58.27.82.161<br>Threat on 02/12/2005 from 58.27.82.161</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2013/03/02/java-scanner-and-bufferedreader/" rel="next" title="Java杂项">
+                <i class="fa fa-chevron-left"></i> Java杂项
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2013/03/04/repost-excellent-java-exception/" rel="prev" title="一篇不错的讲解Java异常的文章(转载）">
+                一篇不错的讲解Java异常的文章(转载） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java的使用"><span class="nav-number">1.</span> <span class="nav-text">Java的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在Java的正则表达式中，分组也是很好用的一个功能，如下："><span class="nav-number">2.</span> <span class="nav-text">在Java的正则表达式中，分组也是很好用的一个功能，如下：</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="前两天将Volley的源代码分析完毕，这两天再继续看看Picasso的源代码，按照习惯，还是先看看怎么使用，然后再从源代码分析其逻辑实现。 其实Picasso的使用起来和Volley相比，要简单的很多，只要一行就可以使用： Picasso.with(mContext).load(mImagePaths.get(position)).into(viewContainer.image); 很多情况下，">
+<meta name="keywords" content="Android,Picasso">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Picasso学习：Picasso的使用">
+<meta property="og:url" content="http://yoursite.com/2014/11/22/picasso-how-to-use/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="前两天将Volley的源代码分析完毕，这两天再继续看看Picasso的源代码，按照习惯，还是先看看怎么使用，然后再从源代码分析其逻辑实现。 其实Picasso的使用起来和Volley相比，要简单的很多，只要一行就可以使用： Picasso.with(mContext).load(mImagePaths.get(position)).into(viewContainer.image); 很多情况下，">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/device-2014-11-22-121448.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.520Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Picasso学习：Picasso的使用">
+<meta name="twitter:description" content="前两天将Volley的源代码分析完毕，这两天再继续看看Picasso的源代码，按照习惯，还是先看看怎么使用，然后再从源代码分析其逻辑实现。 其实Picasso的使用起来和Volley相比，要简单的很多，只要一行就可以使用： Picasso.with(mContext).load(mImagePaths.get(position)).into(viewContainer.image); 很多情况下，">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/device-2014-11-22-121448.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/22/picasso-how-to-use/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Picasso学习：Picasso的使用 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/22/picasso-how-to-use/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Picasso学习：Picasso的使用
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-22 12:20:31" itemprop="dateCreated datePublished" datetime="2014-11-22T12:20:31+08:00">2014-11-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Picasso/" itemprop="url" rel="index"><span itemprop="name">Picasso</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前两天将Volley的源代码分析完毕，这两天再继续看看Picasso的源代码，按照习惯，还是先看看怎么使用，然后再从源代码分析其逻辑实现。 其实Picasso的使用起来和Volley相比，要简单的很多，只要一行就可以使用：</p>
+<p>Picasso.with(mContext).load(mImagePaths.get(position)).into(viewContainer.image);</p>
+<p>很多情况下，我们都是在List或者GridView当中使用的缓存库，那这个时候又该怎么样来使用呢？来写一写 首先是界面布局 activity_main.xml：</p>
+<relativelayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools" android:layout\_width="match\_parent" android:layout\_height="match\_parent" android:paddingbottom="@dimen/activity\_vertical\_margin" android:paddingleft="@dimen/activity\_horizontal\_margin" android:paddingright="@dimen/activity\_horizontal\_margin" android:paddingtop="@dimen/activity\_vertical\_margin" tools:context="me.happyhls.picassostudy.MainActivity"><br><br>    <textview android:layout\_width="wrap\_content" android:layout\_height="wrap\_content" android:layout_alignparenttop="true" android:id="@+id/top" android:text="Picasso Study"><br>    <listview android:layout_below="@id/top" android:layout\_width="match\_parent" android:layout\_height="match\_parent" android:id="@android:id/list"></listview><br><br></textview></relativelayout>
+
+<p>界面中子元素的布局 list_item.xml：</p>
+<p>&lt;?xml version=”1.0” encoding=”utf-8”?&gt;</p>
+<linearlayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout\_width="match\_parent" android:layout\_height="wrap\_content" android:orientation="vertical"><br>    <imageview android:layout\_width="match\_parent" android:layout\_height="wrap\_content" android:id="@+id/imageview"><br></imageview></linearlayout>
+
+<p>再然后我们就写一个Adapter：</p>
+<p>package me.happyhls.picassostudy;</p>
+<p>import java.util.ArrayList;<br>import java.util.List;</p>
+<p>import com.squareup.picasso.Picasso;</p>
+<p>import android.content.Context;<br>import android.view.LayoutInflater;<br>import android.view.View;<br>import android.view.ViewGroup;<br>import android.widget.BaseAdapter;<br>import android.widget.ImageView;</p>
+<p>public class ImageListAdapter extends BaseAdapter{</p>
+<p>  private List<string> mImagePaths = new ArrayList&lt;&gt;();<br>  private Context mContext = null;<br>  private LayoutInflater mLayoutInflater = null;</string></p>
+<p>  public ImageListAdapter(Context context, List<string> imagePaths) {<br>    mContext = context;<br>    mLayoutInflater = LayoutInflater.from(mContext);<br>    mImagePaths.addAll(imagePaths);<br>  }</string></p>
+<p>  @Override<br>  public int getCount() {<br>    // TODO Auto-generated method stub<br>    return mImagePaths.size();<br>  }</p>
+<p>  @Override<br>  public Object getItem(int position) {<br>    // TODO Auto-generated method stub<br>    return mImagePaths.get(position);<br>  }</p>
+<p>  @Override<br>  public long getItemId(int position) {<br>    // TODO Auto-generated method stub<br>    return position;<br>  }</p>
+<p>  @Override<br>  public View getView(int position, View convertView, ViewGroup parent) {<br>    // TODO Auto-generated method stub<br>    ViewContainer viewContainer;<br>    if(convertView == null) {<br>      convertView = mLayoutInflater.inflate(R.layout.list_item, null);<br>      viewContainer = new ViewContainer();<br>      viewContainer.image = (ImageView)convertView.findViewById(R.id.imageview);<br>      convertView.setTag(viewContainer);<br>    }else {<br>      viewContainer = (ViewContainer)convertView.getTag();<br>    }<br>    Picasso.with(mContext).load(mImagePaths.get(position)).into(viewContainer.image);<br>    return convertView;<br>  }</p>
+<p>  private class ViewContainer {<br>    ImageView image;<br>  }</p>
+<p>}</p>
+<p>最后我们在Activity中，将这些配置起来：</p>
+<p>package me.happyhls.picassostudy;</p>
+<p>import java.util.ArrayList;<br>import java.util.List;</p>
+<p>import android.app.ListActivity;<br>import android.os.Bundle;<br>import android.view.Menu;<br>import android.view.MenuItem;</p>
+<p>public class MainActivity extends ListActivity {</p>
+<p>  @Override<br>  protected void onCreate(Bundle savedInstanceState) {<br>    super.onCreate(savedInstanceState);<br>    setContentView(R.layout.activity_main);</p>
+<pre><code>List&lt;String&gt; imagePaths = new ArrayList&lt;&gt;();
+imagePaths.add(&quot;http://img0.bdstatic.com/img/image/daren/taipingyangqiche.jpg&quot;);
+imagePaths.add(&quot;http://img.baidu.com/img/image/0ebe7571756465617070f813.jpg&quot;);
+imagePaths.add(&quot;http://img0.bdstatic.com/img/image/ddwefrew.jpg&quot;);
+imagePaths.add(&quot;http://img.baidu.com/img/image/fb31e5ada4e9ad825f4b656c6576656e32348927.jpg&quot;);
+imagePaths.add(&quot;http://img.baidu.com/img/image/0ebe7571756465617070f813.jpg&quot;);
+imagePaths.add(&quot;http://img0.bdstatic.com/img/image/daren/pocotuiguang.jpg&quot;);
+imagePaths.add(&quot;http://img0.bdstatic.com/img/image/daren/tuchong.jpg&quot;);
+ImageListAdapter adapter = new ImageListAdapter(MainActivity.this, imagePaths);
+getListView().setAdapter(adapter);
+</code></pre><p>  }<br>}</p>
+<p>当然，最后不要忘记添加网络访问的权限：</p>
+<p><uses-permission android:name="android.permission.INTERNET"></uses-permission></p>
+<p>好了，那我们来看看运行结果吧： <a href="/images/wordpress/2014/11/device-2014-11-22-121448.png"><img src="/images/wordpress/2014/11/device-2014-11-22-121448.png" alt="device-2014-11-22-121448"></a>   发现了吧，其中和Picasso相关的代码只有一个</p>
+<pre><code>Picasso.with(mContext).load(mImagePaths.get(position)).into(viewContainer.image);
+</code></pre><p>当然，其实Picasso的功能不仅仅限于这个，还有很多其他的功能，参考：</p>
+<p><a href="http://square.github.io/picasso/" target="_blank" rel="noopener">http://square.github.io/picasso/</a></p>
+<p>  比如： 图片的简单变换：</p>
+<p>Picasso.with(context)<br>  .load(url)<br>  .resize(50, 50)<br>  .centerCrop()<br>  .into(imageView)</p>
+<p>当然我们可以自己指定自己定义的图片转换器：</p>
+<p>public class CropSquareTransformation implements Transformation {<br>  @Override public Bitmap transform(Bitmap source) {<br>    int size = Math.min(source.getWidth(), source.getHeight());<br>    int x = (source.getWidth() - size) / 2;<br>    int y = (source.getHeight() - size) / 2;<br>    Bitmap result = Bitmap.createBitmap(source, x, y, size, size);<br>    if (result != source) {<br>      source.recycle();<br>    }<br>    return result;<br>  }</p>
+<p>  @Override public String key() { return “square()”; }<br>}</p>
+<p>设置默认的图片，以及访问失败的图片：</p>
+<p>Picasso.with(context)<br>    .load(url)<br>    .placeholder(R.drawable.user_placeholder)<br>    .error(R.drawable.user_placeholder_error)<br>    .into(imageView);</p>
+<p>加载资源图片：</p>
+<p>Picasso.with(context).load(R.drawable.landing_screen).into(imageView1);<br>Picasso.with(context).load(new File(…)).into(imageView2);</p>
+<p>DEBUG接口：</p>
+<p>setIndicatorsEnabled(true)</p>
+<p>好了，简单熟悉了Picasso的使用，下面我们就开始分析它的源代码。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Picasso/" rel="tag"># Picasso</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/21/android-volley-4-imagerequest-imageloader/" rel="next" title="Volley源代码分析 – 4: Request实现之ImageRequest&ImageLoader">
+                <i class="fa fa-chevron-left"></i> Volley源代码分析 – 4: Request实现之ImageRequest&ImageLoader
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/23/android-volley-5-summary/" rel="prev" title="Volley源代码学习总结">
+                Volley源代码学习总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

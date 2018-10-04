@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="为什么叫Java正则表达式再学习，在很久之前写过一篇《Java正则表达式》的博客，但好久没有用过了，所以再拿出来梳理一下。 Java的正则表达式的工具在java.util.regex包下，有一个接口MatchResult，两个类Matcher，Pattern，还有一个Exceptions：PatternSyntaxException。 首先来看Pattern类 API地址：https://docs">
+<meta name="keywords" content="Java,正则表达式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java正则表达式再学习">
+<meta property="og:url" content="http://yoursite.com/2014/11/17/java-regex-learn-again/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="为什么叫Java正则表达式再学习，在很久之前写过一篇《Java正则表达式》的博客，但好久没有用过了，所以再拿出来梳理一下。 Java的正则表达式的工具在java.util.regex包下，有一个接口MatchResult，两个类Matcher，Pattern，还有一个Exceptions：PatternSyntaxException。 首先来看Pattern类 API地址：https://docs">
+<meta property="og:locale" content="default">
+<meta property="og:updated_time" content="2018-10-03T14:44:20.457Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java正则表达式再学习">
+<meta name="twitter:description" content="为什么叫Java正则表达式再学习，在很久之前写过一篇《Java正则表达式》的博客，但好久没有用过了，所以再拿出来梳理一下。 Java的正则表达式的工具在java.util.regex包下，有一个接口MatchResult，两个类Matcher，Pattern，还有一个Exceptions：PatternSyntaxException。 首先来看Pattern类 API地址：https://docs">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/17/java-regex-learn-again/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Java正则表达式再学习 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/17/java-regex-learn-again/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Java正则表达式再学习
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-17 12:36:38" itemprop="dateCreated datePublished" datetime="2014-11-17T12:36:38+08:00">2014-11-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 22:44:20" itemprop="dateModified" datetime="2018-10-03T22:44:20+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>为什么叫Java正则表达式再学习，在很久之前写过一篇<a href="http://blog.happyhls.me/2013/03/02/%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F/" target="_blank" rel="noopener">《Java正则表达式》</a>的博客，但好久没有用过了，所以再拿出来梳理一下。 Java的正则表达式的工具在java.util.regex包下，有一个接口MatchResult，两个类Matcher，Pattern，还有一个Exceptions：PatternSyntaxException。 首先来看Pattern类 API地址：<a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#cg" target="_blank" rel="noopener">https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#cg</a> 签名：</p>
+<p>public final class Pattern extends Object implements Serializable</p>
+<p>是一个正则表达式的编译的版本。一个string类型的正则表达式，如果想要使用的话，必须首先要编译成Pattern的实例。编译后的pattern可以用来匹配任意的字符串序列并得到结果Matcher。匹配过程中所有的结果都会保存在Matcher当中，所以很多的matchers都会共享同一个pattern。 一个典型的使用样例如下：</p>
+<p>Pattern p = Pattern.compile(“a*b”);<br>Matcher m = p.matcher(“aaaaab”);<br>boolean b = m.matches();</p>
+<p>同时在Pattern中有一个便于使用的方法matches()，当我们仅仅需要匹配一次的时候，这个就很好用。如下：</p>
+<p>boolean b = Pattern.matches(“a*b”, “aaaaab”);</p>
+<p>其实实际上是和上面的3行代码一样的。 还有一点就是Pattern类是线程安全的，Matcher在这种使用情况下，不是线程安全的。</p>
+<h4 id="Summary-of-regular-expression-constructs"><a href="#Summary-of-regular-expression-constructs" class="headerlink" title="Summary of regular-expression constructs"></a>Summary of regular-expression constructs</h4><p>Construct</p>
+<p>Matches</p>
+<p>Characters</p>
+<p>_x_</p>
+<p>The character _x_</p>
+<p>\\</p>
+<p>The backslash character</p>
+<p>\0_n_</p>
+<p>The character with octal value 0_n_ (0 &lt;= _n_ &lt;= 7)</p>
+<p>\0_nn_</p>
+<p>The character with octal value 0_nn_ (0 &lt;= _n_ &lt;= 7)</p>
+<p>\0_mnn_</p>
+<p>The character with octal value 0_mnn_ (0 &lt;= _m_ &lt;= 3, 0 &lt;= _n_ &lt;= 7)</p>
+<p>\x_hh_</p>
+<p>The character with hexadecimal value 0x_hh_</p>
+<p>\u_hhhh_</p>
+<p>The character with hexadecimal value 0x_hhhh_</p>
+<p>\x_{h…h}_</p>
+<p>The character with hexadecimal value 0x_h…h_ (<a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Character.html#MIN_CODE_POINT" target="_blank" rel="noopener"><code>Character.MIN_CODE_POINT</code></a>  &lt;= 0x_h…h_ &lt;=  <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Character.html#MAX_CODE_POINT" target="_blank" rel="noopener"><code>Character.MAX_CODE_POINT</code></a>)</p>
+<p>\t</p>
+<p>The tab character (‘\u0009’)</p>
+<p>\n</p>
+<p>The newline (line feed) character (‘\u000A’)</p>
+<p>\r</p>
+<p>The carriage-return character (‘\u000D’)</p>
+<p>\f</p>
+<p>The form-feed character (‘\u000C’)</p>
+<p>\a</p>
+<p>The alert (bell) character (‘\u0007’)</p>
+<p>\e</p>
+<p>The escape character (‘\u001B’)</p>
+<p>\c_x_</p>
+<p>The control character corresponding to _x_</p>
+<p>Character classes</p>
+<p>[abc]</p>
+<p>a, b, or c (simple class)</p>
+<p>[^abc]</p>
+<p>Any character except a, b, or c (negation)</p>
+<p>[a-zA-Z]</p>
+<p>a through z or A through Z, inclusive (range)</p>
+<p>[a-d[m-p]]</p>
+<p>a through d, or m through p: [a-dm-p] (union)</p>
+<p>[a-z&amp;&amp;[def]]</p>
+<p>d, e, or f (intersection)</p>
+<p>[a-z&amp;&amp;[^bc]]</p>
+<p>a through z, except for b and c: [ad-z] (subtraction)</p>
+<p>[a-z&amp;&amp;[^m-p]]</p>
+<p>a through z, and not m through p: [a-lq-z](subtraction)</p>
+<p>Predefined character classes</p>
+<p>.</p>
+<p>Any character (may or may not match <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#lt" target="_blank" rel="noopener">line terminators</a>)</p>
+<p>\d</p>
+<p>A digit: [0-9]</p>
+<p>\D</p>
+<p>A non-digit: [^0-9]</p>
+<p>\s</p>
+<p>A whitespace character: [ \t\n\x0B\f\r]</p>
+<p>\S</p>
+<p>A non-whitespace character: [^\s]</p>
+<p>\w</p>
+<p>A word character: [a-zA-Z_0-9]</p>
+<p>\W</p>
+<p>A non-word character: [^\w]</p>
+<p>POSIX character classes (US-ASCII only)</p>
+<p>\p{Lower}</p>
+<p>A lower-case alphabetic character: [a-z]</p>
+<p>\p{Upper}</p>
+<p>An upper-case alphabetic character:[A-Z]</p>
+<p>\p{ASCII}</p>
+<p>All ASCII:[\x00-\x7F]</p>
+<p>\p{Alpha}</p>
+<p>An alphabetic character:[\p{Lower}\p{Upper}]</p>
+<p>\p{Digit}</p>
+<p>A decimal digit: [0-9]</p>
+<p>\p{Alnum}</p>
+<p>An alphanumeric character:[\p{Alpha}\p{Digit}]</p>
+<p>\p{Punct}</p>
+<p>Punctuation: One of !”#$%&amp;’()*+,-./:;&lt;=&gt;?@[\]^_`{|}~</p>
+<p>\p{Graph}</p>
+<p>A visible character: [\p{Alnum}\p{Punct}]</p>
+<p>\p{Print}</p>
+<p>A printable character: [\p{Graph}\x20]</p>
+<p>\p{Blank}</p>
+<p>A space or a tab: [ \t]</p>
+<p>\p{Cntrl}</p>
+<p>A control character: [\x00-\x1F\x7F]</p>
+<p>\p{XDigit}</p>
+<p>A hexadecimal digit: [0-9a-fA-F]</p>
+<p>\p{Space}</p>
+<p>A whitespace character: [ \t\n\x0B\f\r]</p>
+<p>java.lang.Character classes (simple <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#jcc" target="_blank" rel="noopener">java character type</a>)</p>
+<p>\p{javaLowerCase}</p>
+<p>Equivalent to java.lang.Character.isLowerCase()</p>
+<p>\p{javaUpperCase}</p>
+<p>Equivalent to java.lang.Character.isUpperCase()</p>
+<p>\p{javaWhitespace}</p>
+<p>Equivalent to java.lang.Character.isWhitespace()</p>
+<p>\p{javaMirrored}</p>
+<p>Equivalent to java.lang.Character.isMirrored()</p>
+<p>Classes for Unicode scripts, blocks, categories and binary properties</p>
+<p>\p{IsLatin}</p>
+<p>A Latin script character (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#usc" target="_blank" rel="noopener">script</a>)</p>
+<p>\p{InGreek}</p>
+<p>A character in the Greek block (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#ubc" target="_blank" rel="noopener">block</a>)</p>
+<p>\p{Lu}</p>
+<p>An uppercase letter (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#ucc" target="_blank" rel="noopener">category</a>)</p>
+<p>\p{IsAlphabetic}</p>
+<p>An alphabetic character (<a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#ubpc" target="_blank" rel="noopener">binary property</a>)</p>
+<p>\p{Sc}</p>
+<p>A currency symbol</p>
+<p>\P{InGreek}</p>
+<p>Any character except one in the Greek block (negation)</p>
+<p>[\p{L}&amp;&amp;[^\p{Lu}]] </p>
+<p>Any letter except an uppercase letter (subtraction)</p>
+<p>Boundary matchers</p>
+<p>^</p>
+<p>The beginning of a line</p>
+<p>$</p>
+<p>The end of a line</p>
+<p>\b</p>
+<p>A word boundary</p>
+<p>\B</p>
+<p>A non-word boundary</p>
+<p>\A</p>
+<p>The beginning of the input</p>
+<p>\G</p>
+<p>The end of the previous match</p>
+<p>\Z</p>
+<p>The end of the input but for the final <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#lt" target="_blank" rel="noopener">terminator</a>, if any</p>
+<p>\z</p>
+<p>The end of the input</p>
+<p>Greedy quantifiers（贪婪模式）</p>
+<p>_X_?</p>
+<p>_X_, once or not at all        0,1</p>
+<p>_X_*</p>
+<p>_X_, zero or more times     0,1…n</p>
+<p>_X_+</p>
+<p>_X_, one or more times      1,2…n</p>
+<p>_X_{_n_}</p>
+<p>_X_, exactly _n_ times           n</p>
+<p>_X_{_n_,}</p>
+<p>_X_, at least _n_ times          &gt;=n</p>
+<p>_X_{_n_,_m_}</p>
+<p>_X_, at least _n_ but not more than _m_ times     n-&gt;m</p>
+<p>Reluctant quantifiers（勉强模式）</p>
+<p>_X_??</p>
+<p>_X_, once or not at all</p>
+<p>_X_*?</p>
+<p>_X_, zero or more times</p>
+<p>_X_+?</p>
+<p>_X_, one or more times</p>
+<p>_X_{_n_}?</p>
+<p>_X_, exactly _n_ times</p>
+<p>_X_{_n_,}?</p>
+<p>_X_, at least _n_ times</p>
+<p>_X_{_n_,_m_}?</p>
+<p>_X_, at least _n_ but not more than _m_ times</p>
+<p>Possessive quantifiers（侵占模式）</p>
+<p>_X_?+</p>
+<p>_X_, once or not at all</p>
+<p>_X_*+</p>
+<p>_X_, zero or more times</p>
+<p>_X_++</p>
+<p>_X_, one or more times</p>
+<p>_X_{_n_}+</p>
+<p>_X_, exactly _n_ times</p>
+<p>_X_{_n_,}+</p>
+<p>_X_, at least _n_ times</p>
+<p>_X_{_n_,_m_}+</p>
+<p>_X_, at least _n_ but not more than _m_ times</p>
+<p>Logical operators</p>
+<p>_XY_</p>
+<p>_X_ followed by _Y_</p>
+<p>_X_|_Y_</p>
+<p>Either _X_ or _Y_</p>
+<p>(_X_)</p>
+<p>X, as a <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#cg" target="_blank" rel="noopener">capturing group</a></p>
+<p>Back references</p>
+<p>_n_</p>
+<p>Whatever the _n_th <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#cg" target="_blank" rel="noopener">capturing group</a> matched</p>
+<p>_k_&lt;<em>name</em>&gt;</p>
+<p>Whatever the <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#groupname" target="_blank" rel="noopener">named-capturing group</a> “name” matched</p>
+<p>Quotation</p>
+<p>\</p>
+<p>Nothing, but quotes the following character</p>
+<p>\Q</p>
+<p>Nothing, but quotes all characters until \E</p>
+<p>\E</p>
+<p>Nothing, but ends quoting started by \Q</p>
+<p>Special constructs (named-capturing and non-capturing)</p>
+<p>(?&lt;<a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#groupname" target="_blank" rel="noopener">name</a>&gt;_X_)</p>
+<p>_X_, as a named-capturing group</p>
+<p>(?:_X_)</p>
+<p>_X_, as a non-capturing group</p>
+<p>(?idmsuxU-idmsuxU) </p>
+<p>Nothing, but turns match flags <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#CASE_INSENSITIVE" target="_blank" rel="noopener">i</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#UNIX_LINES" target="_blank" rel="noopener">d</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#MULTILINE" target="_blank" rel="noopener">m</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#DOTALL" target="_blank" rel="noopener">s</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#UNICODE_CASE" target="_blank" rel="noopener">u</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#COMMENTS" target="_blank" rel="noopener">x</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#UNICODE_CHARACTER_CLASS" target="_blank" rel="noopener">U</a> on - off</p>
+<p>(?idmsux-idmsux:_X_)</p>
+<p>_X_, as a <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#cg" target="_blank" rel="noopener">non-capturing group</a> with the given flags <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#CASE_INSENSITIVE" target="_blank" rel="noopener">i</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#UNIX_LINES" target="_blank" rel="noopener">d</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#MULTILINE" target="_blank" rel="noopener">m</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#DOTALL" target="_blank" rel="noopener">s</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#UNICODE_CASE" target="_blank" rel="noopener">u</a> <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#COMMENTS" target="_blank" rel="noopener">x</a> on - off</p>
+<p>(?=_X_)</p>
+<p>_X_, via zero-width positive lookahead</p>
+<p>(?!_X_)</p>
+<p>_X_, via zero-width negative lookahead</p>
+<p>(?&lt;=_X_)</p>
+<p>_X_, via zero-width positive lookbehind</p>
+<p>(?&lt;!_X_)</p>
+<p>_X_, via zero-width negative lookbehind</p>
+<p>(?&gt;_X_)</p>
+<p>_X_, as an independent, non-capturing group</p>
+<h4 id="Backslashes-escapes-and-quoting"><a href="#Backslashes-escapes-and-quoting" class="headerlink" title="Backslashes, escapes, and quoting"></a>Backslashes, escapes, and quoting</h4><p>反斜杠(‘\‘)充当的角色是引入注释。上面表格中所示，\为注释后面的部分，\Q…\E则是注释从\Q到\E的部分(quote)。 不要在任何字母之前使用反斜杠，因为这些字符是以后可能用来扩展正则表达式语言所需要的，而且不管后面的字符是不是正则表达式的一部分，转义的处理要优先字母的匹配。 在Java中，根据Java的规范，反斜扛要两个才行，比如\b匹配的是空格，在Java中，要使用\\b才可以。比如”\(hello\)”匹配的是字符串(hello)，但实际上要使”\(hello\)“才能实现。 Character Classes 一些字符串会匹配在另外一些字符中间，也可能这些字符是由连接符或者交集符(&amp;&amp;)组合在一起。其运算顺序从高往低依次是：</p>
+<blockquote>
+<p>1</p>
+<p>Literal escape</p>
+<p>\x</p>
+<p>2</p>
+<p>Grouping</p>
+<p>[…]</p>
+<p>3</p>
+<p>Range</p>
+<p>a-z</p>
+<p>4</p>
+<p>Union</p>
+<p>[a-e][i-u]</p>
+<p>5</p>
+<p>Intersection</p>
+<p>[a-z&amp;&amp;[aeiou]]</p>
+</blockquote>
+<h4 id="Line-terminators"><a href="#Line-terminators" class="headerlink" title="Line terminators"></a>Line terminators</h4><p>A <em>line terminator</em> is a one- or two-character sequence that marks the end of a line of the input character sequence. The following are recognized as line terminators:</p>
+<ul>
+<li>A newline (line feed) character (‘\n’),</li>
+<li>A carriage-return character followed immediately by a newline character (“\r\n”),</li>
+<li>A standalone carriage-return character (‘\r’),</li>
+<li>A next-line character (‘\u0085’),</li>
+<li>A line-separator character (‘\u2028’), or</li>
+<li>A paragraph-separator character (‘\u2029).</li>
+</ul>
+<p>If <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#UNIX_LINES" target="_blank" rel="noopener"><code>UNIX_LINES</code></a> mode is activated, then the only line terminators recognized are newline characters. The regular expression . matches any character except a line terminator unless the <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#DOTALL" target="_blank" rel="noopener"><code>DOTALL</code></a> flag is specified. By default, the regular expressions ^ and $ ignore line terminators and only match at the beginning and the end, respectively, of the entire input sequence. If <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#MULTILINE" target="_blank" rel="noopener"><code>MULTILINE</code></a> mode is activated then ^ matches at the beginning of input and after any line terminator except at the end of input. When in <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#MULTILINE" target="_blank" rel="noopener"><code>MULTILINE</code></a> mode $ matches just before a line terminator or the end of the input sequence.  </p>
+<h4 id="Groups-and-capturing"><a href="#Groups-and-capturing" class="headerlink" title="Groups and capturing"></a>Groups and capturing</h4><h5 id="Group-number"><a href="#Group-number" class="headerlink" title="Group number"></a>Group number</h5><p>groups是从左到有根据左括号来判断。比如在表达式((A)(B(C)))中，有以下的分组</p>
+<blockquote>
+<p>1</p>
+<p>((A)(B(C)))</p>
+<p>2</p>
+<p>(A)</p>
+<p>3</p>
+<p>(B(C))</p>
+<p>4</p>
+<p>(C)</p>
+</blockquote>
+<p>其中group(0)=整个表达式。groups的分组这样来分，是因为输入序列的每一个字片段的匹配都会被保存下来。这些片段可能在以后的表达式中会被用到。具体的分就是根据括号从左到右依次括号括起来的范围，比如上面的((A)(B(C)))，第0个括号，就是整个的分组，即全部的表达式；而第1个括号，此处其实也是全部内容都包括起来了；第2个括号则是仅仅包括了(A)；第3个括号则是包括了(B(C))；第4个括号则是(C)。有以下代码可以参考：</p>
+<pre><code>String patternString = &quot;((A)(B(C)))&quot;;
+Pattern pattern = Pattern.compile(patternString);
+Matcher matcher = pattern.matcher(&quot;DABCDEF&quot;);
+if(matcher.find()) {
+  System.out.println(&quot;Found:&quot; + matcher.pattern().pattern());
+}else {
+  System.out.println(&quot;Not Found:&quot; + matcher.pattern().pattern());
+}
+
+//Group 0 = ABC
+//Group 1 = ABC
+//Group 2 = A
+//Group 3 = BC
+//Group 4 = C
+System.out.println(&quot;Group 0 :&quot; + matcher.group(0));
+System.out.println(&quot;Group 1 :&quot; + matcher.group(1));
+System.out.println(&quot;Group 2 :&quot; + matcher.group(2));
+System.out.println(&quot;Group 3 :&quot; + matcher.group(3));
+System.out.println(&quot;Group 4 :&quot; + matcher.group(4));
+</code></pre><p>输出结果为：</p>
+<p>Found:((A)(B(C)))<br>Group 0 :ABC<br>Group 1 :ABC<br>Group 2 :A<br>Group 3 :BC<br>Group 4 :C</p>
+<h5 id="Group-name"><a href="#Group-name" class="headerlink" title="Group name"></a>Group name</h5><p>一个片段可以起一个名字“name”，称作named-capturing group。名字可以有大小写字母和数字构成A-Za-z0-9，注意，第一个字符必须为字母。 The captured input associated with a group is always the subsequence that the group most recently matched. If a group is evaluated a second time because of quantification then its previously-captured value, if any, will be retained if the second evaluation fails. Matching the string “aba” against the expression (a(b)?)+, for example, leaves group two set to “b”. All captured input is discarded at the beginning of each match. Groups beginning with (? are either pure, non-capturing groups that do not capture text and do not count towards the group total, or named-capturing group. 起名字的方式是在相应的group当中添加?<name>来完成，比如(pattern)为(?<name>pattern)</name></name></p>
+<p>String patternString = “((A)(B(?<namec>C)))”;</namec></p>
+<p>这里面的名字就是nameC</p>
+<h4 id="Unicode-support"><a href="#Unicode-support" class="headerlink" title="Unicode support"></a>Unicode support</h4><p>This class is in conformance with Level 1 of <a href="http://www.unicode.org/reports/tr18/" target="_blank" rel="noopener"><em>Unicode Technical Standard #18: Unicode Regular Expression</em></a>, plus RL2.1 Canonical Equivalents. <strong>Unicode escape sequences</strong> such as \u2014 in Java source code are processed as described in section 3.3 of The Java™ Language Specification. Such escape sequences are also implemented directly by the regular-expression parser so that Unicode escapes can be used in expressions that are read from files or from the keyboard. Thus the strings “\u2014” and “\\u2014”, while not equal, compile into the same pattern, which matches the character with hexadecimal value 0x2014. A Unicode character can also be represented in a regular-expression by using its <strong>Hex notation</strong>(hexadecimal code point value) directly as described in construct \x{…}, for example a supplementary character U+2011F can be specified as\x{2011F}, instead of two consecutive Unicode escape sequences of the surrogate pair \uD840\uDD1F. Unicode scripts, blocks, categories and binary properties are written with the \p and \P constructs as in Perl. \p{<em>prop</em>} matches if the input has the property <em>prop</em>, while \P{<em>prop</em>} does not match if the input has that property. Scripts, blocks, categories and binary properties can be used both inside and outside of a character class. <strong>Scripts</strong> are specified either with the prefix <code>Is</code>, as in <code>IsHiragana</code>, or by using the <code>script</code> keyword (or its short form <code>sc</code>)as in <code>script=Hiragana</code> or <code>sc=Hiragana</code>. The script names supported by <code>Pattern</code> are the valid script names accepted and defined by <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Character.UnicodeScript.html#forName(java.lang.String" target="_blank" rel="noopener"><code>UnicodeScript.forName</code></a>). <strong>Blocks</strong> are specified with the prefix <code>In</code>, as in <code>InMongolian</code>, or by using the keyword <code>block</code> (or its short form <code>blk</code>) as in <code>block=Mongolian</code> or <code>blk=Mongolian</code>. The block names supported by <code>Pattern</code> are the valid block names accepted and defined by <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Character.UnicodeBlock.html#forName(java.lang.String" target="_blank" rel="noopener"><code>UnicodeBlock.forName</code></a>). <strong>Categories</strong> may be specified with the optional prefix <code>Is</code>: Both <code>\p{L}</code> and <code>\p{IsL}</code> denote the category of Unicode letters. Same as scripts and blocks, categories can also be specified by using the keyword <code>general_category</code> (or its short form <code>gc</code>) as in <code>general_category=Lu</code> or <code>gc=Lu</code>. The supported categories are those of <a href="http://www.unicode.org/unicode/standard/standard.html" target="_blank" rel="noopener"><em>The Unicode Standard</em></a> in the version specified by the <a href="https://docs.oracle.com/javase/7/docs/api/java/lang/Character.html" title="class in java.lang" target="_blank" rel="noopener"><code>Character</code></a> class. The category names are those defined in the Standard, both normative and informative. <strong>Binary properties</strong> are specified with the prefix <code>Is</code>, as in <code>IsAlphabetic</code>. The supported binary properties by <code>Pattern</code> are</p>
+<ul>
+<li>Alphabetic</li>
+<li>Ideographic</li>
+<li>Letter</li>
+<li>Lowercase</li>
+<li>Uppercase</li>
+<li>Titlecase</li>
+<li>Punctuation</li>
+<li>Control</li>
+<li>White_Space</li>
+<li>Digit</li>
+<li>Hex_Digit</li>
+<li>Noncharacter_Code_Point</li>
+<li><p>Assigned</p>
+<p><strong>Predefined Character classes</strong> and <strong>POSIX character classes</strong> are in conformance with the recommendation of <em>Annex C: Compatibility Properties</em> of <a href="http://www.unicode.org/reports/tr18/" target="_blank" rel="noopener"><em>Unicode Regular Expression</em></a> , when <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#UNICODE_CHARACTER_CLASS" target="_blank" rel="noopener"><code>UNICODE_CHARACTER_CLASS</code></a> flag is specified.</p>
+</li>
+</ul>
+<p>Classes</p>
+<p>Matches</p>
+<p>\p{Lower}</p>
+<p>A lowercase character:\p{IsLowercase}</p>
+<p>\p{Upper}</p>
+<p>An uppercase character:\p{IsUppercase}</p>
+<p>\p{ASCII}</p>
+<p>All ASCII:[\x00-\x7F]</p>
+<p>\p{Alpha}</p>
+<p>An alphabetic character:\p{IsAlphabetic}</p>
+<p>\p{Digit}</p>
+<p>A decimal digit character:p{IsDigit}</p>
+<p>\p{Alnum}</p>
+<p>An alphanumeric character:[\p{IsAlphabetic}\p{IsDigit}]</p>
+<p>\p{Punct}</p>
+<p>A punctuation character:p{IsPunctuation}</p>
+<p>\p{Graph}</p>
+<p>A visible character: [^\p{IsWhite_Space}\p{gc=Cc}\p{gc=Cs}\p{gc=Cn}]</p>
+<p>\p{Print}</p>
+<p>A printable character: [\p{Graph}\p{Blank}&amp;&amp;[^\p{Cntrl}]]</p>
+<p>\p{Blank}</p>
+<p>A space or a tab: [\p{IsWhite_Space}&amp;&amp;[^\p{gc=Zl}\p{gc=Zp}\x0a\x0b\x0c\x0d\x85]]</p>
+<p>\p{Cntrl}</p>
+<p>A control character: \p{gc=Cc}</p>
+<p>\p{XDigit}</p>
+<p>A hexadecimal digit: [\p{gc=Nd}\p{IsHex_Digit}]</p>
+<p>\p{Space}</p>
+<p>A whitespace character:\p{IsWhite_Space}</p>
+<p>\d</p>
+<p>A digit: \p{IsDigit}</p>
+<p>\D</p>
+<p>A non-digit: [^\d]</p>
+<p>\s</p>
+<p>A whitespace character: \p{IsWhite_Space}</p>
+<p>\S</p>
+<p>A non-whitespace character: [^\s]</p>
+<p>\w</p>
+<p>A word character: [\p{Alpha}\p{gc=Mn}\p{gc=Me}\p{gc=Mc}\p{Digit}\p{gc=Pc}]</p>
+<p>\W</p>
+<p>A non-word character: [^\w]</p>
+<p>Categories that behave like the java.lang.Character boolean is_methodname_ methods (except for the deprecated ones) are available through the same \p{<em>prop</em>} syntax where the specified property has the name java_methodname_.</p>
+<h4 id="Comparison-to-Perl-5"><a href="#Comparison-to-Perl-5" class="headerlink" title="Comparison to Perl 5"></a>Comparison to Perl 5</h4><p>The <code>Pattern</code> engine performs traditional NFA-based matching with ordered alternation as occurs in Perl 5. Perl constructs not supported by this class:</p>
+<ul>
+<li>Predefined character classes (Unicode character)\h    A horizontal whitespace\H    A non horizontal whitespace\v    A vertical whitespace \V    A non vertical whitespace \R    Any Unicode linebreak sequence \u000D\u000A|[\u000A\u000B\u000C\u000D\u0085\u2028\u2029] \X    Match Unicode <a href="http://www.unicode.org/reports/tr18/#Default_Grapheme_Clusters" target="_blank" rel="noopener"><em>extended grapheme cluster</em></a></li>
+<li>The backreference constructs, \g{_n_} for the _n_th<a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#cg" target="_blank" rel="noopener">capturing group</a> and \g{<em>name</em>} for <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#groupname" target="_blank" rel="noopener">named-capturing group</a>.</li>
+<li>The named character construct, \N{<em>name</em>} for a Unicode character by its name.</li>
+<li>The conditional constructs (?(<em>condition</em>)_X_) and (?(<em>condition</em>)_X_|_Y_),</li>
+<li>The embedded code constructs (?{<em>code</em>}) and (??{<em>code</em>}),</li>
+<li>The embedded comment syntax (?#comment), and</li>
+<li>The preprocessing operations \l \u, \L, and \U.</li>
+</ul>
+<p>Constructs supported by this class but not by Perl:</p>
+<ul>
+<li>Character-class union and intersection as described <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#cc" target="_blank" rel="noopener">above</a>.</li>
+</ul>
+<p>Notable differences from Perl:</p>
+<ul>
+<li>In Perl, \1 through \9 are always interpreted as back references; a backslash-escaped number greater than 9 is treated as a back reference if at least that many subexpressions exist, otherwise it is interpreted, if possible, as an octal escape. In this class octal escapes must always begin with a zero. In this class, \1 through \9 are always interpreted as back references, and a larger number is accepted as a back reference if at least that many subexpressions exist at that point in the regular expression, otherwise the parser will drop digits until the number is smaller or equal to the existing number of groups or it is one digit.</li>
+<li>Perl uses the g flag to request a match that resumes where the last match left off. This functionality is provided implicitly by the <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html" title="class in java.util.regex" target="_blank" rel="noopener"><code>Matcher</code></a> class: Repeated invocations of the <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#find(" target="_blank" rel="noopener"><code>find</code></a>) method will resume where the last match left off, unless the matcher is reset.</li>
+<li>In Perl, embedded flags at the top level of an expression affect the whole expression. In this class, embedded flags always take effect at the point at which they appear, whether they are at the top level or within a group; in the latter case, flags are restored at the end of the group just as in Perl.</li>
+</ul>
+<p>For a more precise description of the behavior of regular expression constructs, please see <a href="http://www.oreilly.com/catalog/regex3/" target="_blank" rel="noopener"><em>Mastering Regular Expressions, 3nd Edition</em>, Jeffrey E. F. Friedl, O’Reilly and Associates, 2006.</a>   Java 6、PCRE、Perl支持使用正则记号&lt;\Q&gt;和&lt;\E&gt;。&lt;\Q&gt;会抑制所有元字符的含义，直到出现&lt;\E&gt;为止。如果漏掉了&lt;\E&gt;，那么在&lt;\Q&gt;之后直到正则表达式结束之前的所有字符都会被当作字符文本来对待。所以下面的的两个正则表达式为一个意思：</p>
+<p>Pattern p = Pattern.compile(“\\$\(\)\*\+\.\\?\\[\\\\\^\{\|“);<br>Matcher m = p.matcher(“$()*+.?[\\^{|”);<br>boolean b = m.matches();</p>
+<p>Pattern p = Pattern.compile(“\\Q$()<em>+.?[\\^{|\\E”);<br>Matcher m = p.matcher(“$()</em>+.?[\\^{|”);</p>
+<p>  Pattern的方法比较简单，主要如下：</p>
+<p>Modifier and Type</p>
+<p>Method and Description</p>
+<p><code>static [Pattern](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[compile](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#compile(java.lang.String))**([String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) regex)</code></p>
+<p>Compiles the given regular expression into a pattern.</p>
+<p><code>static [Pattern](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[compile](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#compile(java.lang.String,%20int))**([String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) regex, int flags)</code></p>
+<p>Compiles the given regular expression into a pattern with the given flags.</p>
+<p><code>int</code></p>
+<p><code>**[flags](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#flags())**()</code></p>
+<p>Returns this pattern’s match flags.</p>
+<p><code>[Matcher](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[matcher](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#matcher(java.lang.CharSequence))**([CharSequence](https://docs.oracle.com/javase/7/docs/api/java/lang/CharSequence.html &quot;interface in java.lang&quot;) input)</code></p>
+<p>Creates a matcher that will match the given input against this pattern.</p>
+<p><code>static boolean</code></p>
+<p><code>**[matches](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#matches(java.lang.String,%20java.lang.CharSequence))**([String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) regex, [CharSequence](https://docs.oracle.com/javase/7/docs/api/java/lang/CharSequence.html &quot;interface in java.lang&quot;) input)</code></p>
+<p>Compiles the given regular expression and attempts to match the given input against it.</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[pattern](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#pattern())**()</code></p>
+<p>Returns the regular expression from which this pattern was compiled. 返回所编译的正则表达式</p>
+<p><code>static [String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[quote](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#quote(java.lang.String))**([String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) s)</code></p>
+<p>Returns a literal pattern <code>String</code> for the specified <code>String</code>. 将s使用\Q…\E包围起来，使得其中的元字符不需转义</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)[]</code></p>
+<p><code>**[split](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#split(java.lang.CharSequence))**([CharSequence](https://docs.oracle.com/javase/7/docs/api/java/lang/CharSequence.html &quot;interface in java.lang&quot;) input)</code></p>
+<p>Splits the given input sequence around matches of this pattern.</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)[]</code></p>
+<p><code>**[split](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#split(java.lang.CharSequence,%20int))**([CharSequence](https://docs.oracle.com/javase/7/docs/api/java/lang/CharSequence.html &quot;interface in java.lang&quot;) input, int limit)</code></p>
+<p>Splits the given input sequence around matches of this pattern.</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[toString](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#toString())**()</code></p>
+<p>Returns the string representation of this pattern.</p>
+<p>其中要注意的是，Pattern有几个flags，可以设置匹配的原则：  </p>
+<p>public <a href="http://www.cjsdn.net/Doc/JDK60/java/lang/String.html" title="java.lang 中的类" target="_blank" rel="noopener">String</a>[] <strong>split</strong>(<a href="http://www.cjsdn.net/Doc/JDK60/java/lang/CharSequence.html" title="java.lang 中的接口" target="_blank" rel="noopener">CharSequence</a> input,<br>                      int limit)</p>
+<p>围绕此模式的匹配拆分给定输入序列。此方法返回的数组包含输入序列的子字符串，由匹配此模式的另一子序列或输入序列的结尾终止。数组中子字符串的顺序与其在输入中出现的顺序相同。如果此模式与输入的任何子序列都不匹配，那么得到的数组仅包含一个元素，即字符串形式的输入序列。limit 参数控制应用模式的次数，从而影响结果数组的长度。如果限制 _n_ 大于零，那么模式至多应用 _n_&gt; - 1 次，数组的长度不大于 _n_，并且数组的最后条目将包含除最后的匹配定界符之外的所有输入。如果 _n_ 非正，那么将应用模式的次数不受限制，并且数组可以为任意长度。如果 _n_ 为零，那么应用模式的次数不受限制，数组可以为任意长度，并且将丢弃尾部空字符串。 例如，输入 “boo:and:foo” 将产生以下结果及参数：</p>
+<blockquote>
+<p>_Regex    _</p>
+<p>_Limit    _</p>
+<p>_Result    _</p>
+<p>:</p>
+<p>2</p>
+<p>{ “boo”, “and:foo” }</p>
+<p>:</p>
+<p>5</p>
+<p>{ “boo”, “and”, “foo” }</p>
+<p>:</p>
+<p>-2</p>
+<p>{ “boo”, “and”, “foo” }</p>
+<p>o</p>
+<p>5</p>
+<p>{ “b”, “”, “:and:f”, “”, “” }</p>
+<p>o</p>
+<p>-2</p>
+<p>{ “b”, “”, “:and:f”, “”, “” }</p>
+<p>o</p>
+<p>0</p>
+<p>{ “b”, “”, “:and:f” }</p>
+</blockquote>
+<p><strong>字段摘要</strong></p>
+<p><code>static int</code></p>
+<p><code>**[CANON_EQ](http://www.cjsdn.net/Doc/JDK60/java/util/regex/Pattern.html#CANON_EQ)**</code> 启用规范等价。</p>
+<p><code>static int</code></p>
+<p><code>**[CASE_INSENSITIVE](http://www.cjsdn.net/Doc/JDK60/java/util/regex/Pattern.html#CASE_INSENSITIVE)**</code> 启用不区分大小写的匹配。</p>
+<p><code>static int</code></p>
+<p><code>**[COMMENTS](http://www.cjsdn.net/Doc/JDK60/java/util/regex/Pattern.html#COMMENTS)**</code> 模式中允许空白和注释。</p>
+<p><code>static int</code></p>
+<p><code>**[DOTALL](http://www.cjsdn.net/Doc/JDK60/java/util/regex/Pattern.html#DOTALL)**</code> 启用 dotall 模式。</p>
+<p><code>static int</code></p>
+<p><code>**[LITERAL](http://www.cjsdn.net/Doc/JDK60/java/util/regex/Pattern.html#LITERAL)**</code> 启用模式的字面值解析。</p>
+<p><code>static int</code></p>
+<p><code>**[MULTILINE](http://www.cjsdn.net/Doc/JDK60/java/util/regex/Pattern.html#MULTILINE)**</code> 启用多行模式。</p>
+<p><code>static int</code></p>
+<p><code>**[UNICODE_CASE](http://www.cjsdn.net/Doc/JDK60/java/util/regex/Pattern.html#UNICODE_CASE)**</code> 启用 Unicode 感知的大小写折叠。</p>
+<p><code>static int</code></p>
+<p><code>**[UNIX_LINES](http://www.cjsdn.net/Doc/JDK60/java/util/regex/Pattern.html#UNIX_LINES)**</code> 启用 Unix 行模式。</p>
+<p>  主要关注下Matcher的方法，列表如下：</p>
+<p>Modifier and Type</p>
+<p>Method and Description</p>
+<p><code>[Matcher](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[appendReplacement](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#appendReplacement(java.lang.StringBuffer,%20java.lang.String))**([StringBuffer](https://docs.oracle.com/javase/7/docs/api/java/lang/StringBuffer.html &quot;class in java.lang&quot;) sb, [String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) replacement)</code></p>
+<p>Implements a non-terminal append-and-replace step. 参见下面详细的说明</p>
+<p><code>[StringBuffer](https://docs.oracle.com/javase/7/docs/api/java/lang/StringBuffer.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[appendTail](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#appendTail(java.lang.StringBuffer))**([StringBuffer](https://docs.oracle.com/javase/7/docs/api/java/lang/StringBuffer.html &quot;class in java.lang&quot;) sb)</code></p>
+<p>Implements a terminal append-and-replace step. 参见下面详细的说明</p>
+<p><code>int</code></p>
+<p><code>**[end](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#end())**()</code></p>
+<p>Returns the offset after the last character matched. 返回搜索结果的匹配字符的最后一个字符的位置的后面那个位置，比如“DABCD”中匹配ABC，那么end()的返回值为3+1=4.</p>
+<p><code>int</code></p>
+<p><code>**[end](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#end(int))**(int group)</code></p>
+<p>Returns the offset after the last character of the subsequence captured by the given group during the previous match operation.可以参考start(int group)。</p>
+<p><code>boolean</code></p>
+<p><code>**[find](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#find())**()</code></p>
+<p>Attempts to find the next subsequence of the input sequence that matches the pattern.</p>
+<p><code>boolean</code></p>
+<p><code>**[find](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#find(int))**(int start)</code></p>
+<p>Resets this matcher and then attempts to find the next subsequence of the input sequence that matches the pattern, starting at the specified index.</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[group](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#group())**()</code></p>
+<p>Returns the input subsequence matched by the previous match.返回上次匹配结果的group()，注意，如果上次匹配没有匹配到，会抛出异常Exception in thread “main” java.lang.IllegalStateException: No match found at java.util.regex.Matcher.group(Unknown Source)</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[group](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#group(int))**(int group)</code></p>
+<p>Returns the input subsequence captured by the given group during the previous match operation.类似上面，但可以指定group(int group)。注意，如果上次匹配没有匹配到，会抛出异常Exception in thread “main” java.lang.IllegalStateException: No match found at java.util.regex.Matcher.group(Unknown Source)</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[group](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#group(java.lang.String))**([String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) name)</code></p>
+<p>Returns the input subsequence captured by the given <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html#groupname" target="_blank" rel="noopener">named-capturing group</a> during the previous match operation.比如”((A)(B(?<namec>C)))”，比如matcher.group(“nameC”)则会找到nameC则对应的字符串C。注意，如果上次匹配没有匹配到，会抛出异常Exception in thread “main” java.lang.IllegalStateException: No match found at java.util.regex.Matcher.group(Unknown Source)</namec></p>
+<p><code>int</code></p>
+<p><code>**[groupCount](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#groupCount())**()</code></p>
+<p>Returns the number of capturing groups in this matcher’s pattern. 返回group的数量，即左括号的数量，比如”((A)(B(?<namec>C)))”，那么则对应的groupCount()则为4，注意其中的group=0的不参与计算group数量。任何大于等于0并且小于等于groupCount()的数值，都能保证对应的group(int key)找到一个位置。</namec></p>
+<p><code>boolean</code></p>
+<p><code>**[hasAnchoringBounds](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#hasAnchoringBounds())**()</code></p>
+<p>Queries the anchoring of region bounds for this matcher.</p>
+<p><code>boolean</code></p>
+<p><code>**[hasTransparentBounds](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#hasTransparentBounds())**()</code></p>
+<p>Queries the transparency of region bounds for this matcher.</p>
+<p><code>boolean</code></p>
+<p><code>**[hitEnd](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#hitEnd())**()</code></p>
+<p>Returns true if the end of input was hit by the search engine in the last match operation performed by this matcher.</p>
+<p><code>boolean</code></p>
+<p><code>**[lookingAt](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#lookingAt())**()</code></p>
+<p>Attempts to match the input sequence, starting at the beginning of the region, against the pattern.类似于matches()方法，该方法也会尝试从字符串的开始处开始匹配，但与matches()不同的是，该方法不会要求整个待匹配的字符串和patern完全匹配，而是找到匹配的结果即可。</p>
+<p><code>boolean</code></p>
+<p><code>**[matches](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#matches())**()</code></p>
+<p>Attempts to match the entire region against the pattern. 尝试将整个字符串和pattern匹配。判断pattern是否能够匹配整个字符串。</p>
+<p><code>[Pattern](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[pattern](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#pattern())**()</code></p>
+<p>Returns the pattern that is interpreted by this matcher. 返回Matcher所使用的Pattern。</p>
+<p><code>static [String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[quoteReplacement](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#quoteReplacement(java.lang.String))**([String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) s)</code></p>
+<p>Returns a literal replacement <code>String</code> for the specified <code>String</code>.返回指定 <code>String</code> 的字面值替换 <code>String</code>。 此方法将生成一个 <code>String</code>，它将用作 <a href="http://www.cjsdn.net/Doc/JDK60/java/util/regex/Matcher.html" title="java.util.regex 中的类" target="_blank" rel="noopener"><code>Matcher</code></a> 类的 <code>appendReplacement</code> 方法中的字面值替换 <code>s</code>。所产生的 <code>String</code> 将与作为字面值序列的 <code>s</code> 中的字符序列匹配。斜线 (‘\‘) 和美元符号 (‘$’) 将不具有任何特殊意义。</p>
+<p><code>[Matcher](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[region](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#region(int,%20int))**(int start, int end)</code></p>
+<p>Sets the limits of this matcher’s region. 设置matcher匹配的区域，此方法会调用Matcher的reset()方法，重置搜索结果标志。</p>
+<p><code>int</code></p>
+<p><code>**[regionEnd](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#regionEnd())**()</code></p>
+<p>Reports the end index (exclusive) of this matcher’s region.</p>
+<p><code>int</code></p>
+<p><code>**[regionStart](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#regionStart())**()</code></p>
+<p>Reports the start index of this matcher’s region.</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[replaceAll](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceAll(java.lang.String))**([String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) replacement)</code></p>
+<p>Replaces every subsequence of the input sequence that matches the pattern with the given replacement string.</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[replaceFirst](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#replaceFirst(java.lang.String))**([String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) replacement)</code></p>
+<p>Replaces the first subsequence of the input sequence that matches the pattern with the given replacement string.</p>
+<p><code>boolean</code></p>
+<p><code>**[requireEnd](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#requireEnd())**()</code></p>
+<p>Returns true if more input could change a positive match into a negative one.</p>
+<p><code>[Matcher](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[reset](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#reset())**()</code></p>
+<p>Resets this matcher.重置Matcher所有的状态置为0，包括其中的append position为0.</p>
+<p><code>[Matcher](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[reset](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#reset(java.lang.CharSequence))**([CharSequence](https://docs.oracle.com/javase/7/docs/api/java/lang/CharSequence.html &quot;interface in java.lang&quot;) input)</code></p>
+<p>Resets this matcher with a new input sequence. 类似于reset()，但是会重置搜索查找的字符串。</p>
+<p><code>int</code></p>
+<p><code>**[start](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#start())**()</code></p>
+<p>Returns the start index of the previous match. 返回上一个搜索结果的起始位置。比如“DABCDEF”中搜索“ABC”那么返回的结果为1.</p>
+<p><code>int</code></p>
+<p><code>**[start](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#start(int))**(int group)</code></p>
+<p>Returns the start index of the subsequence captured by the given group during the previous match operation.返回上一个搜索结果的指定group的起始位置。_m._start(0)=_m._start()，比如“DABCDEF”中搜索“((A(B(C)))”的话，那么start(4)，group4对应的为C，那么其实就是搜索字符C对应的位置，也就是4.</p>
+<p><code>[MatchResult](https://docs.oracle.com/javase/7/docs/api/java/util/regex/MatchResult.html &quot;interface in java.util.regex&quot;)</code></p>
+<p><code>**[toMatchResult](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#toMatchResult())**()</code></p>
+<p>Returns the match state of this matcher as a <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/MatchResult.html" title="interface in java.util.regex" target="_blank" rel="noopener"><code>MatchResult</code></a>. 返回当前matcher的match state给一个MatchResult。</p>
+<p><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;)</code></p>
+<p><code>**[toString](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#toString())**()</code></p>
+<p>Returns the string representation of this matcher.</p>
+<p><code>[Matcher](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[useAnchoringBounds](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#useAnchoringBounds(boolean))**(boolean b)</code></p>
+<p>Sets the anchoring of region bounds for this matcher.</p>
+<p><code>[Matcher](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[usePattern](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#usePattern(java.util.regex.Pattern))**([Pattern](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html &quot;class in java.util.regex&quot;) newPattern)</code></p>
+<p>Changes the Pattern that this Matcher uses to find matches with. 更改当前Matcher使用的Pattern。</p>
+<p><code>[Matcher](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html &quot;class in java.util.regex&quot;)</code></p>
+<p><code>**[useTransparentBounds](https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#useTransparentBounds(boolean))**(boolean b)</code></p>
+<p>Sets the transparency of region bounds for this matcher.</p>
+<ul>
+<li><h4 id="appendReplacement"><a href="#appendReplacement" class="headerlink" title="appendReplacement"></a>appendReplacement</h4><p>public <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html" title="class in java.util.regex" target="_blank" rel="noopener">Matcher</a> appendReplacement(<a href="https://docs.oracle.com/javase/7/docs/api/java/lang/StringBuffer.html" title="class in java.lang" target="_blank" rel="noopener">StringBuffer</a> sb,</p>
+<pre><code>[String](https://docs.oracle.com/javase/7/docs/api/java/lang/String.html &quot;class in java.lang&quot;) replacement)
+</code></pre><p>Implements a non-terminal append-and-replace step.This method performs the following actions:</p>
+<ol>
+<li>It reads characters from the input sequence, starting at the append position, and appends them to the given string buffer. It stops after reading the last character preceding the previous match, that is, the character at index <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#start(" target="_blank" rel="noopener"><code>start()</code></a>) - 1.该方法会从输入的序列中读取字符，从append position的标志位开始，默认为0，然后追加到StringBuffer当中。当读到上一次匹配之前的最后一个字符的时候，停止，此时指针的位置为start()-1.</li>
+<li>It appends the given replacement string to the string buffer.将replacement的字符串追加到StringBuffer当中。</li>
+<li>It sets the append position of this matcher to the index of the last character matched, plus one, that is, to <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#end(" target="_blank" rel="noopener"><code>end()</code></a>).设置append position为上次匹配到的字符串的end()位置。</li>
+</ol>
+<p>The replacement string may contain references to subsequences captured during the previous match: Each occurrence of ${<em>name</em>} or $_g_ will be replaced by the result of evaluating the corresponding <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#group(java.lang.String" target="_blank" rel="noopener"><code>group(name)</code></a>) or<a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#group(int" target="_blank" rel="noopener"><code>group(g)</code></a>) respectively. For $_g_, the first number after the $ is always treated as part of the group reference. Subsequent numbers are incorporated into g if they would form a legal group reference. Only the numerals ‘0’ through ‘9’ are considered as potential components of the group reference. If the second group matched the string “foo”, for example, then passing the replacement string “$2bar” would cause “foobar” to be appended to the string buffer. A dollar sign ($) may be included as a literal in the replacement string by preceding it with a backslash (\$). Note that backslashes () and dollar signs ($) in the replacement string may cause the results to be different than if it were being treated as a literal replacement string. Dollar signs may be treated as references to captured subsequences as described above, and backslashes are used to escape literal characters in the replacement string. This method is intended to be used in a loop together with the <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#appendTail(java.lang.StringBuffer" target="_blank" rel="noopener"><code>appendTail</code></a>) and <a href="https://docs.oracle.com/javase/7/docs/api/java/util/regex/Matcher.html#find(" target="_blank" rel="noopener"><code>find</code></a>) methods. The following code, for example, writes one dog two dogs in the yard to the standard-output stream:</p>
+<blockquote>
+<p> Pattern p = Pattern.compile(“cat”);<br> Matcher m = p.matcher(“one cat two cats in the yard”);<br> StringBuffer sb = new StringBuffer();<br> while (m.find()) {</p>
+<pre><code>m.appendReplacement(sb, &quot;dog&quot;);
+</code></pre><p> }<br> m.appendTail(sb);<br> System.out.println(sb.toString());</p>
+</blockquote>
+<p>Parameters:</p>
+<p><code>sb</code> - The target string buffer</p>
+<p><code>replacement</code> - The replacement string</p>
+<p>Returns:</p>
+<p>This matcher</p>
+<p>Throws:</p>
+<p><code>[IllegalStateException](https://docs.oracle.com/javase/7/docs/api/java/lang/IllegalStateException.html &quot;class in java.lang&quot;)</code> - If no match has yet been attempted, or if the previous match operation failed</p>
+<p><code>[IllegalArgumentException](https://docs.oracle.com/javase/7/docs/api/java/lang/IllegalArgumentException.html &quot;class in java.lang&quot;)</code> - If the replacement string refers to a named-capturing group that does not exist in the pattern</p>
+<p><code>[IndexOutOfBoundsException](https://docs.oracle.com/javase/7/docs/api/java/lang/IndexOutOfBoundsException.html &quot;class in java.lang&quot;)</code> - If the replacement string refers to a capturing group that does not exist in the pattern</p>
+</li>
+</ul>
+<p>  对于正则表达式，还有一个知识点是关于匹配模式的，最常见的是贪婪模式与非贪婪模式，有一篇文章写的很好，连接参考： <a href="http://blog.csdn.net/lxcnn/article/details/4756030" target="_blank" rel="noopener">http://blog.csdn.net/lxcnn/article/details/4756030</a> 参考文献： 《<a href="http://www.cnblogs.com/adm1989/archive/2013/01/14/2860216.html" target="_blank" rel="noopener">关于Java正则表达式的一些理解</a>》 《<a href="http://www.cjsdn.net/Doc/JDK60/java/util/regex/Pattern.html" target="_blank" rel="noopener">JDK中文版</a>》 附录：测试代码</p>
+<p>public class GroupStudy {</p>
+<p>  public static void main(String[] args) {<br>    String patternString = “((A)(B(?<namec>C)))”;<br>    Pattern pattern = Pattern.compile(patternString);<br>    Matcher matcher = pattern.matcher(“DABCDEFABCD”);<br>    System.out.println(“First try:”);<br>    if(matcher.find()) {<br>      System.out.println(“Found:” + matcher.pattern().pattern());<br>    }else {<br>      System.out.println(“Not Found:” + matcher.pattern().pattern());<br>    }</namec></p>
+<pre><code>System.out.println(&quot;Next try - matcher.find():&quot;);
+if(matcher.find()) {
+  System.out.println(&quot;Found:&quot; + matcher.pattern().pattern());
+}else {
+  System.out.println(&quot;Not Found:&quot; + matcher.pattern().pattern());
+}
+
+//此处应该确保上一次匹配是匹配到的，否则应该在if(matcher.find())之内运行。
+//Group 0 = ABC
+//Group 1 = ABC
+//Group 2 = A
+//Group 3 = BC
+//Group 4 = C
+System.out.println(&quot;Group :&quot; + matcher.group());
+System.out.println(&quot;Group 0 :&quot; + matcher.group(0));
+System.out.println(&quot;Group 1 :&quot; + matcher.group(1));
+System.out.println(&quot;Group 2 :&quot; + matcher.group(2));
+System.out.println(&quot;Group 3 :&quot; + matcher.group(3));
+System.out.println(&quot;Group 4 :&quot; + matcher.group(4));
+
+
+//start()
+System.out.println(&quot;start() : &quot; + matcher.start());
+//start(group)
+System.out.println(&quot;start(3) : &quot; + matcher.start(4));
+
+//group()
+System.out.println(&quot;group() : &quot; + matcher.group());
+//group(4)
+System.out.println(&quot;group(4) : &quot; + matcher.group(4));
+//group(nameC)
+System.out.println(&quot;group(\\&quot;nameC\\&quot;) : &quot; + matcher.group(&quot;nameC&quot;));
+//groupCount()
+System.out.println(&quot;groupCount() : &quot; + matcher.groupCount());
+</code></pre><p>  }<br>}</p>
+<p>运行结果：</p>
+<p>First try:<br>Found:((A)(B(?<namec>C)))<br>Next try - matcher.find():<br>Found:((A)(B(?<namec>C)))<br>Group :ABC<br>Group 0 :ABC<br>Group 1 :ABC<br>Group 2 :A<br>Group 3 :BC<br>Group 4 :C<br>start() : 7<br>start(3) : 9<br>group() : ABC<br>group(4) : C<br>group(“nameC”) : C<br>groupCount() : 4</namec></namec></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Java/" rel="tag"># Java</a>
+          
+            <a href="/tags/正则表达式/" rel="tag"># 正则表达式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/16/how-to-solve-ADT-supend-at-SDK-Content-Loader/" rel="next" title="ADT卡在Android SDK Content Loader 0的解决办法">
+                <i class="fa fa-chevron-left"></i> ADT卡在Android SDK Content Loader 0的解决办法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/18/regex-notes/" rel="prev" title="整理-常用正则表达式">
+                整理-常用正则表达式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Summary-of-regular-expression-constructs"><span class="nav-number">1.</span> <span class="nav-text">Summary of regular-expression constructs</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Backslashes-escapes-and-quoting"><span class="nav-number">2.</span> <span class="nav-text">Backslashes, escapes, and quoting</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Line-terminators"><span class="nav-number">3.</span> <span class="nav-text">Line terminators</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Groups-and-capturing"><span class="nav-number">4.</span> <span class="nav-text">Groups and capturing</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Group-number"><span class="nav-number">4.1.</span> <span class="nav-text">Group number</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Group-name"><span class="nav-number">4.2.</span> <span class="nav-text">Group name</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Unicode-support"><span class="nav-number">5.</span> <span class="nav-text">Unicode support</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Comparison-to-Perl-5"><span class="nav-number">6.</span> <span class="nav-text">Comparison to Perl 5</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#appendReplacement"><span class="nav-number">7.</span> <span class="nav-text">appendReplacement</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在之前Volley的学习当中，我们始终跟随者Volley的架构图进行分析，了解到Volley整体上分为3层线程，UI线程负责将Reqeust添加到ReqeustQueue当中，CacheDispatcher负责将从DiskCache中获取Response，如果Cache Hit，则直接分发结果至UI线程，如果Cache Miss，那么就将Reqeust添加至NetworkQueue当中，然后Net">
+<meta name="keywords" content="Android,Picasso,架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Picasso源代码分析：5、Picasso架构分析">
+<meta property="og:url" content="http://yoursite.com/2014/11/27/picasso-source-code-5-architecture/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="在之前Volley的学习当中，我们始终跟随者Volley的架构图进行分析，了解到Volley整体上分为3层线程，UI线程负责将Reqeust添加到ReqeustQueue当中，CacheDispatcher负责将从DiskCache中获取Response，如果Cache Hit，则直接分发结果至UI线程，如果Cache Miss，那么就将Reqeust添加至NetworkQueue当中，然后Net">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/Picasso-整体架构-1024x595.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.534Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Picasso源代码分析：5、Picasso架构分析">
+<meta name="twitter:description" content="在之前Volley的学习当中，我们始终跟随者Volley的架构图进行分析，了解到Volley整体上分为3层线程，UI线程负责将Reqeust添加到ReqeustQueue当中，CacheDispatcher负责将从DiskCache中获取Response，如果Cache Hit，则直接分发结果至UI线程，如果Cache Miss，那么就将Reqeust添加至NetworkQueue当中，然后Net">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/Picasso-整体架构-1024x595.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/27/picasso-source-code-5-architecture/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Picasso源代码分析：5、Picasso架构分析 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/27/picasso-source-code-5-architecture/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Picasso源代码分析：5、Picasso架构分析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-27 10:43:38" itemprop="dateCreated datePublished" datetime="2014-11-27T10:43:38+08:00">2014-11-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/Picasso/" itemprop="url" rel="index"><span itemprop="name">Picasso</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在之前Volley的学习当中，我们始终跟随者Volley的架构图进行分析，了解到Volley整体上分为3层线程，UI线程负责将Reqeust添加到ReqeustQueue当中，CacheDispatcher负责将从DiskCache中获取Response，如果Cache Hit，则直接分发结果至UI线程，如果Cache Miss，那么就将Reqeust添加至NetworkQueue当中，然后NetworkDispatcher则从队列中获取任务病执行，最后在UI线程中将结果分发。详细的可以参看：《<a href="http://blog.happyhls.me/2014/11/23/volley%e6%ba%90%e4%bb%a3%e7%a0%81%e5%ad%a6%e4%b9%a0%e6%80%bb%e7%bb%93/" target="_blank" rel="noopener">Volley源代码学习总结</a>》。 那么Picasso呢？这段时间我们学习Picasso，发现去文档、注释确实要远远逊色于Volley，说实话Picasso的代码风格个人也并不是很喜欢。但不能否认，Picasso是一个设计的十分细致的工具库。那整体框架是怎么样的呢？我根据这几天的学习以及个人的理解，按照Volley的架构图风格，给Picasso画了一张架构图。 <img src="/images/wordpress/2014/11/Picasso-整体架构-1024x595.png" alt="Picasso-整体架构">   大体一看，感觉和Volley很相近，但其实两者有很多细微上的不同，这里我们先不多说，后面会写一篇文章来对比Picasso和Volley。 我们来仔细看一下这张图，我来用文字再描述一边其整体的设计： 我们以一个任务的执行流程来描述一下Picasso的工作流程流程，最初的分析可以参考《<a href="http://blog.happyhls.me/2014/11/25/picasso%e6%ba%90%e4%bb%a3%e7%a0%81%e5%88%86%e6%9e%90%ef%bc%9a1%e3%80%81%e8%b7%9f%e9%9a%8f%e4%bb%a3%e7%a0%81%e7%9a%84%e8%a7%92%e5%ba%a6%ef%bc%8c%e5%bd%93%e6%88%91%e4%bb%ac%e6%b7%bb%e5%8a%a0%e4%ba%86/" target="_blank" rel="noopener">Picasso源代码分析：1、跟随代码的角度，当我们添加了一个任务，到底发生了什么？</a>》，其中不同的线程所做的工作，我会用上图中对应的颜色进行标注：</p>
+<p>Picasso.with(Context).load(“<a href="http://www.baidu.com/img/bdlogo.png&quot;).into(imageview)" target="_blank" rel="noopener">http://www.baidu.com/img/bdlogo.png&quot;).into(imageview)</a>;</p>
+<ol>
+<li>初始化Picasso，实例化其唯一的对象。</li>
+<li>根据传入的Url、File、resource Id，构建ReqeustCreator对象</li>
+<li>根据ReqeustCreator构建Request对象，同时根据Reqeust属性，尝试从Cache中访问数据</li>
+<li>Cache Hit，则通过回调，设置Target或者ImageView，完成该Reqeust</li>
+<li>如果Cache Miss，那么则构建相应的Action，并提交到DispatcherThread当中。</li>
+<li>Dispatcher中的Handler接收到相应的Message，调用dispatcher.performSubmit(action)进行处理。</li>
+<li>创建BitmapHunter对象，并提交到PicassoExecutorService线程池</li>
+<li>再次检查Memory Cache中已经有缓存，如果Hit，则读取缓存中的Bitmap</li>
+<li>如果Cache miss，则交给Action对应的ReqeustHandler进行处理，比如网络请求，或者从File读取图片</li>
+<li>返回结果之后，通知Dispatcher中的Handler处理结果。</li>
+<li>DispatcherThread中将BitmapHunter的结果打包(batch)，最快200ms打包一次。通知主线程HANDLER进行处理</li>
+<li><p>主线程HANDLER接收打包的BitmapHunter，对最后的结果进行分发。</p>
+<p>我觉得应该从Picasso中学习到的设计图形缓存库的几个注意的地方：</p>
+</li>
+</ol>
+<ul>
+<li>异步执行：包括任务的调度分发，任务的执行。</li>
+<li>结果的分发：所有的任务其结果通过主线程进行分发。</li>
+<li>避免内存泄漏：在Dispatcher中，使用WeakHashMap保存当前任务。</li>
+<li>避免OOM：同一时刻，仅允许一张图片进行解码，进行Transformation。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Picasso/" rel="tag"># Picasso</a>
+          
+            <a href="/tags/架构/" rel="tag"># 架构</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/26/picasso-source-code-4-dispatcher/" rel="next" title="Picasso源代码分析：4、任务的分发 Dispatcher">
+                <i class="fa fa-chevron-left"></i> Picasso源代码分析：4、任务的分发 Dispatcher
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/27/android-volley-picasso-comparation/" rel="prev" title="Volley与Picasso的对比">
+                Volley与Picasso的对比 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

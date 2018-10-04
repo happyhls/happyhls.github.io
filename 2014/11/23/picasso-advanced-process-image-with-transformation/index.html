@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在stackoverflow上闲逛的时候，发现有个哥们问了这么一个问题：Draw a line on ImageView set by Picasso 意思是他想在使用Picasso的时候，对加载的图片做一个类似的滤镜的功能，需要将图片的中间画一条横线，该怎么处理呢？ 如果熟悉Picasso的机制，当然可以很快搞定，但如果不是很熟悉呢？最好的办法当然是探索源码，从源码中分析Picasso的原理，进">
+<meta name="keywords" content="Android,Picasso">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Picasso的使用：使用Transformation，下载后预处理图片并显示">
+<meta property="og:url" content="http://yoursite.com/2014/11/23/picasso-advanced-process-image-with-transformation/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="在stackoverflow上闲逛的时候，发现有个哥们问了这么一个问题：Draw a line on ImageView set by Picasso 意思是他想在使用Picasso的时候，对加载的图片做一个类似的滤镜的功能，需要将图片的中间画一条横线，该怎么处理呢？ 如果熟悉Picasso的机制，当然可以很快搞定，但如果不是很熟悉呢？最好的办法当然是探索源码，从源码中分析Picasso的原理，进">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://yoursite.com/images/wordpress/2014/11/device-2014-11-23-231406-576x1024.png">
+<meta property="og:updated_time" content="2018-10-03T16:12:52.534Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Picasso的使用：使用Transformation，下载后预处理图片并显示">
+<meta name="twitter:description" content="在stackoverflow上闲逛的时候，发现有个哥们问了这么一个问题：Draw a line on ImageView set by Picasso 意思是他想在使用Picasso的时候，对加载的图片做一个类似的滤镜的功能，需要将图片的中间画一条横线，该怎么处理呢？ 如果熟悉Picasso的机制，当然可以很快搞定，但如果不是很熟悉呢？最好的办法当然是探索源码，从源码中分析Picasso的原理，进">
+<meta name="twitter:image" content="http://yoursite.com/images/wordpress/2014/11/device-2014-11-23-231406-576x1024.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2014/11/23/picasso-advanced-process-image-with-transformation/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Picasso的使用：使用Transformation，下载后预处理图片并显示 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2014/11/23/picasso-advanced-process-image-with-transformation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Picasso的使用：使用Transformation，下载后预处理图片并显示
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-23 23:16:14" itemprop="dateCreated datePublished" datetime="2014-11-23T23:16:14+08:00">2014-11-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/Picasso/" itemprop="url" rel="index"><span itemprop="name">Picasso</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在stackoverflow上闲逛的时候，发现有个哥们问了这么一个问题：<a href="http://stackoverflow.com/questions/27081534/draw-a-line-on-imageview-set-by-picasso/27086735#27086735" target="_blank" rel="noopener">Draw a line on ImageView set by Picasso</a> 意思是他想在使用Picasso的时候，对加载的图片做一个类似的滤镜的功能，需要将图片的中间画一条横线，该怎么处理呢？ 如果熟悉Picasso的机制，当然可以很快搞定，但如果不是很熟悉呢？最好的办法当然是探索源码，从源码中分析Picasso的原理，进而看看到底是怎么样来实现这个功能。我们从以下的角度来分析：</p>
+<ul>
+<li>尽可能使用Picasso线程的API，不去修改Picasso的源代码</li>
+<li>既然是图片下载之后添加横线，那么必然对应着Picasso中图片获取完成之后，分发结果的相关代码。</li>
+</ul>
+<p>我们现在还没有完全分析完Picasso的源代码，但顺着这个路子，我们依然可以发现关于结果分发的相关代码。 在我们没有特殊的需求之前，我们一般是这样简单的使用Picasso的：</p>
+<p>Picasso.with(context).load(“<a href="http://www.baidu.com/img/bdlogo.png&quot;).into(imageview)" target="_blank" rel="noopener">http://www.baidu.com/img/bdlogo.png&quot;).into(imageview)</a>;</p>
+<p>我们依次分析</p>
+<ul>
+<li><p>Picasso.with(context)是利用默认的构造器创建一个Picasso的对象，因此我们首先找一找Picasso的类当中，有没有相关的函数。我们来看Picasso的构造函数：</p>
+<p>Picasso(Context context, Dispatcher dispatcher, Cache cache, Listener listener,</p>
+<pre><code>RequestTransformer requestTransformer, List&lt;RequestHandler&gt; extraRequestHandlers,
+Stats stats, boolean indicatorsEnabled, boolean loggingEnabled) {
+</code></pre><p>从构造函数的名称，可以大体了解每一个参数是做什么使用的，这里面有一个RequestTransformer对象可能有点靠近，那我们去看看这段函数是做什么使用的。</p>
+<p>/**<br> * A transformer that is called immediately before every request is submitted. This can be used to<br> * modify any information about a request.<br> * 请求在提交之前，会立刻调用一个transformer。这个可以用来一个请求的任何信息<br> * </p><p><br> * For example, if you use a CDN you can change the hostname for the image based on the current<br> * location of the user in order to get faster download speeds.<br> * </p><p><br> * <b>NOTE:</b> This is a beta feature. The API is subject to change in a backwards incompatible<br> * way at any time.<br> <em>/<br>public interface RequestTransformer {<br>  /\</em>*<br>   * Transform a request before it is submitted to be processed.<br>   *<br>   * @return The original request or a new request to replace it. Must not be null.<br>   */<br>  Request transformRequest(Request request);</p>
+<p>  /** A {@link RequestTransformer} which returns the original request. <em>/<br>  /\</em>* 返回原始版本的Request */<br>  RequestTransformer IDENTITY = new RequestTransformer() {</p>
+<pre><code>@Override public Request transformRequest(Request request) {
+  return request;
+}
+</code></pre><p>  };<br>}</p>
+<p>可以看出，这其实并不是对结果的一个预处理，而是对请求的预处理，也就是，如果我们有需要，那么可以在同一的在Volley中，去对输入的请求进行统一的控制，比如本来要访问的域名都是a.happyhls.me，那么我就可以通过这个都给修改为b.happyhls.me，在一个系统中可能多个版本比如v1，v2同时运行的时候，会特别有用。</p>
+</li>
+<li><p>既然Picasso的类中没有相关的信息，那么我们继续向下观察：</p>
+<p>Picasso.with(context).load(“<a href="http://www.baidu.com/img/bdlogo.png&quot;" target="_blank" rel="noopener">http://www.baidu.com/img/bdlogo.png&quot;</a>)</p>
+<p>根据我们之前的学习，程序执行到这里，其实是构建了一个RequestCreator对象，因此，我们可以继续分析ReqeustCreator对象，有没有可以发现的地方。在其中我们看到</p>
+<p>/**<br> * Add a custom transformation to be applied to the image.<br> * </p><p><br> * Custom transformations will always be run after the built-in transformations.<br> */<br>// TODO show example of calling resize after a transform in the javadoc<br>public RequestCreator transform(Transformation transformation) {<br>  data.transform(transformation);<br>  return this;<br>}</p>
+<p>看到这里，注释很明了了，将需要设置的图片进行一次自定义的变换。作者还标记了一个//TODO，要写一个重新设置大小的例子。当然TODO嘛，肯定是没有。但既然找到地方了，那么我们就自己来写一个就可以了。观察这个方法，其实可以发现其实就是将数据在Transformation中走了一遍。</p>
+</li>
+<li><p>那么我们继续分析Transformation，看看其中的门道。</p>
+<p>package com.squareup.picasso;</p>
+<p>import android.graphics.Bitmap;</p>
+<p>/** Image transformation. <em>/<br>public interface Transformation {<br>  /\</em>*<br>   * Transform the source bitmap into a new bitmap. If you create a new bitmap instance, you must<br>   * call {@link android.graphics.Bitmap#recycle()} on {@code source}. You may return the original<br>   * if no transformation is required.<br>   */<br>  Bitmap transform(Bitmap source);</p>
+<p>  /**<br>   * Returns a unique key for the transformation, used for caching purposes. If the transformation<br>   * has parameters (e.g. size, scale factor, etc) then these should be part of the key.<br>   */<br>  String key();<br>}</p>
+<p>好了，这里是Transformation接口的全部代码，可以看到，Bitmap transform(Bitmap source)就是我们需要处理的地方，通过实现这个方法，可以将已经解码的图片source，根据自己的需要进行处理，并返回一个新的图片。需要注意的，处理完成，在返回之前，我们必须要通过方法{@link android.graphics.Bitmap#recycle()}将之前的资源回收掉。如果不需要的话，之前返回原始的图片就可以。</p>
+</li>
+</ul>
+<p>综上，我们已经根据代码路径，分析完成我们所需要做的事情，下面就是我写的例子，实现的效果也简单，就是解决上面的问题中提到的，如何在图片的中间加一条横线。上代码，<a href="https://github.com/happyhls/PicassoDemo" target="_blank" rel="noopener">Github</a>：</p>
+<p>public class PostProcessActivity extends Activity {</p>
+<p>  @Override<br>  protected void onCreate(Bundle savedInstanceState) {<br>    super.onCreate(savedInstanceState);<br>    setContentView(R.layout.activity_postprocess);<br>    ImageView imageview = (ImageView)findViewById(R.id.imageview);</p>
+<pre><code>Picasso picasso = Picasso.with(getApplicationContext());
+DrawLineTransformation myTransformation = new DrawLineTransformation();
+picasso.load(&quot;http://www.baidu.com/img/bdlogo.png&quot;).transform(myTransformation).into(imageview);
+</code></pre><p>  }</p>
+<p>  class DrawLineTransformation implements Transformation {</p>
+<pre><code>@Override
+public String key() {
+  // TODO Auto-generated method stub
+  return &quot;drawline&quot;;
+}
+
+@Override
+public Bitmap transform(Bitmap bitmap) {
+  // TODO Auto-generated method stub
+  synchronized (DrawLineTransformation.class) {
+    if(bitmap == null) {
+      return null;
+    }
+    Bitmap resultBitmap = bitmap.copy(bitmap.getConfig(), true);
+    Canvas canvas = new Canvas(resultBitmap);
+    Paint paint = new Paint();
+    paint.setColor(Color.BLUE);
+    paint.setStrokeWidth(10);
+    canvas.drawLine(0, resultBitmap.getHeight()/2, resultBitmap.getWidth(), resultBitmap.getHeight()/2, paint);
+    bitmap.recycle();
+    return resultBitmap;
+  }
+}
+</code></pre><p>  }<br>}</p>
+<p>明白思路之后，代码就很简单了，我注意了几个小细节，如果不相近，请朋友们补充：</p>
+<ul>
+<li>同解码一样，在处理的时候，添加同步，同一时刻仅仅处理一张图片</li>
+<li>像作者注释中写的一样，在新的图片生成之后，要调用bitmap.recycle()方法释放之前的旧图片所占用的空间。</li>
+</ul>
+<p>好了，看一下效果： <a href="/images/wordpress/2014/11/device-2014-11-23-231406.png"><img src="/images/wordpress/2014/11/device-2014-11-23-231406-576x1024.png" alt="device-2014-11-23-231406"></a>   后面我们会和Volley一样，继续分析Picasso的源代码。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"># Android</a>
+          
+            <a href="/tags/Picasso/" rel="tag"># Picasso</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2014/11/23/android-develop-notes/" rel="next" title="Android开发笔记">
+                <i class="fa fa-chevron-left"></i> Android开发笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2014/11/25/picasso-source-code-1-what-happened-after-a-task-submitted/" rel="prev" title="Picasso源代码分析：1、跟随代码的角度，当我们添加了一个任务，到底发生了什么？">
+                Picasso源代码分析：1、跟随代码的角度，当我们添加了一个任务，到底发生了什么？ <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

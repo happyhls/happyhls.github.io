@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.4.2" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.4.2">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.4.2">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.4.2" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '6.4.2',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在上一篇的文章中说了说怎么在局域网上网中设置DNS的方法，可以让我们自己去寻找最快速的DNS服务器，可以避免电信、联通的满页面的广告。可这个方法一般适用于共享上网，或者是在学校、写字楼，或者是在家中使用路由器上网的方法，可很多朋友还是PPPOE拨号上网的方法来上网，这该怎么弄呢？上篇文章的方法已经不起作用，下面介绍我们如何设置来使用PPPOE拨号时也能够自己设置DNS. ADSL上网一般有两种设备">
+<meta name="keywords" content="Linux编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PPPoe ADSL更改DNS的方法">
+<meta property="og:url" content="http://yoursite.com/2010/03/04/windows-dns-pppoe-adsl/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="在上一篇的文章中说了说怎么在局域网上网中设置DNS的方法，可以让我们自己去寻找最快速的DNS服务器，可以避免电信、联通的满页面的广告。可这个方法一般适用于共享上网，或者是在学校、写字楼，或者是在家中使用路由器上网的方法，可很多朋友还是PPPOE拨号上网的方法来上网，这该怎么弄呢？上篇文章的方法已经不起作用，下面介绍我们如何设置来使用PPPOE拨号时也能够自己设置DNS. ADSL上网一般有两种设备">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-1-268x300.png">
+<meta property="og:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-2-289x300.png">
+<meta property="og:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-3.png">
+<meta property="og:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot1-300x241.png">
+<meta property="og:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot-11-216x300.png">
+<meta property="og:updated_time" content="2018-10-03T15:18:04.868Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PPPoe ADSL更改DNS的方法">
+<meta name="twitter:description" content="在上一篇的文章中说了说怎么在局域网上网中设置DNS的方法，可以让我们自己去寻找最快速的DNS服务器，可以避免电信、联通的满页面的广告。可这个方法一般适用于共享上网，或者是在学校、写字楼，或者是在家中使用路由器上网的方法，可很多朋友还是PPPOE拨号上网的方法来上网，这该怎么弄呢？上篇文章的方法已经不起作用，下面介绍我们如何设置来使用PPPOE拨号时也能够自己设置DNS. ADSL上网一般有两种设备">
+<meta name="twitter:image" content="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-1-268x300.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2010/03/04/windows-dns-pppoe-adsl/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PPPoe ADSL更改DNS的方法 | Hexo</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Hexo</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />Home</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />About</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />Archives</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2010/03/04/windows-dns-pppoe-adsl/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PPPoe ADSL更改DNS的方法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2010-03-04 12:30:51" itemprop="dateCreated datePublished" datetime="2010-03-04T12:30:51+08:00">2010-03-04</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 23:18:04" itemprop="dateModified" datetime="2018-10-03T23:18:04+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+                  , 
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/Linux编程/" itemprop="url" rel="index"><span itemprop="name">Linux编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在上一篇的文章中说了说怎么在局域网上网中设置DNS的方法，可以让我们自己去寻找最快速的DNS服务器，可以避免电信、联通的满页面的广告。可这个方法一般适用于共享上网，或者是在学校、写字楼，或者是在家中使用路由器上网的方法，可很多朋友还是PPPOE拨号上网的方法来上网，这该怎么弄呢？上篇文章的方法已经不起作用，下面介绍我们如何设置来使用PPPOE拨号时也能够自己设置DNS. ADSL上网一般有两种设备，一种是以太网接口的设备，是我们今天所要说的，另一种则是USB接口的设备，我这里没有设备，没法测试，感兴趣的朋友可以测试一下。 其实和上篇中的方法基本一致，都是更改IPV4协议中的DNS设置，无图无真相，上图给大家详细介绍。 这个是windows系统，以win7为例： 我们打开“网络连接”窗口， 在 拨号连接 处点击右键，选择属性，切换到 网络 选项，出现如下窗口 <a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-1.png" target="_blank" rel="noopener"><img src="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-1-268x300.png" alt="" title="dns-1"></a> 选中IPV4,点击 属性，进入下一步： <a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-2.png" target="_blank" rel="noopener"><img src="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-2-289x300.png" alt="" title="dns-2"></a> 选中“使用下面的DNS服务器地址”，然后在下面输入DNS服务器的地址，比如8.8.8.8，就是谷歌的DNS服务器，单击确定即可。 好了，设置我们已经完成了，那到底有没有用呢？我们来看一看，在命令提示符中使用ipconfig命令得到如下窗口 <a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-3.png" target="_blank" rel="noopener"><img src="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-3.png" alt="" title="dns-3"></a> 好了，发现了吧，得到的结果看到DNS的服务器已经更改成我们所设置的了~ 同样，在Ubuntu下设置也不麻烦。当然也是真的以太网的ADSL MODEM，USB的暂时没有找到方法。打开连接属性，选则DSL，新建连接。 <a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot1.png" target="_blank" rel="noopener"><img src="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot1-300x241.png" alt="" title="Screenshot"></a> 然后选中自动PPPoe，仅地址，在DNS中输入8.8.8.8，确定即可。 <a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot-11.png" target="_blank" rel="noopener"><img src="http://www.happyhls.org/blog/wp-content/uploads/2010/03/Screenshot-11-216x300.png" alt="" title="Screenshot-1"></a> 好了，经过我们的一番设置，PPPoe拨号的朋友也可以使用自己喜欢的DNS了~ :shock:<a href="http://www.happyhls.org/blog/wp-content/uploads/2010/03/dns-3.png" target="_blank" rel="noopener"></a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux编程/" rel="tag"># Linux编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2010/03/03/linux-change-dns-server/" rel="next" title="更改DNS服务器，访问更快，广告更少~">
+                <i class="fa fa-chevron-left"></i> 更改DNS服务器，访问更快，广告更少~
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2010/03/07/windows-h3c-802-1x/" rel="prev" title="Windows 7下使用H3C inode软件802.1x认证上网方法">
+                Windows 7下使用H3C inode软件802.1x认证上网方法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">John Doe</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">31</span>
+                    <span class="site-state-item-name">categories</span>
+                  
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">39</span>
+                    <span class="site-state-item-name">tags</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a class="theme-link" target="_blank" href="https://theme-next.org">NexT.Mist</a> v6.4.2</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.4.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.4.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.4.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.4.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.4.2"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
