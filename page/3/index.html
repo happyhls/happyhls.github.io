@@ -289,6 +289,183 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://happyhls.me/2014/11/23/android-volley-5-summary/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="happyhls">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="happyhls">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2014/11/23/android-volley-5-summary/" itemprop="url">
+                  Volley源代码学习总结
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-23 00:20:29" itemprop="dateCreated datePublished" datetime="2014-11-23T00:20:29+08:00">2014-11-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Volley/" itemprop="url" rel="index"><span itemprop="name">Volley</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          Volley整体框架设计   其实Volley的整体框架就是如上所示，在主线程当中，会维护一个ReqeustQueue，我们要添加的任务，都会添加到这个Reqeust队列当中；任务添加进来之后，运行于cache线程的CacheDispatcher就会取走Reqeust，然后要不从cache中获取结果，要不然发送给NetworkDispatcher；再然后就是NetworkDispatcher从其对应的队列取Request，执行操作。 我们以ImageLoader的典型用法，来分析一下其具体的工作流程：
+final ImageView imageView = (ImageView)findViewById(R.id.imageview);RequestQueue queue = Volley.newRequestQueue(getApplicationContext());ImageLoader imageLoader = new ImageLoader(queue, new LruBitmapCache(getApplicationContext()));imageLoader.get
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2014/11/23/android-volley-5-summary/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://happyhls.me/2014/11/22/picasso-how-to-use/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1914,193 +2091,6 @@ Delete the folder cache which is located inside .android
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://happyhls.me/2014/11/15/gson-user-guide/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="happyhls">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="happyhls">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2014/11/15/gson-user-guide/" itemprop="url">
-                  Gson User Guide (译)
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2014-11-15 13:34:32" itemprop="dateCreated datePublished" datetime="2014-11-15T13:34:32+08:00">2014-11-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-10-03 23:08:44" itemprop="dateModified" datetime="2018-10-03T23:08:44+08:00">2018-10-03</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          原文：https://sites.google.com/site/gson/gson-user-guide
-OverviewGson是一个Java库，用来将Java Objects转换为JSON的表示方法，也可以用来将一个JSON字符串转换为相等的JAVA object。GSON是一个开源代码，其代码主页为http://code.google.com/p/google-gson. 即使已经存在的对象，我们没有源代码的情况下，Gson依然可以工作。
-Goals for Gson
-提供一种比较易用的，像toString()或者构造函数那样的机制来转换Java和JSON。
-允许已经存在的不能修改的对象也可以和JSON之间相互转换。
-允许自定义对象的表示方法。
-允许任意复杂的对象。
-生成紧凑简洁而又可读性好的JSON输出。
-
-Gson Performance and Scalability  这里有一些桌面环境(dual opteron, 8GB RAM, 64-bit Ubuntu)获得的指标。我们可以使用类PerformanceTest来重新测试。
-
-Strings: Deserializ
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2014/11/15/gson-user-guide/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2148,7 +2138,7 @@ Strings: Deserializ
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-count">85</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>

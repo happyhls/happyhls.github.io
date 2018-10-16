@@ -289,6 +289,187 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://happyhls.me/2013/07/10/java-jni-method/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="happyhls">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="happyhls">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2013/07/10/java-jni-method/" itemprop="url">
+                  Java 本地方法 1、初步认识
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2013-07-10 16:20:12" itemprop="dateCreated datePublished" datetime="2013-07-10T16:20:12+08:00">2013-07-10</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-03 22:43:33" itemprop="dateModified" datetime="2018-10-03T22:43:33+08:00">2018-10-03</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Java编程/" itemprop="url" rel="index"><span itemprop="name">Java编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          本地方法，就是在Java虚拟机中调用二进制文件，Android的JNI调用用的也是Java的这一套，因此有必要好好来学习一下。 主要参考 《Java核心技术：卷 II 高级特性》
+一、从Java中调用C函数1、Java层代码：在Android编程中，这也是本地方法最为常用的一块内容，在Java中，使用native关键字表示本地方法，提示该方法是在外部定义。本地方法不包括代码，直接用分号结束。如：在Fruit.java，代码如下：
+package NativeMethod;
+public class Fruit {    public static native void hello();}
+此处的本地方法，我们使用的是静态的，其实本地方法既可以是静态的，也可以是非静态的。区别？ 该类可以编译，但现在还无法被调用，否则会提示找到函数的错误。
+2、C本地代码：为了使得我们的程序能够被Java中被调用，我们必须按照Java本地方法的原则来书写函数，规则为： 我们的工程的目录为 包名(NativeMethod)，该包下面有Fruit.java和TestNativeMethod.java两个文件
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2013/07/10/java-jni-method/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://happyhls.me/2013/07/08/java-serialize/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1922,191 +2103,6 @@ def has\_view\_permission(self, request, obj=None):
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://happyhls.me/2013/06/09/linux-process-management/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="happyhls">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="happyhls">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2013/06/09/linux-process-management/" itemprop="url">
-                  一、进程管理
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2013-06-09 16:12:20" itemprop="dateCreated datePublished" datetime="2013-06-09T16:12:20+08:00">2013-06-09</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-10-03 22:43:05" itemprop="dateModified" datetime="2018-10-03T22:43:05+08:00">2018-10-03</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux内核设计与实现/" itemprop="url" rel="index"><span itemprop="name">Linux内核设计与实现</span></a></span>
-
-                
-                
-                  , 
-                
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Linux内核设计与实现/读书笔记/" itemprop="url" rel="index"><span itemprop="name">读书笔记</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          一：进程和线程的概念：进程：是执行期间的程序，不仅仅局限于一段可执行的代码(text section)，还要包含其他的资源,eg.文件、挂起的信号量，数据，处理器状态等等。还有一个或者多个具有内存映射的内存地址空间或者一个或者多个执行线程(thread of execution)。全局变量的数据端。。。等等。进程也称做task 线程(thread)：进程中活动的对象，每个线程都有一个独立的程序计数器、进程栈、进程寄存器。线程是内核调度的对象。在Linux中，并不严格的区分线程和进程，一般而言，把线程看作一种特殊的进程。
-二、进程描述符&amp;&amp;任务结构内核将进程列表放入任务队列中(task list)，为一个双向循环列表，每一项都是进程描述符(process descriptor)结构，类型为task_struct，该结构的定义位于 &lt;linux/sched.h&gt;，包含进程运行时的所有信息，占据内存1.7KB
-1、分配进程描述符(1)、内容Linux通过slab分配器分配task_struct结构，slab在于实现快速进程创建，关于slab的详细介绍，有篇文章，记
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2013/06/09/linux-process-management/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2154,7 +2150,7 @@ def has\_view\_permission(self, request, obj=None):
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-count">85</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>

@@ -289,6 +289,182 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://happyhls.me/2014/11/29/android-differences-between-activity-start-mode-and-task-affinity/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="happyhls">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="happyhls">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2014/11/29/android-differences-between-activity-start-mode-and-task-affinity/" itemprop="url">
+                  Android中Activity四种启动模式和taskAffinity属性详解 （转载）
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-11-29 15:34:39" itemprop="dateCreated datePublished" datetime="2014-11-29T15:34:39+08:00">2014-11-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+          转自http://blog.csdn.net/zhangjg_blog/article/details/10923643 感谢原作者。 在android应用开发中，打造良好的用户体验是非常重要的。而在用户体验中，界面的引导和跳转是值得深入研究的重要内容。在开发中，与界面跳转联系比较紧密的概念是Task（任务）和Back Stack（回退栈）。activity的启动模式会影响Task和Back Stack的状态，进而影响用户体验。除了启动模式之外，Intent类中定义的一些标志（以FLAG_ACTIVITY_开头）也会影响Task和Back Stack的状态。在这篇文章中主要对四种启动模式进行分析和验证，其中涉及到activity的一个重要属性taskAffinity和Intent中的标志之一FLAG_ACTIVITY_NEW_TASK。关于Intent中其他标志位的具体用法会在另一篇文章中介绍。 Task是一个存在于Framework层的概念，容易与它混淆的有Application（应用）和Process（进程）。在开始介绍Activity的启动模式的使用之前，首先对这些概念做一个简单
+          ...
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2014/11/29/android-differences-between-activity-start-mode-and-task-affinity/#more" rel="contents">
+              Read more &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://happyhls.me/2014/11/27/android-volley-picasso-comparation/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1935,183 +2111,6 @@ Picasso.with(context).load(“http://www.baidu.com/img/bdlogo.png&quot;).into(im
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://happyhls.me/2014/11/23/android-volley-5-summary/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="happyhls">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="happyhls">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2014/11/23/android-volley-5-summary/" itemprop="url">
-                  Volley源代码学习总结
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">Posted on</span>
-              
-
-              
-                
-              
-
-              <time title="Created: 2014-11-23 00:20:29" itemprop="dateCreated datePublished" datetime="2014-11-23T00:20:29+08:00">2014-11-23</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">Edited on</span>
-                
-                <time title="Modified: 2018-10-04 00:12:52" itemprop="dateModified" datetime="2018-10-04T00:12:52+08:00">2018-10-04</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">In</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Volley/" itemprop="url" rel="index"><span itemprop="name">Volley</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-          Volley整体框架设计   其实Volley的整体框架就是如上所示，在主线程当中，会维护一个ReqeustQueue，我们要添加的任务，都会添加到这个Reqeust队列当中；任务添加进来之后，运行于cache线程的CacheDispatcher就会取走Reqeust，然后要不从cache中获取结果，要不然发送给NetworkDispatcher；再然后就是NetworkDispatcher从其对应的队列取Request，执行操作。 我们以ImageLoader的典型用法，来分析一下其具体的工作流程：
-final ImageView imageView = (ImageView)findViewById(R.id.imageview);RequestQueue queue = Volley.newRequestQueue(getApplicationContext());ImageLoader imageLoader = new ImageLoader(queue, new LruBitmapCache(getApplicationContext()));imageLoader.get
-          ...
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2014/11/23/android-volley-5-summary/#more" rel="contents">
-              Read more &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2159,7 +2158,7 @@ final ImageView imageView = (ImageView)findViewById(R.id.imageview);RequestQueue
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">84</span>
+                    <span class="site-state-item-count">85</span>
                     <span class="site-state-item-name">posts</span>
                   </a>
                 </div>
